@@ -2,14 +2,14 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Metric-matched fallback keeps the layout stable while Inter loads. */
+/* Metric-matched fallback keeps the layout stable while Instrument Sans loads. */
 @font-face {
-  font-family: 'Inter Fallback';
+  font-family: 'Instrument Sans Fallback';
   src: local('Arial');
-  ascent-override: 89.79%;
-  descent-override: 22.36%;
+  ascent-override: 98.63%;
+  descent-override: 25.42%;
   line-gap-override: 0%;
-  size-adjust: 107.89%;
+  size-adjust: 98.35%;
 }
 
 /* Both faces are monospaced at the same advance width, avoiding horizontal reflow. */
@@ -32,7 +32,7 @@
 
 :root {
   --font-mono: 'IBM Plex Mono', 'IBM Plex Mono Fallback', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --font-body: 'Inter', 'Inter Fallback', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+  --font-body: 'Instrument Sans', 'Instrument Sans Fallback', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
     'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   --font-heading: 'Bricolage Grotesque', 'Bricolage Fallback', ui-sans-serif, system-ui, sans-serif;
   --font-body-size: 17px;

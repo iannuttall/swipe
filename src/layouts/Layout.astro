@@ -2,9 +2,9 @@
 import { siteDescription, siteName, siteUrl } from "@/lib/site";
 import "@/styles/app.css";
 import bricolage600Url from "@fontsource/bricolage-grotesque/files/bricolage-grotesque-latin-600-normal.woff2?url";
-import inter400Url from "@fontsource/inter/files/inter-latin-400-normal.woff2?url";
-import inter500Url from "@fontsource/inter/files/inter-latin-500-normal.woff2?url";
-import inter600Url from "@fontsource/inter/files/inter-latin-600-normal.woff2?url";
+import instrumentSans400Url from "@fontsource/instrument-sans/files/instrument-sans-latin-400-normal.woff2?url";
+import instrumentSans500Url from "@fontsource/instrument-sans/files/instrument-sans-latin-500-normal.woff2?url";
+import instrumentSans600Url from "@fontsource/instrument-sans/files/instrument-sans-latin-600-normal.woff2?url";
 import ibmPlexMono400Url from "@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2?url";
 import ibmPlexMono600ItalicUrl from "@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-600-italic.woff2?url";
 
@@ -32,22 +32,22 @@ const structuredDataList = (Array.isArray(structuredData) ? structuredData : str
 const gradientTheme: "original" | "pink" = "original";
 const fontFaceCss = `
   @font-face {
-    font-family: "Inter";
-    src: url("${inter400Url}") format("woff2");
+    font-family: "Instrument Sans";
+    src: url("${instrumentSans400Url}") format("woff2");
     font-display: swap;
     font-style: normal;
     font-weight: 400;
   }
   @font-face {
-    font-family: "Inter";
-    src: url("${inter500Url}") format("woff2");
+    font-family: "Instrument Sans";
+    src: url("${instrumentSans500Url}") format("woff2");
     font-display: swap;
     font-style: normal;
     font-weight: 500;
   }
   @font-face {
-    font-family: "Inter";
-    src: url("${inter600Url}") format("woff2");
+    font-family: "Instrument Sans";
+    src: url("${instrumentSans600Url}") format("woff2");
     font-display: swap;
     font-style: normal;
     font-weight: 600;
@@ -84,9 +84,9 @@ const fontFaceCss = `
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
     {[
-      inter400Url,
-      inter500Url,
-      inter600Url,
+      instrumentSans400Url,
+      instrumentSans500Url,
+      instrumentSans600Url,
       bricolage600Url,
       ibmPlexMono400Url,
       ibmPlexMono600ItalicUrl,

@@ -1,0 +1,22 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "swipe",
+  "compatibility_date": "2026-06-30",
+  "compatibility_flags": ["global_fetch_strictly_public"],
+  "main": "./src/worker.ts",
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [
+    { "pattern": "swipe.md", "custom_domain": true }
+    // Use a Cloudflare Redirect Rule for www.swipe.md -> swipe.md.
+    // Keeping www out of the Worker route avoids Worker invocations for static pages.
+  ],
+  "assets": {
+    "directory": "./dist/client",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page"
+  },
+  "observability": {
+    "enabled": true
+  }
+}

@@ -1,0 +1,58 @@
+---
+import { siteDescription, siteName, siteUrl } from "@/lib/site";
+import "@/styles/app.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonicalPath?: string;
+  noIndex?: boolean;
+  ogType?: "website" | "article";
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const {
+  title = siteName,
+  description = siteDescription,
+  canonicalPath = Astro.url.pathname,
+  noIndex = false,
+  ogType = "website",
+  structuredData,
+} = Astro.props;
+
+const fullTitle = title === siteName || title.startsWith(`${siteName} `) ? title : `${title} | ${siteName}`;
+const canonicalUrl = new URL(canonicalPath, Astro.site ?? siteUrl).toString();
+const structuredDataList = (Array.isArray(structuredData) ? structuredData : structuredData ? [structuredData] : []).filter(Boolean);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <link
+      rel="preload"
+      href="/fonts/InterVF.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    {noIndex ? <meta name="robots" content="noindex,nofollow" /> : <meta name="robots" content="index,follow" />}
+    <title>{fullTitle}</title>
+    {structuredDataList.map((entry) => <script type="application/ld+json" set:html={JSON.stringify(entry)} />)}
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

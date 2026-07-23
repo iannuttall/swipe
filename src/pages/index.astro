@@ -1,0 +1,10 @@
+---
+export const prerender = true
+
+import { HomePage } from '@/components/HomePage'
+import Layout from '@/layouts/Layout.astro'
+---
+
+<Layout title="SWIPE.md - practical ai for code, marketing, and life" canonicalPath="/">
+  <HomePage client:load />
+</Layout>

@@ -66,6 +66,20 @@ function useThemeColors() {
   return colors
 }
 
+function useReducedMotion() {
+  const [reduced, setReduced] = React.useState(false)
+
+  React.useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const update = () => setReduced(media.matches)
+    update()
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [])
+
+  return reduced
+}
+
 export function DitherCard({
   children,
   className,
@@ -76,6 +90,7 @@ export function DitherCard({
   invertDither = false,
 }: DitherCardProps) {
   const theme = useThemeColors()
+  const reducedMotion = useReducedMotion()
   const instanceId = React.useId()
   const motionSeed = React.useMemo(() => hashString(instanceId), [instanceId])
   const speedVariance = (motionSeed % 17) / 100
@@ -106,7 +121,7 @@ export function DitherCard({
     shape: resolvedShape as 'simplex',
     type: '4x4' as const,
     size: 3,
-    speed: motionSpeed,
+    speed: reducedMotion ? 0 : motionSpeed,
     offsetX,
     offsetY,
     rotation,
@@ -131,7 +146,7 @@ export function DitherCard({
       >
         <Dithering {...bgDitherProps} className="absolute inset-0" style={ditherTransition} />
         <div className={`absolute inset-0 ${theme?.isDark ? 'bg-white/20' : 'bg-gradient-to-b from-transparent to-black/35'}`} />
-        <div className="relative z-10 px-6 py-6">{children}</div>
+        <div className="relative z-10 px-7 py-7 sm:px-8 sm:py-8">{children}</div>
       </div>
     )
   }
@@ -140,7 +155,7 @@ export function DitherCard({
     return (
       <div className={`flex ${className ?? ''}`}>
         <Dithering {...ditherProps} style={{ width: stripSize, ...ditherTransition }} className="shrink-0" />
-        <div className="flex-1 border-l-[2px] border-dither bg-card px-6 py-6">
+        <div className="flex-1 border-l-[2px] border-dither bg-card px-7 py-7 sm:px-8 sm:py-8">
           {children}
         </div>
       </div>
@@ -152,7 +167,7 @@ export function DitherCard({
     <div className={`flex flex-col ${className ?? ''}`}>
       <Dithering {...ditherProps} style={{ height: stripSize, ...ditherTransition }} className="w-full" />
       <div
-        className="flex-1 px-6 py-6"
+        className="flex-1 px-7 py-7 sm:px-8 sm:py-8"
         style={{
           backgroundColor: 'var(--card-inv-bg)',
           color: 'var(--card-inv-fg)',

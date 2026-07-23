@@ -2,12 +2,19 @@ import rawYaml from '../../content/home-cards.yaml?raw'
 import yaml from 'js-yaml'
 
 export type CardDef =
-  | { id: string; type: 'terminal'; title: string; text: string }
   | { id: string; type: 'chat'; messages: { role: 'user' | 'ai'; text: string }[] }
-  | { id: string; type: 'file'; filename: string; text: string }
   | { id: string; type: 'message'; sender: string; time?: string; text: string }
-  | { id: string; type: 'cli'; terminal?: string; tool: string; command: string; diff: string }
-  | { id: string; type: 'plan'; question: string; options: { label: string; desc: string }[]; selected?: number }
+  | {
+      id: string
+      type: 'workflow'
+      title: string
+      input: string
+      steps: string[]
+      output: string
+    }
+  | { id: string; type: 'swipe'; title: string; text: string; tryThis: string }
+  | { id: string; type: 'before-after'; title: string; before: string; after: string }
+  | { id: string; type: 'result'; app: string; title: string; detail: string; status: string }
 
 const parsed = yaml.load(rawYaml) as Record<string, unknown>[]
 
@@ -15,8 +22,6 @@ const parsed = yaml.load(rawYaml) as Record<string, unknown>[]
 function trimText(card: Record<string, unknown>): CardDef {
   const c = { ...card }
   if (typeof c.text === 'string') c.text = c.text.trimEnd()
-  if (typeof c.diff === 'string') c.diff = c.diff.trimEnd()
-  if (typeof c.command === 'string') c.command = c.command.trimEnd()
   if (Array.isArray(c.messages)) {
     c.messages = (c.messages as { role: string; text: string }[]).map((m) => ({
       ...m,
@@ -28,15 +33,13 @@ function trimText(card: Record<string, unknown>): CardDef {
 
 /** Max cards shown per group. Groups without a limit are uncapped. */
 const GROUP_LIMITS: Record<string, number> = {
-  plan: 2,
-  skill: 2,
-  chat: 5,
-  'plan-file': 2,
-  'claude-cli': 1,
-  'codex-cli': 1,
-  'claude-md': 1,
-  'agents-md': 1,
-  message: 4,
+  build: 4,
+  create: 4,
+  marketing: 4,
+  product: 4,
+  business: 4,
+  research: 4,
+  everyday: 4,
 }
 
 function hashString(input: string) {

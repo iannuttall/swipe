@@ -1,62 +1,39 @@
 import { useEffect, useMemo, useState } from 'react'
 import { DitherCard } from '@/components/DitherCard'
 import { NewsletterForm } from '@/components/NewsletterForm'
-import { InlineCode } from '@/components/ui/inline-code'
 import { Rainbow } from '@/components/ui/rainbow'
-import { Text } from '@/components/ui/text'
 import { getCardsForSeed, type CardDef } from '@/data/home-cards'
 
 function Lines({ text }: { text: string }) {
   const lines = text.split('\n')
   return (
     <>
-      {lines.map((line, i) => (
-        <span key={i}>
+      {lines.map((line, index) => (
+        <span key={index}>
           {line}
-          {i < lines.length - 1 && <br />}
+          {index < lines.length - 1 && <br />}
         </span>
       ))}
     </>
   )
 }
 
-function TerminalCard({ title, text }: { title: string; text: string }) {
-  return (
-    <div className="flex flex-col overflow-hidden rounded border border-foreground/[0.07] bg-foreground/[0.03]">
-      <div className="flex items-center gap-1.5 border-b border-foreground/[0.06] px-3 py-1.5">
-        <span className="h-2 w-2 rounded-full bg-foreground/10" />
-        <span className="h-2 w-2 rounded-full bg-foreground/10" />
-        <span className="h-2 w-2 rounded-full bg-foreground/10" />
-        <span className="ml-2 font-mono text-[9px] uppercase tracking-widest text-foreground/25">{title}</span>
-      </div>
-      <div className="px-3 py-2.5 font-mono text-[11px] leading-relaxed text-foreground/30">
-        <Lines text={text} />
-      </div>
-    </div>
-  )
-}
-
 function ChatCard({ messages }: { messages: { role: 'user' | 'ai'; text: string }[] }) {
   return (
-    <div className="flex flex-col gap-2">
-      {messages.map((message, i) => {
+    <div className="flex flex-col gap-2.5">
+      {messages.map((message, index) => {
         const isUser = message.role === 'user'
-        const lines = message.text.split('\n').filter((line) => line.length > 0)
 
         return (
-          <div key={i} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
+          <div key={index} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
             <div
-              className={`max-w-[85%] rounded-lg px-3 py-2 font-mono text-[11px] leading-relaxed ${
+              className={`max-w-[88%] rounded-xl px-3.5 py-2.5 text-xs leading-[1.55] ${
                 isUser
-                  ? 'bg-foreground/[0.07] text-foreground/35'
-                  : 'border border-foreground/[0.07] text-foreground/25'
+                  ? 'bg-foreground/[0.075] text-foreground/45'
+                  : 'border border-foreground/[0.09] bg-background/35 text-foreground/36'
               }`}
             >
-              {lines.map((line, j) => (
-                <p key={j} className={j > 0 ? 'mt-1.5' : ''}>
-                  {line}
-                </p>
-              ))}
+              <Lines text={message.text} />
             </div>
           </div>
         )
@@ -65,122 +42,137 @@ function ChatCard({ messages }: { messages: { role: 'user' | 'ai'; text: string 
   )
 }
 
-function FileCard({ filename, text }: { filename: string; text: string }) {
+function MessageCard({
+  sender,
+  time,
+  text,
+}: {
+  sender: string
+  time: string
+  text: string
+}) {
   return (
-    <div className="overflow-hidden rounded border border-foreground/[0.07]">
-      <div className="flex items-stretch border-b border-foreground/[0.06] bg-foreground/[0.03]">
-        <div className="border-r border-foreground/[0.06] px-3 py-1 font-mono text-[10px] text-foreground/30">
-          {filename}
-        </div>
+    <div className="overflow-hidden rounded-xl border border-foreground/[0.09] bg-background/35 px-3.5 py-3">
+      <div className="mb-2 flex items-baseline justify-between gap-3">
+        <span className="text-xs font-semibold text-foreground/45">{sender}</span>
+        <span className="font-mono text-[10px] text-foreground/22">{time}</span>
       </div>
-      <div className="px-3 py-2.5 font-mono text-[11px] leading-relaxed text-foreground/30">
+      <div className="text-xs leading-[1.55] text-foreground/34">
         <Lines text={text} />
       </div>
     </div>
   )
 }
 
-function MessageCard({ sender, time, text }: { sender: string; time: string; text: string }) {
-  return (
-    <div className="flex flex-col overflow-hidden rounded border border-foreground/[0.07] px-3 py-2.5">
-      <div className="mb-1 flex items-baseline justify-between">
-        <span className="font-mono text-[10px] font-medium text-foreground/30">{sender}</span>
-        <span className="font-mono text-[9px] text-foreground/15">{time}</span>
-      </div>
-      <div className="font-mono text-[11px] leading-relaxed text-foreground/25">
-        <Lines text={text} />
-      </div>
-    </div>
-  )
-}
-
-function PlanCard({
-  question,
-  options,
-  selected = 0,
+function WorkflowCard({
+  title,
+  input,
+  steps,
+  output,
 }: {
-  question: string
-  options: { label: string; desc: string }[]
-  selected?: number
+  title: string
+  input: string
+  steps: string[]
+  output: string
 }) {
   return (
-    <div className="overflow-hidden rounded border border-foreground/[0.07] px-3 py-2.5">
-      <div className="mb-2 font-mono text-[9px] uppercase tracking-widest text-foreground/15">plan mode</div>
-      <div className="mb-2 font-mono text-[11px] font-medium leading-relaxed text-foreground/35">
-        {question}
+    <div className="overflow-hidden rounded-xl border border-foreground/[0.09] bg-background/40">
+      <div className="border-b border-foreground/[0.07] px-3.5 py-2.5 text-[13px] font-semibold text-foreground/46">
+        {title}
       </div>
-      <div className="flex flex-col gap-1">
-        {options.map((option, i) => {
-          const isSelected = i === selected
-          return (
-            <div key={i} className="font-mono text-[10px] leading-relaxed">
-              <div className={isSelected ? 'text-foreground/40' : 'text-foreground/25'}>
-                <span className="inline-block w-4 text-foreground/15">{isSelected ? '›' : '\u00A0'}</span>
-                {i + 1}. {option.label}
-              </div>
-              <div className="ml-4 pl-2 text-[9px] text-foreground/15">{option.desc}</div>
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-const TERMINALS = ['ghostty', 'terminal', 'iterm2', 'warp']
-
-function CliCard({
-  terminal,
-  tool,
-  command,
-  diff,
-}: {
-  terminal?: string
-  tool: string
-  command: string
-  diff: string
-}) {
-  const termName = terminal || TERMINALS[Math.abs(hashStr(tool + command)) % TERMINALS.length]
-  const diffLines = diff.split('\n')
-  const fileHeader = diffLines[0]
-  const codeLines = diffLines.slice(1)
-
-  return (
-    <div className="flex flex-col overflow-hidden rounded border border-foreground/[0.07] bg-foreground/[0.03]">
-      <div className="flex items-center gap-1.5 border-b border-foreground/[0.06] px-3 py-1.5">
-        <span className="h-2 w-2 rounded-full bg-foreground/10" />
-        <span className="h-2 w-2 rounded-full bg-foreground/10" />
-        <span className="h-2 w-2 rounded-full bg-foreground/10" />
-        <span className="ml-2 font-mono text-[9px] uppercase tracking-widest text-foreground/25">{termName}</span>
-      </div>
-
-      <div className="px-3 py-2.5">
-        <div className="mb-2 font-mono text-[11px] text-foreground/30">$ {tool}</div>
-        <div className="mb-2 border-b border-foreground/[0.06] pb-2 font-mono text-[11px] leading-relaxed text-foreground/35">
-          &gt; <Lines text={command} />
+      <div className="px-3.5 py-3">
+        <div className="mb-2.5 rounded-lg bg-foreground/[0.045] px-2.5 py-2 text-xs leading-snug text-foreground/34">
+          {input}
         </div>
-        <div className="mb-1 font-mono text-[9px] text-foreground/20">{fileHeader}</div>
-        <div className="font-mono text-[10px] leading-relaxed">
-          {codeLines.map((line, i) => {
-            const isAdd = line.startsWith('+')
-            const isRemove = line.startsWith('-')
+        <ol className="space-y-2">
+          {steps.map((step, index) => (
+            <li key={step} className="flex gap-2.5 text-xs leading-snug text-foreground/32">
+              <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-foreground/12 font-mono text-[9px] text-foreground/30">
+                {index + 1}
+              </span>
+              <span>{step}</span>
+            </li>
+          ))}
+        </ol>
+        <div className="mt-2.5 border-t border-foreground/[0.07] pt-2.5 text-xs font-medium leading-snug text-foreground/42">
+          → {output}
+        </div>
+      </div>
+    </div>
+  )
+}
 
-            return (
-              <div
-                key={i}
-                className={
-                  isRemove
-                    ? 'bg-red-500/8 text-red-500/50'
-                    : isAdd
-                      ? 'bg-green-500/8 text-green-500/50'
-                      : 'text-foreground/20'
-                }
-                style={{ paddingLeft: 4, paddingRight: 4, marginLeft: -4, marginRight: -4 }}
-              >
-                {line || '\u00A0'}
-              </div>
-            )
-          })}
+function SwipeCard({
+  title,
+  text,
+  tryThis,
+}: {
+  title: string
+  text: string
+  tryThis: string
+}) {
+  return (
+    <div className="rounded-xl border border-foreground/[0.09] bg-foreground/[0.025] px-4 py-3.5">
+      <div className="mb-2 flex items-center gap-2">
+        <span className="flex h-5 w-5 items-center justify-center rounded-md border border-foreground/10 text-sm text-foreground/32">
+          +
+        </span>
+        <span className="text-[13px] font-semibold text-foreground/46">{title}</span>
+      </div>
+      <p className="text-xs leading-[1.55] text-foreground/34">{text}</p>
+      <p className="mt-2.5 font-mono text-[10px] leading-relaxed text-foreground/28">
+        Swipe this: {tryThis}
+      </p>
+    </div>
+  )
+}
+
+function BeforeAfterCard({
+  title,
+  before,
+  after,
+}: {
+  title: string
+  before: string
+  after: string
+}) {
+  return (
+    <div className="overflow-hidden rounded-xl border border-foreground/[0.09]">
+      <div className="bg-foreground/[0.035] px-3.5 py-2.5 text-[13px] font-semibold text-foreground/46">
+        {title}
+      </div>
+      <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2.5 px-3.5 py-3 text-xs leading-snug">
+        <span className="font-mono text-[10px] text-foreground/24">Before</span>
+        <span className="text-foreground/29">{before}</span>
+        <span className="font-mono text-[10px] text-foreground/36">After</span>
+        <span className="font-medium text-foreground/42">{after}</span>
+      </div>
+    </div>
+  )
+}
+
+function ResultCard({
+  app,
+  title,
+  detail,
+  status,
+}: {
+  app: string
+  title: string
+  detail: string
+  status: string
+}) {
+  return (
+    <div className="overflow-hidden rounded-xl border border-foreground/[0.09] bg-background/40">
+      <div className="flex items-center justify-between border-b border-foreground/[0.07] px-3.5 py-2">
+        <span className="font-mono text-[10px] text-foreground/28">{app}</span>
+        <span className="h-2 w-2 rounded-full bg-foreground/12" />
+      </div>
+      <div className="px-3.5 py-3.5">
+        <div className="text-sm font-semibold leading-snug text-foreground/46">{title}</div>
+        <div className="mt-1.5 text-xs leading-[1.5] text-foreground/32">{detail}</div>
+        <div className="mt-3 inline-flex rounded-full border border-foreground/10 px-2.5 py-1 font-mono text-[10px] text-foreground/35">
+          {status}
         </div>
       </div>
     </div>
@@ -189,7 +181,9 @@ function CliCard({
 
 function hashStr(value: string): number {
   let hash = 0
-  for (let i = 0; i < value.length; i++) hash = (hash * 31 + value.charCodeAt(i)) | 0
+  for (let index = 0; index < value.length; index++) {
+    hash = (hash * 31 + value.charCodeAt(index)) | 0
+  }
   return hash
 }
 
@@ -204,18 +198,38 @@ function randomTime(seed: string): string {
 
 function renderCard(card: CardDef) {
   switch (card.type) {
-    case 'terminal':
-      return <TerminalCard title={card.title} text={card.text} />
     case 'chat':
       return <ChatCard messages={card.messages} />
-    case 'file':
-      return <FileCard filename={card.filename} text={card.text} />
     case 'message':
-      return <MessageCard sender={card.sender} time={card.time || randomTime(card.id)} text={card.text} />
-    case 'cli':
-      return <CliCard terminal={card.terminal} tool={card.tool} command={card.command} diff={card.diff} />
-    case 'plan':
-      return <PlanCard question={card.question} options={card.options} selected={card.selected} />
+      return (
+        <MessageCard
+          sender={card.sender}
+          time={card.time || randomTime(card.id)}
+          text={card.text}
+        />
+      )
+    case 'workflow':
+      return (
+        <WorkflowCard
+          title={card.title}
+          input={card.input}
+          steps={card.steps}
+          output={card.output}
+        />
+      )
+    case 'swipe':
+      return <SwipeCard title={card.title} text={card.text} tryThis={card.tryThis} />
+    case 'before-after':
+      return <BeforeAfterCard title={card.title} before={card.before} after={card.after} />
+    case 'result':
+      return (
+        <ResultCard
+          app={card.app}
+          title={card.title}
+          detail={card.detail}
+          status={card.status}
+        />
+      )
   }
 }
 
@@ -223,33 +237,33 @@ function createRng(seed: number) {
   let state = seed >>> 0
   return () => {
     state += 0x6d2b79f5
-    let t = state
-    t = Math.imul(t ^ (t >>> 15), t | 1)
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+    let value = state
+    value = Math.imul(value ^ (value >>> 15), value | 1)
+    value ^= value + Math.imul(value ^ (value >>> 7), value | 61)
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296
   }
 }
 
-function shuffle<T>(arr: T[], random: () => number): T[] {
-  const copy = [...arr]
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(random() * (i + 1))
-    ;[copy[i], copy[j]] = [copy[j], copy[i]]
+function shuffle<T>(items: T[], random: () => number): T[] {
+  const copy = [...items]
+  for (let index = copy.length - 1; index > 0; index--) {
+    const nextIndex = Math.floor(random() * (index + 1))
+    ;[copy[index], copy[nextIndex]] = [copy[nextIndex], copy[index]]
   }
   return copy
 }
 
-const VISUAL_GROUP: Record<string, string> = {
-  terminal: 'terminal',
-  file: 'file',
-  chat: 'message',
-  message: 'message',
-  cli: 'terminal',
-  plan: 'message',
+const VISUAL_GROUP: Record<CardDef['type'], string> = {
+  chat: 'conversation',
+  message: 'conversation',
+  workflow: 'process',
+  swipe: 'note',
+  'before-after': 'transformation',
+  result: 'result',
 }
 
-const COL_WIDTH = 260
-const COL_GAP = 10
+const COL_WIDTH = 280
+const COL_GAP = 12
 const CONTAINER_PAD = 24
 
 function estimateColumnCount(): number {
@@ -261,11 +275,11 @@ function interleaveForColumns(cards: CardDef[], columnCount: number, seed: numbe
   const totalCards = cards.length
   const rowCount = Math.ceil(totalCards / columnCount)
   const random = createRng((seed ^ (columnCount * 0x9e3779b9) ^ totalCards) >>> 0)
-
   const shuffled = shuffle(cards, random)
   const byType: Record<string, CardDef[]> = {}
+
   for (const card of shuffled) {
-    const key = VISUAL_GROUP[card.type] ?? card.type
+    const key = VISUAL_GROUP[card.type]
     ;(byType[key] ??= []).push(card)
   }
 
@@ -279,18 +293,18 @@ function interleaveForColumns(cards: CardDef[], columnCount: number, seed: numbe
     grid.push(new Array(columnCount).fill(undefined))
     typeGrid.push(new Array(columnCount).fill(undefined))
 
-    for (let col = 0; col < columnCount && placed < totalCards; col++) {
-      const above = row > 0 ? typeGrid[row - 1][col] : undefined
-      const left = col > 0 ? typeGrid[row][col - 1] : undefined
+    for (let column = 0; column < columnCount && placed < totalCards; column++) {
+      const above = row > 0 ? typeGrid[row - 1][column] : undefined
+      const left = column > 0 ? typeGrid[row][column - 1] : undefined
       const available = typeKeys.filter((type) => cursors[type] < byType[type].length)
       const ideal = available.filter((type) => type !== above && type !== left)
-      const okish = available.filter((type) => type !== above || type !== left)
-      const pool = ideal.length > 0 ? ideal : okish.length > 0 ? okish : available
+      const acceptable = available.filter((type) => type !== above || type !== left)
+      const pool = ideal.length > 0 ? ideal : acceptable.length > 0 ? acceptable : available
 
       if (pool.length > 0) {
         const pick = pool[Math.floor(random() * pool.length)]
-        grid[row][col] = byType[pick][cursors[pick]]
-        typeGrid[row][col] = pick
+        grid[row][column] = byType[pick][cursors[pick]]
+        typeGrid[row][column] = pick
         cursors[pick]++
         placed++
       }
@@ -298,9 +312,9 @@ function interleaveForColumns(cards: CardDef[], columnCount: number, seed: numbe
   }
 
   const result: CardDef[] = []
-  for (let col = 0; col < columnCount; col++) {
-    for (let row = 0; row < grid.length; row++) {
-      const card = grid[row][col]
+  for (let column = 0; column < columnCount; column++) {
+    for (const row of grid) {
+      const card = row[column]
       if (card) result.push(card)
     }
   }
@@ -309,27 +323,28 @@ function interleaveForColumns(cards: CardDef[], columnCount: number, seed: numbe
 }
 
 export function HomePage() {
-  const [seed] = useState(() => Math.floor(Math.random() * 0x7fffffff))
-  const [colCount, setColCount] = useState(5)
-  const [ready, setReady] = useState(false)
+  const [seed, setSeed] = useState(0)
+  const [columnCount, setColumnCount] = useState(5)
 
   useEffect(() => {
-    setColCount(estimateColumnCount())
+    const updateColumnCount = () => setColumnCount(estimateColumnCount())
+    updateColumnCount()
+    window.addEventListener('resize', updateColumnCount)
+    return () => window.removeEventListener('resize', updateColumnCount)
   }, [])
 
   useEffect(() => {
-    const raf = requestAnimationFrame(() => setReady(true))
-    return () => cancelAnimationFrame(raf)
+    setSeed(Math.floor(Math.random() * 0x7fffffff))
   }, [])
 
   const selectedCards = useMemo(() => getCardsForSeed(seed), [seed])
   const cards = useMemo(
-    () => interleaveForColumns(selectedCards, colCount, seed),
-    [selectedCards, colCount, seed],
+    () => interleaveForColumns(selectedCards, columnCount, seed),
+    [selectedCards, columnCount, seed],
   )
 
   return (
-    <div className={`relative h-dvh overflow-hidden transition-opacity duration-500 ${ready ? 'opacity-100' : 'opacity-0'}`}>
+    <main className="relative h-dvh overflow-hidden">
       <div
         className="pointer-events-none absolute inset-0 z-10"
         style={{
@@ -340,50 +355,54 @@ export function HomePage() {
         }}
       />
 
-      <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center p-6">
+      <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center p-4 sm:p-8">
         <div
-          className="pointer-events-auto rounded-lg bg-[var(--bg)] p-3"
-          style={{ boxShadow: '0 0 60px 40px var(--bg)' }}
+          className="pointer-events-auto w-full max-w-[620px] rounded-xl bg-[var(--bg)] p-2.5 sm:p-3.5"
+          style={{ boxShadow: '0 0 76px 52px var(--bg)' }}
         >
-          <DitherCard className="w-full max-w-md">
-            <Text variant="body" className="mb-1 text-xl font-medium">
-              Subscribe to <InlineCode>SWIPE.md</InlineCode>
-            </Text>
-            <Text variant="body" className="mb-4">
-              <Rainbow as="em" invert animated className="font-bold">The</Rainbow> newsletter for people who want to do cool things with AI. No FOMO.
-            </Text>
+          <DitherCard className="w-full" stripSize={20}>
+            <h1 className="mb-4 font-heading text-[2rem] font-semibold leading-[1.02] tracking-[-0.04em] sm:text-[2.65rem]">
+              Swipe AI skills and workflows that work.
+            </h1>
+            <p className="mb-6 max-w-[30rem] text-[1.15rem] leading-[1.45] sm:text-[1.3rem]">
+              <Rainbow as="em" invert animated className="font-mono font-semibold">
+                The
+              </Rainbow>{' '}
+              weekly newsletter that helps you learn AI by actually doing cool things with it.
+            </p>
             <NewsletterForm
               source="home_v2_cta"
-              buttonText="let me in!"
+              buttonText="Subscribe"
               buttonVariant="primary"
-              buttonClassName="h-11 px-5 text-sm normal-case italic tracking-normal font-medium"
-              inputClassName="h-11 text-base"
+              buttonClassName="subscribe-button h-12 px-6 font-heading text-base font-semibold normal-case tracking-normal text-white"
+              inputClassName="h-12 text-base"
             />
           </DitherCard>
         </div>
       </div>
 
       <div
-        className="p-3 grayscale"
+        aria-hidden="true"
+        className="p-3"
         style={{
-          columnWidth: 260,
-          columnGap: 10,
-          height: '140dvh',
+          columnWidth: COL_WIDTH,
+          columnGap: COL_GAP,
+          height: '150dvh',
         }}
       >
-        {cards.map((card, i) => (
+        {cards.map((card) => (
           <div
-            key={`${card.id}-${i}`}
+            key={card.id}
             className="overflow-hidden"
             style={{
               breakInside: 'avoid',
-              marginBottom: 10,
+              marginBottom: COL_GAP,
             }}
           >
             {renderCard(card)}
           </div>
         ))}
       </div>
-    </div>
+    </main>
   )
 }

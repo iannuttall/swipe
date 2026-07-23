@@ -43,13 +43,16 @@ export function NewsletterForm({
       data-source={source}
       className="flex flex-col gap-2 sm:flex-row sm:items-end"
     >
+      <label htmlFor={inputId} className="sr-only">
+        Email address
+      </label>
       <Input
         id={inputId}
         name="email"
         type="email"
         value={email}
         onChange={(event) => setEmail(event.target.value)}
-        placeholder="mscott@dundermifflin.com"
+        placeholder="sam@openai.com"
         autoComplete="email"
         required
         className={inputClassName}

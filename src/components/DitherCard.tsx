@@ -156,7 +156,7 @@ export function DitherCard({
     return (
       <div className={`flex ${className ?? ''}`}>
         <Dithering {...ditherProps} style={{ width: stripSize, ...ditherTransition }} className="shrink-0" />
-        <div className="flex-1 border-l-[2px] border-dither bg-card px-7 py-7 sm:px-8 sm:py-8">
+        <div className="flex-1 border-l-2 border-dither bg-card px-7 py-7 sm:px-8 sm:py-8">
           {children}
         </div>
       </div>

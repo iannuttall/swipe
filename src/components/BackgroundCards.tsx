@@ -16,16 +16,16 @@ function Lines({ text }: { text: string }) {
 
 function TerminalCard({ title, text }: { title: string; text: string }) {
   return (
-    <div className="flex flex-col overflow-hidden rounded-xl border border-foreground/[0.09] bg-foreground/[0.03]">
-      <div className="flex items-center gap-1.5 border-b border-foreground/[0.07] px-3.5 py-2">
+    <div className="flex flex-col overflow-hidden rounded-xl border border-foreground/9 bg-foreground/3">
+      <div className="flex items-center gap-1.5 border-b border-foreground/7 px-3.5 py-2">
         <span className="h-2 w-2 rounded-full bg-foreground/10" />
         <span className="h-2 w-2 rounded-full bg-foreground/10" />
         <span className="h-2 w-2 rounded-full bg-foreground/10" />
-        <span className="ml-2 font-mono text-[9px] uppercase tracking-widest text-foreground/25">
+        <span className="ml-2 font-mono text-2xs uppercase tracking-widest text-foreground/25">
           {title}
         </span>
       </div>
-      <div className="px-3.5 py-3 font-mono text-[11px] leading-relaxed text-foreground/32">
+      <div className="px-3.5 py-3 font-mono text-xs leading-relaxed text-foreground/32">
         <Lines text={text} />
       </div>
     </div>
@@ -34,13 +34,13 @@ function TerminalCard({ title, text }: { title: string; text: string }) {
 
 function FileCard({ filename, text }: { filename: string; text: string }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-foreground/[0.09] bg-background/40">
-      <div className="flex items-stretch border-b border-foreground/[0.07] bg-foreground/[0.03]">
-        <div className="border-r border-foreground/[0.07] px-3.5 py-1.5 font-mono text-[10px] text-foreground/32">
+    <div className="overflow-hidden rounded-xl border border-foreground/9 bg-background/40">
+      <div className="flex items-stretch border-b border-foreground/7 bg-foreground/3">
+        <div className="border-r border-foreground/7 px-3.5 py-1.5 font-mono text-2xs text-foreground/32">
           {filename}
         </div>
       </div>
-      <div className="px-3.5 py-3 font-mono text-[11px] leading-relaxed text-foreground/30">
+      <div className="px-3.5 py-3 font-mono text-xs leading-relaxed text-foreground/30">
         <Lines text={text} />
       </div>
     </div>
@@ -57,25 +57,25 @@ function PlanCard({
   selected?: number
 }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-foreground/[0.09] bg-background/40 px-3.5 py-3">
-      <div className="mb-2 font-mono text-[9px] uppercase tracking-widest text-foreground/20">
+    <div className="overflow-hidden rounded-xl border border-foreground/9 bg-background/40 px-3.5 py-3">
+      <div className="mb-2 font-mono text-2xs uppercase tracking-widest text-foreground/20">
         plan mode
       </div>
-      <div className="mb-2 font-mono text-[11px] font-medium leading-relaxed text-foreground/42">
+      <div className="mb-2 font-mono text-xs font-medium leading-relaxed text-foreground/42">
         {question}
       </div>
       <div className="flex flex-col gap-1">
         {options.map((option, index) => {
           const isSelected = index === selected
           return (
-            <div key={index} className="font-mono text-[10px] leading-relaxed">
+            <div key={index} className="font-mono text-2xs leading-relaxed">
               <div className={isSelected ? 'text-foreground/42' : 'text-foreground/26'}>
                 <span className="inline-block w-4 text-foreground/18">
                   {isSelected ? '›' : ' '}
                 </span>
                 {index + 1}. {option.label}
               </div>
-              <div className="ml-4 pl-2 text-[9px] text-foreground/18">{option.desc}</div>
+              <div className="ml-4 pl-2 text-2xs text-foreground/18">{option.desc}</div>
             </div>
           )
         })}
@@ -104,23 +104,23 @@ function CliCard({
   const codeLines = diffLines.slice(1)
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-xl border border-foreground/[0.09] bg-foreground/[0.03]">
-      <div className="flex items-center gap-1.5 border-b border-foreground/[0.07] px-3.5 py-2">
+    <div className="flex flex-col overflow-hidden rounded-xl border border-foreground/9 bg-foreground/3">
+      <div className="flex items-center gap-1.5 border-b border-foreground/7 px-3.5 py-2">
         <span className="h-2 w-2 rounded-full bg-foreground/10" />
         <span className="h-2 w-2 rounded-full bg-foreground/10" />
         <span className="h-2 w-2 rounded-full bg-foreground/10" />
-        <span className="ml-2 font-mono text-[9px] uppercase tracking-widest text-foreground/25">
+        <span className="ml-2 font-mono text-2xs uppercase tracking-widest text-foreground/25">
           {termName}
         </span>
       </div>
 
       <div className="px-3.5 py-3">
-        <div className="mb-2 font-mono text-[11px] text-foreground/32">$ {tool}</div>
-        <div className="mb-2 border-b border-foreground/[0.07] pb-2 font-mono text-[11px] leading-relaxed text-foreground/38">
+        <div className="mb-2 font-mono text-xs text-foreground/32">$ {tool}</div>
+        <div className="mb-2 border-b border-foreground/7 pb-2 font-mono text-xs leading-relaxed text-foreground/38">
           &gt; <Lines text={command} />
         </div>
-        <div className="mb-1 font-mono text-[9px] text-foreground/22">{fileHeader}</div>
-        <div className="font-mono text-[10px] leading-relaxed">
+        <div className="mb-1 font-mono text-2xs text-foreground/22">{fileHeader}</div>
+        <div className="font-mono text-2xs leading-relaxed">
           {codeLines.map((line, index) => {
             const isAdd = line.startsWith('+')
             const isRemove = line.startsWith('-')
@@ -156,10 +156,10 @@ function ChatCard({ messages }: { messages: { role: 'user' | 'ai'; text: string 
         return (
           <div key={index} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
             <div
-              className={`max-w-[88%] rounded-xl px-3.5 py-2.5 text-xs leading-[1.55] ${
+              className={`max-w-11/12 rounded-xl px-3.5 py-2.5 text-xs leading-normal ${
                 isUser
-                  ? 'bg-foreground/[0.075] text-foreground/45'
-                  : 'border border-foreground/[0.09] bg-background/35 text-foreground/36'
+                  ? 'bg-foreground/8 text-foreground/45'
+                  : 'border border-foreground/9 bg-background/35 text-foreground/36'
               }`}
             >
               <Lines text={message.text} />
@@ -181,12 +181,12 @@ function MessageCard({
   text: string
 }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-foreground/[0.09] bg-background/35 px-3.5 py-3">
+    <div className="overflow-hidden rounded-xl border border-foreground/9 bg-background/35 px-3.5 py-3">
       <div className="mb-2 flex items-baseline justify-between gap-3">
         <span className="text-xs font-semibold text-foreground/45">{sender}</span>
-        <span className="font-mono text-[10px] text-foreground/22">{time}</span>
+        <span className="font-mono text-2xs text-foreground/22">{time}</span>
       </div>
-      <div className="text-xs leading-[1.55] text-foreground/34">
+      <div className="text-xs leading-normal text-foreground/34">
         <Lines text={text} />
       </div>
     </div>
@@ -221,25 +221,25 @@ function WorkflowCard({
 
   if (variant === 1) {
     return (
-      <div className="overflow-hidden rounded-xl border border-foreground/[0.09] bg-background/40">
-        <div className="px-3.5 pb-2 pt-3 text-[13px] font-semibold text-foreground/46">
+      <div className="overflow-hidden rounded-xl border border-foreground/9 bg-background/40">
+        <div className="px-3.5 pb-2 pt-3 text-sm font-semibold text-foreground/46">
           {title}
         </div>
-        <div className="grid grid-cols-[3.25rem_1fr] border-t border-foreground/[0.07] text-xs leading-snug">
-          <span className="px-3 py-2.5 font-mono text-[9px] text-foreground/22">Give it</span>
-          <span className="border-l border-foreground/[0.07] px-3 py-2.5 text-foreground/31">
+        <div className="grid grid-cols-[auto_1fr] border-t border-foreground/7 text-xs leading-snug">
+          <span className="px-3 py-2.5 font-mono text-2xs text-foreground/22">Give it</span>
+          <span className="border-l border-foreground/7 px-3 py-2.5 text-foreground/31">
             {input}
           </span>
-          <span className="border-t border-foreground/[0.07] px-3 py-2.5 font-mono text-[9px] text-foreground/22">
+          <span className="border-t border-foreground/7 px-3 py-2.5 font-mono text-2xs text-foreground/22">
             It does
           </span>
-          <span className="border-l border-t border-foreground/[0.07] px-3 py-2.5 text-foreground/31">
+          <span className="border-l border-t border-foreground/7 px-3 py-2.5 text-foreground/31">
             {steps.join(' · ')}
           </span>
-          <span className="border-t border-foreground/[0.07] px-3 py-2.5 font-mono text-[9px] text-foreground/28">
+          <span className="border-t border-foreground/7 px-3 py-2.5 font-mono text-2xs text-foreground/28">
             You get
           </span>
-          <span className="border-l border-t border-foreground/[0.07] px-3 py-2.5 font-medium text-foreground/43">
+          <span className="border-l border-t border-foreground/7 px-3 py-2.5 font-medium text-foreground/43">
             <OutputLines output={output} />
           </span>
         </div>
@@ -248,25 +248,25 @@ function WorkflowCard({
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-foreground/[0.09] bg-background/40">
-      <div className="border-b border-foreground/[0.07] px-3.5 py-2.5 text-[13px] font-semibold text-foreground/46">
+    <div className="overflow-hidden rounded-xl border border-foreground/9 bg-background/40">
+      <div className="border-b border-foreground/7 px-3.5 py-2.5 text-sm font-semibold text-foreground/46">
         {title}
       </div>
       <div className="px-3.5 py-3">
-        <div className="mb-2.5 rounded-lg bg-foreground/[0.045] px-2.5 py-2 text-xs leading-snug text-foreground/34">
+        <div className="mb-2.5 rounded-lg bg-foreground/5 px-2.5 py-2 text-xs leading-snug text-foreground/34">
           {input}
         </div>
         <ol className="space-y-2">
           {steps.map((step, index) => (
             <li key={step} className="flex gap-2.5 text-xs leading-snug text-foreground/32">
-              <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-foreground/12 font-mono text-[9px] text-foreground/30">
+              <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-foreground/12 font-mono text-2xs text-foreground/30">
                 {index + 1}
               </span>
               <span>{step}</span>
             </li>
           ))}
         </ol>
-        <div className="mt-2.5 border-t border-foreground/[0.07] pt-2.5 text-xs font-medium leading-snug text-foreground/42">
+        <div className="mt-2.5 border-t border-foreground/7 pt-2.5 text-xs font-medium leading-snug text-foreground/42">
           {Array.isArray(output) ? <OutputLines output={output} /> : <>→ {output}</>}
         </div>
       </div>
@@ -288,22 +288,22 @@ function SkillCard({
   output?: string[]
 }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-foreground/[0.09] bg-background/40">
-      <div className="flex items-center gap-2 border-b border-foreground/[0.07] px-3.5 py-2.5">
-        <span className="font-mono text-[9px] text-foreground/25">Agent skill</span>
-        <span className="h-px flex-1 bg-foreground/[0.07]" />
+    <div className="overflow-hidden rounded-xl border border-foreground/9 bg-background/40">
+      <div className="flex items-center gap-2 border-b border-foreground/7 px-3.5 py-2.5">
+        <span className="font-mono text-2xs text-foreground/25">Agent skill</span>
+        <span className="h-px flex-1 bg-foreground/7" />
       </div>
       <div className="px-3.5 py-3.5">
         <div className="text-sm font-semibold leading-snug text-foreground/48">{title}</div>
-        <dl className="mt-3 grid grid-cols-[3.4rem_1fr] gap-x-2.5 gap-y-2 text-xs leading-snug">
-          <dt className="font-mono text-[9px] text-foreground/22">Give it</dt>
+        <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-2.5 gap-y-2 text-xs leading-snug">
+          <dt className="font-mono text-2xs text-foreground/22">Give it</dt>
           <dd className="m-0 text-foreground/31">{giveIt}</dd>
-          <dt className="font-mono text-[9px] text-foreground/22">It learns</dt>
+          <dt className="font-mono text-2xs text-foreground/22">It learns</dt>
           <dd className="m-0 text-foreground/35">{learns}</dd>
         </dl>
         {output ? (
-          <div className="mt-3 border-t border-foreground/[0.07] pt-2.5">
-            <div className="mb-1.5 font-mono text-[9px] text-foreground/22">It made</div>
+          <div className="mt-3 border-t border-foreground/7 pt-2.5">
+            <div className="mb-1.5 font-mono text-2xs text-foreground/22">It made</div>
             <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
               {output.map((line, index) => (
                 <li key={index} className="text-xs leading-snug text-foreground/37">
@@ -313,7 +313,7 @@ function SkillCard({
             </ul>
           </div>
         ) : result ? (
-          <div className="mt-3 border-t border-foreground/[0.07] pt-2.5 text-xs font-medium leading-snug text-foreground/43">
+          <div className="mt-3 border-t border-foreground/7 pt-2.5 text-xs font-medium leading-snug text-foreground/43">
             → {result}
           </div>
         ) : null}
@@ -334,17 +334,17 @@ function PromptCard({
   output?: string[]
 }) {
   return (
-    <div className="rounded-xl border border-foreground/[0.09] bg-foreground/[0.022] px-3.5 py-3.5">
+    <div className="rounded-xl border border-foreground/9 bg-foreground/2 px-3.5 py-3.5">
       <div className="mb-2.5 flex items-baseline justify-between gap-3">
-        <span className="text-[13px] font-semibold text-foreground/45">{title}</span>
-        <span className="font-mono text-[9px] text-foreground/21">prompt</span>
+        <span className="text-sm font-semibold text-foreground/45">{title}</span>
+        <span className="font-mono text-2xs text-foreground/21">prompt</span>
       </div>
-      <blockquote className="m-0 border-l-2 border-foreground/[0.09] pl-3 font-mono text-[10px] leading-[1.65] text-foreground/31">
+      <blockquote className="m-0 border-l-2 border-foreground/9 pl-3 font-mono text-2xs leading-relaxed text-foreground/31">
         {prompt}
       </blockquote>
       {output ? (
-        <div className="mt-3 border-t border-foreground/[0.07] pt-2.5">
-          <div className="mb-1.5 font-mono text-[9px] text-foreground/22">output</div>
+        <div className="mt-3 border-t border-foreground/7 pt-2.5">
+          <div className="mb-1.5 font-mono text-2xs text-foreground/22">output</div>
           <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
             {output.map((line, index) => (
               <li
@@ -377,10 +377,10 @@ function FieldNoteCard({
   result: string
 }) {
   return (
-    <div className="rounded-xl border border-foreground/[0.09] bg-background/35 px-3.5 py-3">
-      <div className="mb-2 font-mono text-[9px] text-foreground/23">{eyebrow}</div>
-      <div className="text-[13px] font-semibold leading-snug text-foreground/46">{title}</div>
-      <p className="my-2 text-xs leading-[1.5] text-foreground/32">{text}</p>
+    <div className="rounded-xl border border-foreground/9 bg-background/35 px-3.5 py-3">
+      <div className="mb-2 font-mono text-2xs text-foreground/23">{eyebrow}</div>
+      <div className="text-sm font-semibold leading-snug text-foreground/46">{title}</div>
+      <p className="my-2 text-xs leading-normal text-foreground/32">{text}</p>
       <div className="text-xs font-medium leading-snug text-foreground/40">{result}</div>
     </div>
   )
@@ -396,15 +396,15 @@ function SwipeCard({
   tryThis: string
 }) {
   return (
-    <div className="rounded-xl border border-foreground/[0.09] bg-foreground/[0.025] px-4 py-3.5">
+    <div className="rounded-xl border border-foreground/9 bg-foreground/3 px-4 py-3.5">
       <div className="mb-2 flex items-center gap-2">
         <span className="flex h-5 w-5 items-center justify-center rounded-md border border-foreground/10 text-sm text-foreground/32">
           +
         </span>
-        <span className="text-[13px] font-semibold text-foreground/46">{title}</span>
+        <span className="text-sm font-semibold text-foreground/46">{title}</span>
       </div>
-      <p className="text-xs leading-[1.55] text-foreground/34">{text}</p>
-      <p className="mt-2.5 font-mono text-[10px] leading-relaxed text-foreground/28">
+      <p className="text-xs leading-normal text-foreground/34">{text}</p>
+      <p className="mt-2.5 font-mono text-2xs leading-relaxed text-foreground/28">
         Swipe this: {tryThis}
       </p>
     </div>
@@ -421,14 +421,14 @@ function BeforeAfterCard({
   after: string
 }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-foreground/[0.09]">
-      <div className="bg-foreground/[0.035] px-3.5 py-2.5 text-[13px] font-semibold text-foreground/46">
+    <div className="overflow-hidden rounded-xl border border-foreground/9">
+      <div className="bg-foreground/4 px-3.5 py-2.5 text-sm font-semibold text-foreground/46">
         {title}
       </div>
       <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2.5 px-3.5 py-3 text-xs leading-snug">
-        <span className="font-mono text-[10px] text-foreground/24">Before</span>
+        <span className="font-mono text-2xs text-foreground/24">Before</span>
         <span className="text-foreground/29">{before}</span>
-        <span className="font-mono text-[10px] text-foreground/36">After</span>
+        <span className="font-mono text-2xs text-foreground/36">After</span>
         <span className="font-medium text-foreground/42">{after}</span>
       </div>
     </div>
@@ -447,15 +447,15 @@ function ResultCard({
   status: string
 }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-foreground/[0.09] bg-background/40">
-      <div className="flex items-center justify-between border-b border-foreground/[0.07] px-3.5 py-2">
-        <span className="font-mono text-[10px] text-foreground/28">{app}</span>
+    <div className="overflow-hidden rounded-xl border border-foreground/9 bg-background/40">
+      <div className="flex items-center justify-between border-b border-foreground/7 px-3.5 py-2">
+        <span className="font-mono text-2xs text-foreground/28">{app}</span>
         <span className="h-2 w-2 rounded-full bg-foreground/12" />
       </div>
       <div className="px-3.5 py-3.5">
         <div className="text-sm font-semibold leading-snug text-foreground/46">{title}</div>
-        <div className="mt-1.5 text-xs leading-[1.5] text-foreground/32">{detail}</div>
-        <div className="mt-3 inline-flex rounded-full border border-foreground/10 px-2.5 py-1 font-mono text-[10px] text-foreground/35">
+        <div className="mt-1.5 text-xs leading-normal text-foreground/32">{detail}</div>
+        <div className="mt-3 inline-flex rounded-full border border-foreground/10 px-2.5 py-1 font-mono text-2xs text-foreground/35">
           {status}
         </div>
       </div>
@@ -604,13 +604,13 @@ function cardShapeClass(card: CardDef): string {
 
   switch (card.type) {
     case 'prompt':
-      return `w-[93%] ${alignRight ? 'ml-auto' : 'mr-auto'}`
+      return `w-11/12 ${alignRight ? 'ml-auto' : 'mr-auto'}`
     case 'field-note':
-      return `w-[89%] ${alignRight ? 'ml-auto' : 'mr-auto'}`
+      return `w-11/12 ${alignRight ? 'ml-auto' : 'mr-auto'}`
     case 'message':
-      return `w-[94%] ${alignRight ? 'ml-auto' : 'mr-auto'}`
+      return `w-11/12 ${alignRight ? 'ml-auto' : 'mr-auto'}`
     case 'chat':
-      return `w-[96%] ${alignRight ? 'ml-auto' : 'mr-auto'}`
+      return `w-11/12 ${alignRight ? 'ml-auto' : 'mr-auto'}`
     default:
       return 'w-full'
   }

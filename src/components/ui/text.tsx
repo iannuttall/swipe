@@ -13,9 +13,9 @@ type TextProps<T extends TextElement = 'p'> = {
 } & Omit<React.ComponentPropsWithoutRef<T>, 'color' | 'className' | 'children'>
 
 const variantClasses: Record<TextVariant, string> = {
-  body: 'font-body text-[length:var(--font-body-size)] leading-relaxed',
+  body: 'font-body text-body leading-relaxed',
   small: 'text-sm',
-  detail: 'text-[13px]',
+  detail: 'text-sm',
 }
 
 const colorClasses: Record<TextColor, string> = {

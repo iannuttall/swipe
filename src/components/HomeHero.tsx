@@ -6,14 +6,14 @@ export function HomeHero() {
   return (
     <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center p-4 sm:p-8">
       <div
-        className="pointer-events-auto w-full max-w-[620px] rounded-xl bg-[var(--bg)] p-2.5 sm:p-3.5"
+        className="pointer-events-auto w-full max-w-xl rounded-xl bg-background p-2.5 sm:p-3.5"
         style={{ boxShadow: '0 0 76px 52px var(--bg)' }}
       >
         <DitherCard className="w-full" stripSize={20}>
-          <h1 className="mb-4 font-heading text-[2rem] font-semibold leading-[1.02] tracking-[-0.04em] sm:text-[2.65rem]">
+          <h1 className="mb-4 font-heading text-3xl font-semibold leading-none tracking-tighter sm:text-4xl">
             Swipe the best AI skills, prompts, and workflows.
           </h1>
-          <p className="mb-6 max-w-[30rem] text-[1.15rem] leading-[1.45] sm:text-[1.3rem]">
+          <p className="mb-6 max-w-lg text-lg leading-normal sm:text-xl">
             <Rainbow as="em" invert animated className="font-mono font-semibold">
               The
             </Rainbow>{' '}

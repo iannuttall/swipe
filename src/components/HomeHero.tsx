@@ -11,7 +11,7 @@ export function HomeHero() {
       >
         <DitherCard className="w-full" stripSize={20}>
           <h1 className="mb-4 font-heading text-[2rem] font-semibold leading-[1.02] tracking-[-0.04em] sm:text-[2.65rem]">
-            Swipe AI skills and workflows that work.
+            Swipe the best AI skills, prompts, and workflows.
           </h1>
           <p className="mb-6 max-w-[30rem] text-[1.15rem] leading-[1.45] sm:text-[1.3rem]">
             <Rainbow as="em" invert animated className="font-mono font-semibold">

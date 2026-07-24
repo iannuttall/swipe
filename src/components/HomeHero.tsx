@@ -10,7 +10,7 @@ export function HomeHero() {
         style={{ boxShadow: '0 0 76px 52px var(--bg)' }}
       >
         <DitherCard className="w-full" stripSize={20}>
-          <h1 className="mb-4 font-heading text-3xl font-semibold leading-none tracking-tighter sm:text-4xl">
+          <h1 className="mb-4 font-heading text-3xl font-semibold leading-none tracking-tighter sm:text-hero">
             Swipe the best AI skills, prompts, and workflows.
           </h1>
           <p className="mb-6 max-w-lg text-lg leading-normal sm:text-xl">

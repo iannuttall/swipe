@@ -145,6 +145,9 @@ html[data-gradient='pink'] {
   --text-2xs: 0.625rem;
   --text-2xs--line-height: 1.4;
   --text-body: var(--font-body-size);
+  /* Hero headline: sized to hold the headline to two lines in the max-w-xl card */
+  --text-hero: 2.65rem;
+  --text-hero--line-height: 1.02;
 
   --color-background: var(--bg);
   --color-foreground: var(--fg);

@@ -1,0 +1,539 @@
+# ── Background cards, v4 ──────────────────────────────────────
+#
+# v1's format language, v3's content lesson.
+#
+# Only five card types: chat, terminal, file, message, plan.
+# One voice, casual lowercase, everything reads like a screenshot.
+#
+# The teaching happens inside the chat cards: the user's bubble IS
+# the swipeable prompt, the agent's reply is the receipt. Business
+# audience — founders, marketers, operators — no dev chores.
+# ───────────────────────────────────────────────────────────────
+
+# ── chats: every user bubble is a prompt worth stealing ───────
+
+- id: sceptical-customer
+  group: chat
+  type: chat
+  messages:
+    - role: user
+      text: |
+        read this page like a sceptical customer. mark every line that sounds impressive but says nothing.
+    - role: ai
+      text: |
+        "seamless integration" — with what? "empowers your team" — to do what? rewrote both. the hero now says what you actually do.
+
+- id: ogilvy-score
+  group: chat
+  type: chat
+  messages:
+    - role: user
+      text: |
+        score my landing page out of 100 against Ogilvy's advertising principles. rank the gaps.
+    - role: ai
+      text: |
+        49/100 — it reads like a changelog, not an ad. no proof anywhere, and the headline lists features instead of hooking. rewrite attached. it hurts because it's right.
+
+- id: review-phrases
+  group: chat
+  type: chat
+  messages:
+    - role: user
+      text: |
+        here are 40 customer reviews. find the phrases people keep repeating.
+    - role: ai
+      text: |
+        "set up in one lunch break" — 14 times. "finally killed the spreadsheet" — 9. your next headline is already in there.
+
+- id: competitor-watch-chat
+  group: chat
+  type: chat
+  messages:
+    - role: user
+      text: |
+        check these three pricing pages every monday. only tell me what actually changed.
+    - role: ai
+      text: |
+        done. first report: acme dropped their free plan this morning and moved team pricing from £12 to £18.
+
+- id: interview-patterns
+  group: chat
+  type: chat
+  messages:
+    - role: user
+      text: |
+        read these 12 interview transcripts. what does everyone complain about?
+    - role: ai
+      text: |
+        9 of 12 describe the same workaround — export to excel, do one calculation, paste it back. that's your next feature.
+
+- id: honest-proposal
+  group: chat
+  type: chat
+  messages:
+    - role: user
+      text: |
+        turn these discovery notes into a proposal. don't invent deliverables or dates.
+    - role: ai
+      text: |
+        drafted. I left two questions where the scope is still fuzzy — better to ask than to guess.
+
+- id: contract-diff
+  group: chat
+  type: chat
+  messages:
+    - role: user
+      text: |
+        compare the new contract with last year's. what changed?
+    - role: ai
+      text: |
+        notice period doubled, the price cap is gone, and clause 4.2 now auto-renews. table with links to every clause attached.
+
+- id: inbox-triage-chat
+  group: chat
+  type: chat
+  messages:
+    - role: user
+      text: |
+        triage my inbox. only show me what actually needs me.
+    - role: ai
+      text: |
+        42 overnight. 3 need you. 11 have drafted replies waiting for approval. the rest is archived.
+
+- id: spreadsheet-strange
+  group: chat
+  type: chat
+  messages:
+    - role: user
+      text: |
+        what's strange in this spreadsheet? show me the pattern before you explain it.
+    - role: ai
+      text: |
+        returns triple when delivery takes over four days. I charted it and listed the 23 orders that prove it.
+
+- id: deck-cut-chat
+  group: chat
+  type: chat
+  messages:
+    - role: user
+      text: |
+        this deck is 34 slides. the meeting is 20 minutes.
+    - role: ai
+      text: |
+        cut to 9. everything else moved to an appendix the numbers people can dig into afterwards.
+
+- id: writing-voice-chat
+  group: chat
+  type: chat
+  messages:
+    - role: user
+      text: |
+        here are 50 things I've written. learn how I sound.
+    - role: ai
+      text: |
+        short sentences. no hedging. you never open with "I hope this finds you well." saved as a skill — every draft uses it now.
+
+- id: publish-button-chat
+  group: chat
+  type: chat
+  messages:
+    - role: user
+      text: |
+        turn that research into a page I can send to the client.
+    - role: ai
+      text: |
+        published — here's the link. it's on your domain, and I can password-protect it if the numbers are sensitive.
+
+- id: fastest-mvp
+  group: chat
+  type: chat
+  messages:
+    - role: user
+      text: |
+        I have an idea for a SaaS. what's the fastest path to MVP?
+    - role: ai
+      text: |
+        what's the single workflow it replaces? no dashboard, no login, no billing. build the workflow, sell the result, validate in a weekend.
+
+- id: report-in-20
+  group: chat
+  type: chat
+  messages:
+    - role: user
+      text: |
+        I have 20 minutes and an 80-page report. what matters?
+    - role: ai
+      text: |
+        three things — and the real finding is buried on page 41: churn is a pricing problem, not a product one. the exec summary oversells the rest.
+
+- id: unanswered-questions
+  group: chat
+  type: chat
+  messages:
+    - role: user
+      text: |
+        read the comments on these 20 videos. what is nobody answering?
+    - role: ai
+      text: |
+        "can I do this without a website?" — asked 31 times, answered twice. that's your next video.
+
+- id: quiet-proposals
+  group: chat
+  type: chat
+  messages:
+    - role: user
+      text: |
+        which proposals have gone quiet?
+    - role: ai
+      text: |
+        four. I drafted polite nudges in your voice — approve and I'll send them one by one.
+
+- id: support-week
+  group: chat
+  type: chat
+  messages:
+    - role: user
+      text: |
+        what did customers struggle with this week?
+    - role: ai
+      text: |
+        312 tickets, one recurring problem: nobody can find the invoice button. it's behind two menus.
+
+- id: argue-with-yourself
+  group: chat
+  type: chat
+  messages:
+    - role: user
+      text: |
+        now build the strongest case against your own conclusion.
+    - role: ai
+      text: |
+        two of my sources were quoting the same blog post, and the 40% stat is from 2019. the conclusion survives — with one caveat attached.
+
+- id: lead-scorer
+  group: chat
+  type: chat
+  messages:
+    - role: user
+      text: |
+        I need a tiny tool that sorts this CSV and gives each lead a score.
+    - role: ai
+      text: |
+        done. drop in the file, tune the scoring rules and export the shortlist.
+
+- id: spreadsheet-to-app-chat
+  group: chat
+  type: chat
+  messages:
+    - role: user
+      text: |
+        this spreadsheet runs the whole warehouse. can you make it an app?
+    - role: ai
+      text: |
+        same data, now with a clean form, search and permissions. shared with the team — 8 people are in it already.
+
+- id: landing-page-meta
+  group: chat
+  type: chat
+  messages:
+    - role: user
+      text: |
+        hey, how do I make a landing page like this one?
+    - role: ai
+      text: |
+        did you try subscribing to the newsletter?
+    - role: user
+      text: |
+        I'll do that right now!
+
+- id: did-ai-write-this
+  group: chat
+  type: chat
+  messages:
+    - role: user
+      text: |
+        did AI write this email?
+    - role: ai
+      text: |
+        you wrote it. I just removed the three paragraphs where you apologised for asking.
+
+- id: attend-my-meeting
+  group: chat
+  type: chat
+  messages:
+    - role: user
+      text: |
+        can you attend this meeting for me?
+    - role: ai
+      text: |
+        no. but I read the pre-read and drafted your three questions — you can leave after asking them.
+
+# ── terminals: agents doing business work ─────────────────────
+
+- id: overnight-run
+  group: terminal
+  type: terminal
+  title: overnight
+  text: |
+    $ agent run overnight.md
+
+    ✓ inbox triaged (42 → 3)
+    ✓ 4 invoice chasers drafted
+    ✓ competitor diff saved
+
+    done in 11m — while you slept
+
+- id: churn-risk-terminal
+  group: terminal
+  type: terminal
+  title: claude code
+  text: |
+    $ claude -p "read this quarter's
+    support tickets, rank churn risks"
+
+    Reading 1,204 tickets...
+    ✓ 7 recurring problems
+    ✓ 3 accounts at risk
+    ✓ saved to reports/q3-churn.md
+
+- id: monday-cron
+  group: terminal
+  type: terminal
+  title: cron
+  text: |
+    $ crontab -e
+    0 7 * * 1 competitor-watch --diff
+
+    ✓ every Monday, 7am:
+      what changed, before standup
+
+- id: faq-miner-loop
+  group: terminal
+  type: terminal
+  title: agent loop
+  text: |
+    $ agent run --plan
+    plans/faq-miner.md
+
+    iteration 1 of 25
+    -> pull comments from niche videos
+    -> cluster repeated questions
+    -> draft an "audience asks" brief
+
+# ── files: the prompts and skills themselves ──────────────────
+
+- id: memory-md
+  group: file
+  type: file
+  filename: MEMORY.md
+  text: |
+    # What I know about you
+
+    - Prefers bullets over paragraphs
+    - No meetings before 10am
+    - Quotes in USD, invoices in GBP
+    - Will always pick the simpler option
+    - Signs off emails with just "ian"
+
+- id: agents-md
+  group: file
+  type: file
+  filename: AGENTS.md
+  text: |
+    # House rules
+
+    - Draft, never send without approval
+    - Check every number against the source
+    - Flag anything legal or pricing
+    - If unsure, ask one question — not five
+
+- id: prompt-library
+  group: file
+  type: file
+  filename: prompts.md
+  text: |
+    ## Saved prompts
+
+    - grade my page like Ogilvy
+    - the sceptical customer read
+    - argue with your own research
+    - what changed in this contract
+    - find the phrases customers repeat
+
+- id: skill-competitor-watch
+  group: file
+  type: file
+  filename: SKILL.md
+  text: |
+    ---
+    name: competitor-watch
+    description: Visit saved competitor
+      pages weekly and report only
+      what actually changed.
+    ---
+
+    1. Load the watchlist
+    2. Compare against last week's copy
+    3. Ignore cosmetic changes
+    4. Post offer, proof and pricing
+       diffs to Slack
+
+- id: skill-after-call
+  group: file
+  type: file
+  filename: SKILL.md
+  text: |
+    ---
+    name: after-call
+    description: Turn call recordings
+      into CRM updates and a
+      follow-up draft.
+    ---
+
+    1. Pull needs, objections, next steps
+    2. Update the right CRM fields
+    3. Draft the follow-up in my voice
+    4. Queue it for approval
+
+- id: skill-chase-invoices
+  group: file
+  type: file
+  filename: SKILL.md
+  text: |
+    ---
+    name: chase-invoices
+    description: Find overdue invoices
+      and draft polite chasers
+      in my tone.
+    ---
+
+    1. List invoices over 30 days
+    2. Check for part-payments first
+    3. Draft a chaser per client
+    4. Never send — queue for review
+
+- id: plan-competitor-tracker
+  group: file
+  type: file
+  filename: /plans/competitor-tracker.md
+  text: |
+    # Build a competitor price tracker
+
+    Watch competitor pricing pages
+    daily, diff the changes, and
+    alert the team before they find
+    out from a customer.
+
+    ## Steps
+
+    [ ] List target URLs
+    [ ] Scrape on a daily schedule
+    [ ] Diff current vs previous
+    [ ] Post the before/after to Slack
+    ...
+
+# ── messages: agents reporting back ───────────────────────────
+
+- id: audience-language
+  group: message
+  type: message
+  sender: Audience research
+  text: |
+    People rarely say "increase productivity."
+    They say "stop losing Friday to admin."
+
+    I found 14 more phrases worth stealing.
+
+- id: pricing-watcher
+  group: message
+  type: message
+  sender: Pricing watcher
+  text: |
+    Acme removed the free plan.
+    Team pricing moved from £12 to £18.
+    Their annual discount stayed the same.
+
+- id: books-check
+  group: message
+  type: message
+  sender: Books check
+  time: "2:41 AM"
+  text: |
+    Reconciled the month.
+    One duplicate charge, one missing receipt.
+    Flagged both — go back to sleep.
+
+- id: monday-brief
+  group: message
+  type: message
+  sender: Monday brief
+  text: |
+    Revenue is on plan.
+    Two projects are blocked by the same approval.
+    Three invoices are now over 30 days late.
+
+- id: prototype-test
+  group: message
+  type: message
+  sender: Prototype test
+  text: |
+    4 of 5 people missed the export button.
+    All five understood the new filter.
+    The empty state needs one real example.
+
+- id: churn-watch
+  group: message
+  type: message
+  sender: Churn watch
+  text: |
+    6 of this month's 9 cancellations
+    stopped using the same feature
+    three weeks before they left.
+
+- id: mention-watcher
+  group: message
+  type: message
+  sender: Mention watcher
+  text: |
+    Your product came up in 3 podcasts this week.
+    Two praised the onboarding.
+    One host couldn't find your pricing page.
+
+- id: meeting-prep
+  group: message
+  type: message
+  sender: Meeting prep
+  text: |
+    You meet Dana at 2pm. Since your last call:
+    they raised a Series A, changed pricing,
+    and your proposal went unanswered.
+
+# ── plan mode ─────────────────────────────────────────────────
+
+- id: plan-invoice-chase
+  group: plan
+  type: plan
+  question: How should I chase this late invoice?
+  selected: 0
+  options:
+    - label: friendly nudge
+      desc: third reminder, keep it warm
+    - label: firm reminder
+      desc: copy in their accounts team
+    - label: pick up the phone
+      desc: it's been 45 days
+
+- id: plan-newsletter-angle
+  group: plan
+  type: plan
+  question: What's the newsletter angle?
+  selected: 1
+  options:
+    - label: behind-the-scenes
+      desc: what you're actually building
+    - label: curated finds
+      desc: the best stuff, before it's popular
+    - label: tutorials
+      desc: step-by-step guides
+    - label: hot takes
+      desc: opinions on AI trends

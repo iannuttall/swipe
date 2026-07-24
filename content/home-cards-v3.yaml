@@ -1,0 +1,794 @@
+# ── Background cards, v3 ──────────────────────────────────────
+#
+# Principle: artifacts, not adverts. Every card should read like a
+# screenshot of something that actually happened in the AI-augmented
+# week of a founder, marketer or operator — not like landing-page copy.
+#
+# Audience: business people, marketers, founders, entrepreneurs.
+# Test for every card: "didn't know AI could do that" or a specific
+# detail that proves it happened.
+# ───────────────────────────────────────────────────────────────
+
+# ── build ─────────────────────────────────────────────────────
+
+- id: one-word-domain-finder
+  group: build
+  type: field-note
+  eyebrow: Built this week
+  title: A one-word domain finder
+  text: Give it a rough idea. It expands the concept, checks hundreds of extensions and ranks the names worth registering.
+  result: 300 open tabs became one shortlist.
+
+- id: agent-publish-button
+  group: build
+  type: field-note
+  eyebrow: Tiny idea, big upgrade
+  title: Give your agent a publish button
+  text: Let an AI agent turn its work into a report, dashboard or one-pager with a real shareable link.
+  result: Publish the next research task instead of pasting it into a doc.
+
+- id: screenshot-to-site
+  group: build
+  type: before-after
+  title: Rebuild a page from a screenshot
+  before: A flat image with no editable parts
+  after: A responsive page you can change and ship
+
+- id: spreadsheet-to-app
+  group: build
+  type: result
+  app: stockroom.tools
+  title: The spreadsheet became an app
+  detail: The same data, now with a clean form, search, permissions and automatic reminders.
+  status: shared with 8 people
+
+- id: talk-a-prototype-into-life
+  group: build
+  type: chat
+  messages:
+    - role: user
+      text: |
+        I need a tiny tool that sorts this CSV and gives each lead a score.
+    - role: ai
+      text: |
+        Done. Drop in the file, tune the scoring rules and export the shortlist.
+
+- id: numbers-before-nine
+  group: build
+  type: result
+  app: localhost/dashboard
+  title: Every number that matters, before 9am
+  detail: Revenue, pipeline, sign-ups and blockers, pulled onto one page by an agent overnight.
+  status: refreshed 6:47 AM
+
+- id: quote-calculator
+  group: build
+  type: result
+  app: quote-builder
+  title: The pricing PDF became a quote calculator
+  detail: Sales picks the options, the numbers update live and the finished quote lands in the CRM as a draft.
+  status: used 31 times this week
+
+- id: fastest-path-to-mvp
+  group: build
+  type: chat
+  messages:
+    - role: user
+      text: |
+        I have an idea for a SaaS. What's the fastest path to MVP?
+    - role: ai
+      text: |
+        What's the single workflow it replaces? Forget features.
+    - role: user
+      text: |
+        Manual competitor monitoring. Teams spend hours checking sites weekly.
+    - role: ai
+      text: |
+        MVP: check 10 URLs daily, diff the changes, send a Slack summary. No dashboard, no login, no billing. Build it in a weekend.
+
+- id: plan-competitor-tracker
+  group: build
+  type: file
+  filename: /plans/competitor-tracker.md
+  text: |
+    # Build a competitor price tracker
+
+    Watch competitor pricing pages
+    daily, diff the changes, and
+    alert the team before they find
+    out from a customer.
+
+    ## Steps
+
+    [ ] List target URLs
+    [ ] Scrape on a daily schedule
+    [ ] Diff current vs previous
+    [ ] Post the before/after to Slack
+    ...
+
+- id: warranty-form
+  group: build
+  type: chat
+  messages:
+    - role: user
+      text: |
+        Build a form that logs warranty claims into the spreadsheet and emails the customer back.
+    - role: ai
+      text: |
+        Done — form, confirmation email and a claims tab. Want a weekly summary of open claims too?
+
+# ── marketing ─────────────────────────────────────────────────
+
+- id: reviews-to-ads
+  group: marketing
+  type: skill
+  title: Turn reviews into better ads
+  giveIt: Your best customer reviews
+  learns: The phrases people repeat, the problems behind them and the result they want
+  output:
+    - '"Set up in one lunch break" — 14 reviews'
+    - '"Finally killed the spreadsheet" — 9 reviews'
+    - 'New headline: "Kill the spreadsheet."'
+
+- id: plain-english-copy-critic
+  group: marketing
+  type: prompt
+  title: Find the vague bits
+  prompt: Read this page like a sceptical customer. Mark every line that sounds impressive but does not say what changes for me.
+  output:
+    - '"Seamless integration" — with what?'
+    - '"Empowers your team" — to do what?'
+    - 'Rewrite: "Send invoices that chase themselves"'
+
+- id: ogilvy-audit
+  group: marketing
+  type: prompt
+  title: Grade your page like Ogilvy
+  prompt: Score this page out of 100 against Ogilvy's advertising principles. Rank the biggest gaps, then rewrite the copy to hit 100.
+  output:
+    - 49/100 — "reads like a changelog, not an ad"
+    - No proof anywhere. Not one number, name or result.
+    - The headline lists features instead of hooking
+    - Rewrite attached. It hurts because it's right.
+
+- id: audience-language-report
+  group: marketing
+  type: message
+  sender: Audience research
+  text: |
+    People rarely say "increase productivity."
+    They say "stop losing Friday to admin."
+
+    I found 14 more phrases worth stealing.
+
+- id: watch-competitor-pages
+  group: marketing
+  type: swipe
+  title: Watch competitor pages for real changes
+  text: Have an agent visit the same pages each week and explain only what changed in the offer, proof or pricing.
+  tryThis: watch three pricing pages every Monday
+
+- id: old-content-new-traffic
+  group: marketing
+  type: workflow
+  title: Find the posts worth updating
+  input: Your analytics and old articles
+  steps:
+    - Spot pages that are slowly slipping
+    - Compare them with current search results
+    - Suggest the smallest useful update
+  output: A ranked refresh list, not a new content treadmill
+
+- id: content-splitter
+  group: marketing
+  type: result
+  app: content-splitter
+  title: One blog post became a week of content
+  detail: An email, six social posts, a video script and a carousel — each rewritten for its channel, not copy-pasted.
+  status: ready to review
+
+- id: copy-teardown
+  group: marketing
+  type: chat
+  messages:
+    - role: user
+      text: |
+        Tear down this landing page copy.
+    - role: ai
+      text: |
+        The hero says "revolutionize your workflow" — that says nothing. CTA is below the fold. No proof anywhere.
+    - role: user
+      text: |
+        Rewrite it.
+    - role: ai
+      text: |
+        New hero: "Stop losing 10 hours a week to manual work." CTA right under it. Features rewritten as outcomes.
+
+- id: seo-audit-chat
+  group: marketing
+  type: chat
+  messages:
+    - role: user
+      text: |
+        Audit my site's SEO.
+    - role: ai
+      text: |
+        Crawling... missing descriptions on 12 pages, no structured data on the blog, and your best page links to nothing.
+    - role: user
+      text: |
+        Fix all of it.
+    - role: ai
+      text: |
+        Done, except the descriptions — I drafted those for your review. They sell better when a human signs off.
+
+- id: welcome-sequence
+  group: marketing
+  type: chat
+  messages:
+    - role: user
+      text: |
+        Write a 5-email welcome sequence. Make it sound like me, not a marketer.
+    - role: ai
+      text: |
+        Dropping the corporate voice — short sentences, one idea per email. Draft 1 of 5 ready.
+
+- id: newsletter-report
+  group: marketing
+  type: message
+  sender: Newsletter report
+  text: |
+    847 new subscribers this week (+12%).
+    Open rate 52%.
+    The Tuesday send beat Thursday. Again.
+
+- id: mention-watcher
+  group: marketing
+  type: message
+  sender: Mention watcher
+  text: |
+    Your product came up in 3 podcasts this week.
+    Two praised the onboarding.
+    One host couldn't find your pricing page.
+
+# ── product ───────────────────────────────────────────────────
+
+- id: interviews-to-themes
+  group: product
+  type: workflow
+  title: Find patterns across user interviews
+  input: Transcripts from recent calls
+  steps:
+    - Tag problems in the customer's words
+    - Count repeated moments and workarounds
+    - Link every theme to the source calls
+  output: A short evidence-backed product brief
+
+- id: sketch-to-prototype
+  group: product
+  type: before-after
+  title: Test the idea before the backlog
+  before: A whiteboard sketch and a long meeting
+  after: A clickable flow that five users can try today
+
+- id: feedback-to-roadmap
+  group: product
+  type: result
+  app: feedback-board
+  title: 286 requests, grouped by real need
+  detail: Duplicates merged, themes named and every insight linked back to the original customer.
+  status: 7 themes need review
+
+- id: release-notes-from-work
+  group: product
+  type: prompt
+  title: Write release notes people understand
+  prompt: Read the shipped tickets. Group them by customer outcome, remove internal project names and explain what changed in plain English.
+  output:
+    - Search is faster (4 seconds → instant)
+    - Invoices can now be edited after sending
+    - The CSV export bug is gone
+
+- id: app-reviews-to-spec
+  group: product
+  type: workflow
+  title: Mine app reviews for product gaps
+  input: Reviews for your app and its alternatives
+  steps:
+    - Separate bugs from missing outcomes
+    - Find complaints shared across products
+    - Turn the strongest gap into a small spec
+  output: One testable feature idea with evidence
+
+- id: pricing-page-changed
+  group: product
+  type: message
+  sender: Pricing watcher
+  text: |
+    Acme removed the free plan.
+    Team pricing moved from £12 to £18.
+    Their annual discount stayed the same.
+
+- id: prototype-test-recap
+  group: product
+  type: message
+  sender: Prototype test
+  text: |
+    4 of 5 people missed the export button.
+    All five understood the new filter.
+    The empty state needs one real example.
+
+- id: churn-watch
+  group: product
+  type: message
+  sender: Churn watch
+  text: |
+    6 of this month's 9 cancellations
+    stopped using the same feature
+    three weeks before they left.
+
+# ── business ──────────────────────────────────────────────────
+
+- id: sales-call-follow-up
+  group: business
+  type: skill
+  title: Finish the admin after every sales call
+  giveIt: A call recording and access to the CRM
+  learns: Where you keep needs, objections, next steps and the wording you use in follow-ups
+  result: A clean record and an email ready to send
+
+- id: invoice-cleanup
+  group: business
+  type: before-after
+  title: Clean up a month of invoices
+  before: PDFs, forwarded emails and mystery filenames
+  after: One checked spreadsheet with duplicates and missing VAT flagged
+
+- id: notes-to-proposal
+  group: business
+  type: prompt
+  title: Turn discovery notes into a proposal
+  prompt: Draft a short proposal from these notes. Do not invent deliverables, dates or certainty. Leave a clear question wherever the scope is still fuzzy.
+  result: A usable first draft with the gaps left visible
+
+- id: support-weekly-report
+  group: business
+  type: result
+  app: support pulse
+  title: What customers struggled with this week
+  detail: The recurring problems, emerging bugs and replies that actually solved them.
+  status: 312 tickets analysed
+
+- id: compare-contracts
+  group: business
+  type: swipe
+  title: Compare the new contract with the old one
+  text: Ask AI to show changed obligations, dates and costs in a table, with a link to every clause.
+  tryThis: treat the result as a review aid, not legal advice
+
+- id: weekly-ops-brief
+  group: business
+  type: message
+  sender: Monday brief
+  text: |
+    Revenue is on plan.
+    Two projects are blocked by the same approval.
+    Three invoices are now over 30 days late.
+
+- id: kill-the-meeting
+  group: business
+  type: before-after
+  title: Replace the status meeting
+  before: Six people reading their updates aloud
+  after: One agent-written brief with decisions and blockers highlighted
+
+- id: inbox-triage
+  group: business
+  type: message
+  sender: Inbox triage
+  time: "6:58 AM"
+  text: |
+    42 emails overnight. 3 need you.
+    I drafted replies for 11 more
+    and archived the rest.
+
+- id: meeting-prep
+  group: business
+  type: message
+  sender: Meeting prep
+  text: |
+    You meet Dana at 2pm. Since your last call:
+    they raised a Series A, changed pricing,
+    and your proposal went unanswered.
+
+- id: books-check
+  group: business
+  type: message
+  sender: Books check
+  time: "2:41 AM"
+  text: |
+    Reconciled the month.
+    One duplicate charge, one missing receipt.
+    Flagged both — go back to sleep.
+
+- id: hiring-screen
+  group: business
+  type: workflow
+  title: Screen 200 applications fairly
+  input: A folder of CVs and your must-haves
+  steps:
+    - Score each against the same criteria
+    - Quote the evidence for every score
+    - Flag the borderline ones for a human
+  output: A shortlist with reasons, not vibes
+
+- id: follow-up-chaser
+  group: business
+  type: message
+  sender: Follow-up bot
+  text: |
+    4 proposals have gone quiet.
+    I drafted polite nudges in your voice.
+    Approve to send.
+
+# ── research ──────────────────────────────────────────────────
+
+- id: pdf-to-cited-brief
+  group: research
+  type: workflow
+  title: Turn a dense PDF into a useful brief
+  input: A report you do not have an afternoon to read
+  steps:
+    - Extract the claims that matter to you
+    - Check them against the tables and notes
+    - Add page links for every important point
+  output: A brief you can verify in minutes
+
+- id: searchable-bookmarks
+  group: research
+  type: result
+  app: saved-stuff
+  title: Your bookmarks can answer questions now
+  detail: Articles, videos and notes are indexed by meaning, with the original source one click away.
+  status: 1,842 items searchable
+
+- id: spreadsheet-patterns
+  group: research
+  type: prompt
+  title: Find the strange thing in this spreadsheet
+  prompt: Show me the pattern first. Then explain it in plain English and list the rows that prove it.
+  result: The odd bit, with receipts
+
+- id: saved-tabs-to-market-map
+  group: research
+  type: before-after
+  title: Map a market from your open tabs
+  before: Twenty-seven companies and no clear picture
+  after: Categories, overlaps, gaps and a short note on every company
+
+- id: comments-to-faq
+  group: research
+  type: workflow
+  title: Find questions hiding in comments
+  input: Comments from useful videos, forums or communities
+  steps:
+    - Pull out genuine unanswered questions
+    - Merge repeated versions of the same need
+    - Rank them by frequency and urgency
+  output:
+    - '"Can I do this without a website?" — asked 31 times, answered twice'
+    - '"Does it work for services?" — 17 times, never answered'
+    - One video could own both answers
+
+- id: claim-checker
+  group: research
+  type: prompt
+  title: Make AI argue with its own research
+  prompt: Build the strongest case against your conclusion. Show weak evidence, missing sources and what would change your mind.
+  output:
+    - Two of your sources are quoting the same blog post
+    - The 40% stat is from 2019
+    - The conclusion survives, with one caveat attached
+
+- id: topic-brief-delivered
+  group: research
+  type: message
+  sender: Research agent
+  text: |
+    I read 18 sources and rejected five weak ones.
+    The brief has four findings, two disagreements
+    and links to the original evidence.
+
+- id: new-market-crash-course
+  group: research
+  type: before-after
+  title: Get up to speed on a new market
+  before: Forty tabs, three analyst reports and a folder of PDFs
+  after: A briefing, the five companies that matter and the questions worth asking
+
+# ── create ────────────────────────────────────────────────────
+
+- id: logo-png-to-svg
+  group: create
+  type: skill
+  title: Turn an AI logo into a real SVG
+  giveIt: A fuzzy PNG from ChatGPT or another image tool
+  learns: How to rebuild the shapes, paths and lettering, then compare its work with the original
+  result: A crisp, editable logo at any size
+
+- id: train-your-writing-voice
+  group: create
+  type: skill
+  title: Teach an agent how you write
+  giveIt: 30 to 100 things you have written
+  learns: Your phrases, rhythm, word choice and sentence patterns
+  output:
+    - Short sentences. No hedging.
+    - Never opens with "I hope this finds you well"
+    - Says "buy" where drafts said "invest in"
+
+- id: logo-to-brand-kit
+  group: create
+  type: before-after
+  title: Grow one logo into a brand kit
+  before: A single logo file sitting in Downloads
+  after: Colours, type, icons, social cards and simple usage rules
+
+- id: podcast-to-clips
+  group: create
+  type: result
+  app: clip-maker
+  title: 47 minutes became six useful clips
+  detail: The best moments were found, reframed, captioned and given titles without scrubbing the timeline.
+  status: ready to review
+
+- id: sketch-to-product-shot
+  group: create
+  type: swipe
+  title: Turn a rough sketch into a product shot
+  text: Keep the shape of your idea, then ask AI to explore materials, lighting and real-world settings.
+  tryThis: photograph the sketch beside one reference image
+
+- id: voice-notes-to-update
+  group: create
+  type: result
+  app: weeknotes
+  title: Five voice notes became the investor update
+  detail: Rambling thoughts merged, numbers checked against the dashboard, recordings kept beside the draft.
+  status: draft for review
+
+- id: deck-cut
+  group: create
+  type: chat
+  messages:
+    - role: user
+      text: |
+        This deck is 34 slides. The meeting is 20 minutes.
+    - role: ai
+      text: |
+        Cut to 9. Everything else moved to an appendix the numbers people can dig into afterwards.
+
+# ── agents ────────────────────────────────────────────────────
+
+- id: memory-md
+  group: agents
+  type: file
+  filename: MEMORY.md
+  text: |
+    # What I know about you
+
+    - Prefers bullets over paragraphs
+    - No meetings before 10am
+    - Quotes in USD, invoices in GBP
+    - Will always pick the simpler option
+    - Signs off emails with just "ian"
+
+- id: agents-md
+  group: agents
+  type: file
+  filename: AGENTS.md
+  text: |
+    # House rules
+
+    - Draft, never send without approval
+    - Check every number against the source
+    - Flag anything legal or pricing
+    - If unsure, ask one question — not five
+
+- id: skill-competitor-watch
+  group: agents
+  type: file
+  filename: SKILL.md
+  text: |
+    ---
+    name: competitor-watch
+    description: Visit saved competitor
+      pages weekly and report only
+      what actually changed.
+    ---
+
+    1. Load the watchlist
+    2. Compare against last week's copy
+    3. Ignore cosmetic changes
+    4. Post offer, proof and pricing
+       diffs to Slack
+
+- id: skill-after-call
+  group: agents
+  type: file
+  filename: SKILL.md
+  text: |
+    ---
+    name: after-call
+    description: Turn call recordings
+      into CRM updates and a
+      follow-up draft.
+    ---
+
+    1. Pull needs, objections, next steps
+    2. Update the right CRM fields
+    3. Draft the follow-up in my voice
+    4. Queue it for approval
+
+- id: skill-chase-invoices
+  group: agents
+  type: file
+  filename: SKILL.md
+  text: |
+    ---
+    name: chase-invoices
+    description: Find overdue invoices
+      and draft polite chasers
+      in my tone.
+    ---
+
+    1. List invoices over 30 days
+    2. Check for part-payments first
+    3. Draft a chaser per client
+    4. Never send — queue for review
+
+- id: plan-invoice-chase
+  group: agents
+  type: plan
+  question: How should I chase this late invoice?
+  selected: 0
+  options:
+    - label: friendly nudge
+      desc: third reminder, keep it warm
+    - label: firm reminder
+      desc: copy in their accounts team
+    - label: pick up the phone
+      desc: it's been 45 days
+
+- id: plan-newsletter-angle
+  group: agents
+  type: plan
+  question: What's the newsletter angle?
+  selected: 1
+  options:
+    - label: behind-the-scenes
+      desc: what you're actually building
+    - label: curated finds
+      desc: the best stuff, before it's popular
+    - label: tutorials
+      desc: step-by-step guides
+    - label: hot takes
+      desc: opinions on AI trends
+
+- id: spotted-early
+  group: agents
+  type: field-note
+  eyebrow: Spotted before it blew up
+  title: Agents that read your receipts
+  text: A tiny tool that turns order confirmations into a live spending dashboard. It had 40 users when we found it.
+  result: It has 40,000 now.
+
+- id: morning-digest
+  group: agents
+  type: message
+  sender: Morning digest
+  time: "7:02 AM"
+  text: |
+    3 new subscribers overnight.
+    The proposal was opened twice at 11pm.
+    Nothing needs you before coffee.
+
+- id: flight-handoff
+  group: agents
+  type: chat
+  messages:
+    - role: user
+      text: |
+        I'm on a flight for the next 6 hours. Keep working through the research list.
+    - role: ai
+      text: |
+        Will do. Three briefs will be ready when you land.
+
+# ── terminal ──────────────────────────────────────────────────
+
+- id: ralph-loop
+  group: terminal
+  type: terminal
+  title: agent loop
+  text: |
+    $ agent run --plan
+    plans/faq-miner.md
+
+    iteration 1 of 25
+    -> pull comments from niche videos
+    -> cluster repeated questions
+    -> draft an "audience asks" brief
+
+- id: churn-risk-terminal
+  group: terminal
+  type: terminal
+  title: claude code
+  text: |
+    $ claude -p "read this quarter's
+    support tickets, rank churn risks"
+
+    Reading 1,204 tickets...
+    ✓ 7 recurring problems
+    ✓ 3 accounts at risk
+    ✓ saved to reports/q3-churn.md
+
+- id: monday-cron
+  group: terminal
+  type: terminal
+  title: cron
+  text: |
+    $ crontab -e
+    0 7 * * 1 competitor-watch --diff
+
+    ✓ every Monday, 7am:
+      what changed, before standup
+
+- id: overnight-run
+  group: terminal
+  type: terminal
+  title: overnight
+  text: |
+    $ agent run overnight.md
+
+    ✓ inbox triaged (42 → 3)
+    ✓ 4 invoice chasers drafted
+    ✓ competitor diff saved
+
+    done in 11m — while you slept
+
+# ── fun ───────────────────────────────────────────────────────
+
+- id: landing-page-meta
+  group: fun
+  type: chat
+  messages:
+    - role: user
+      text: |
+        hey, how do I make a landing page like this one?
+    - role: ai
+      text: |
+        did you try subscribing to the newsletter?
+    - role: user
+      text: |
+        I'll do that right now!
+
+- id: did-ai-write-this
+  group: fun
+  type: chat
+  messages:
+    - role: user
+      text: |
+        Did AI write this email?
+    - role: ai
+      text: |
+        You wrote it. I just removed the three paragraphs where you apologised for asking.
+
+- id: attend-my-meeting
+  group: fun
+  type: chat
+  messages:
+    - role: user
+      text: |
+        Can you attend this meeting for me?
+    - role: ai
+      text: |
+        No. But I read the pre-read and drafted your three questions — you can leave after asking them.

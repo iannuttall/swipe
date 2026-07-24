@@ -106,7 +106,8 @@ export function DitherCard({
   }, [shape, motionSeed])
 
   const defaultBack = theme?.bg || '#ffffff'
-  const defaultFront = theme?.fg || '#0f1115'
+  const defaultFront =
+    variant === 'strips' && theme?.isDark ? '#ffffff' : theme?.fg || '#0f1115'
 
   // Fade in after client hydration so the dither doesn't pop in jarringly
   const [visible, setVisible] = React.useState(false)

@@ -1,20 +1,18 @@
 - id: one-word-domain-finder
   group: build
-  type: workflow
-  title: Find a one-word domain
-  input: A short description of the project
-  steps:
-    - Generate related real words
-    - Check hundreds of extensions
-    - Rank the names that sound good aloud
-  output: A shortlist you can actually register
+  type: field-note
+  eyebrow: Built this week
+  title: A one-word domain finder
+  text: Give it a rough idea. It expands the concept, checks hundreds of extensions and ranks the names worth registering.
+  result: 300 open tabs became one shortlist.
 
 - id: agent-publish-button
   group: build
-  type: swipe
+  type: field-note
+  eyebrow: Tiny idea, big upgrade
   title: Give your agent a publish button
-  text: Let any AI agent turn its work into a report, dashboard or one-pager with a real shareable link.
-  tryThis: publish the next research task instead of pasting it into a doc
+  text: Let an AI agent turn its work into a report, dashboard or one-pager with a real shareable link.
+  result: Publish the next research task instead of pasting it into a doc.
 
 - id: screenshot-to-site
   group: build
@@ -63,25 +61,19 @@
 
 - id: logo-png-to-svg
   group: create
-  type: workflow
+  type: skill
   title: Turn an AI logo into a real SVG
-  input: A fuzzy PNG from an image generator
-  steps:
-    - Identify shapes, paths and type
-    - Rebuild the mark as clean vectors
-    - Compare the render with the original
-  output: A crisp, editable logo at any size
+  giveIt: A fuzzy PNG from ChatGPT or another image tool
+  learns: How to rebuild the shapes, paths and lettering, then compare its work with the original
+  result: A crisp, editable logo at any size
 
 - id: train-your-writing-voice
   group: create
-  type: workflow
+  type: skill
   title: Teach an agent how you write
-  input: 30 to 100 things you have written
-  steps:
-    - Find your phrases and sentence patterns
-    - Map tone, rhythm and word choice
-    - Turn the analysis into reusable rules
-  output: Drafts that sound like you, not like AI
+  giveIt: 30 to 100 things you have written
+  learns: Your phrases, rhythm, word choice and sentence patterns
+  result: Writing rules the agent can use again
 
 - id: logo-to-brand-kit
   group: create
@@ -125,14 +117,11 @@
 
 - id: reviews-to-ads
   group: marketing
-  type: workflow
+  type: skill
   title: Turn reviews into better ads
-  input: Your best customer reviews
-  steps:
-    - Pull out the exact phrases people repeat
-    - Group them by problem and desired result
-    - Draft ads around the strongest language
-  output: Copy built from what customers already say
+  giveIt: Your best customer reviews
+  learns: The phrases people repeat, the problems behind them and the result they want
+  result: Ad copy built from what customers already say
 
 - id: webinar-to-campaign
   group: marketing
@@ -143,14 +132,10 @@
 
 - id: plain-english-copy-critic
   group: marketing
-  type: chat
-  messages:
-    - role: user
-      text: |
-        Tear down this landing page. Tell me where it gets vague or starts sounding corporate.
-    - role: ai
-      text: |
-        The hero promises "transformation" but never says what changes. Lead with the saved time instead.
+  type: prompt
+  title: Find the vague bits
+  prompt: Read this page like a sceptical customer. Mark every line that sounds impressive but does not say what changes for me.
+  result: A sharper page built around the actual outcome
 
 - id: brand-voice-campaign
   group: marketing
@@ -216,14 +201,10 @@
 
 - id: release-notes-from-work
   group: product
-  type: chat
-  messages:
-    - role: user
-      text: |
-        Read the shipped tickets and write release notes customers will understand.
-    - role: ai
-      text: |
-        I grouped them into three outcomes and removed the internal project names. Want the short version too?
+  type: prompt
+  title: Write release notes people understand
+  prompt: Read the shipped tickets. Group them by customer outcome, remove internal project names and explain what changed in plain English.
+  result: Release notes worth reading
 
 - id: app-reviews-to-spec
   group: product
@@ -256,14 +237,11 @@
 
 - id: sales-call-follow-up
   group: business
-  type: workflow
+  type: skill
   title: Finish the admin after every sales call
-  input: A call recording
-  steps:
-    - Pull out needs, objections and next steps
-    - Update the right CRM fields
-    - Draft the follow-up in your voice
-  output: A clean record and an email ready to send
+  giveIt: A call recording and access to the CRM
+  learns: Where you keep needs, objections, next steps and the wording you use in follow-ups
+  result: A clean record and an email ready to send
 
 - id: invoice-cleanup
   group: business
@@ -274,14 +252,10 @@
 
 - id: notes-to-proposal
   group: business
-  type: chat
-  messages:
-    - role: user
-      text: |
-        Turn these discovery notes into a short proposal. Do not invent deliverables or dates.
-    - role: ai
-      text: |
-        Drafted. I left two questions where the scope is still unclear.
+  type: prompt
+  title: Turn discovery notes into a proposal
+  prompt: Draft a short proposal from these notes. Do not invent deliverables, dates or certainty. Leave a clear question wherever the scope is still fuzzy.
+  result: A usable first draft with the gaps left visible
 
 - id: support-weekly-report
   group: business
@@ -335,14 +309,10 @@
 
 - id: spreadsheet-patterns
   group: research
-  type: chat
-  messages:
-    - role: user
-      text: |
-        What is strange in this spreadsheet? Show me the pattern before you explain it.
-    - role: ai
-      text: |
-        Returns jump when delivery takes over four days. I charted it and listed the 23 affected orders.
+  type: prompt
+  title: Find the strange thing in this spreadsheet
+  prompt: Show me the pattern first. Then explain it in plain English and list the rows that prove it.
+  result: The odd bit, with receipts
 
 - id: saved-tabs-to-market-map
   group: research
@@ -364,10 +334,10 @@
 
 - id: claim-checker
   group: research
-  type: swipe
+  type: prompt
   title: Make AI argue with its own research
-  text: Use one pass to build the case and another to attack weak claims, missing sources and convenient assumptions.
-  tryThis: ask what evidence would change the conclusion
+  prompt: Build the strongest case against your conclusion. Show weak evidence, missing sources and what would change your mind.
+  result: A conclusion that survives a second pass
 
 - id: topic-brief-delivered
   group: research
@@ -428,18 +398,15 @@
 
 - id: searchable-family-archive
   group: everyday
-  type: workflow
+  type: skill
   title: Make old family photos searchable
-  input: Scanned albums and boxes of unlabeled pictures
-  steps:
-    - Group photos by faces, place and decade
-    - Transcribe notes written on the back
-    - Let relatives add names and stories
-  output: An archive you can search and share
+  giveIt: Scanned albums and boxes of unlabeled pictures
+  learns: How to group faces, places and decades while keeping family names and stories attached
+  result: An archive your family can search and add to
 
 - id: gift-finder
   group: everyday
-  type: swipe
+  type: prompt
   title: Find a gift from the clues you already have
-  text: Feed AI a few messages, hobbies and your budget, then ask for thoughtful ideas rather than a shopping list.
-  tryThis: request five ideas that cannot be bought on Amazon
+  prompt: Use these messages, hobbies and my budget. Give me five thoughtful ideas that cannot be bought on Amazon.
+  result: A gift that feels like you paid attention

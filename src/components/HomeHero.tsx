@@ -17,7 +17,8 @@ export function HomeHero() {
             <Rainbow as="em" invert animated className="font-mono font-semibold">
               The
             </Rainbow>{' '}
-            weekly newsletter that helps you learn AI by actually doing cool things with it.
+            newsletter to learn AI by stealing the cool ideas, skills, and tools you didn't
+            know you needed.
           </p>
           <NewsletterForm
             source="home_v2_cta"

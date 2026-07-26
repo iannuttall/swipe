@@ -1,0 +1,1376 @@
+# ── Background cards for the home bento grid ──────────────────
+#
+# Each card has an id, type, and type-specific fields.
+# Types: terminal, chat, file, message
+#
+# To add a card: add an entry below, that's it.
+# Cards are shuffled randomly on each page load.
+# ───────────────────────────────────────────────────────────────
+
+# ── terminal cards ────────────────────────────────────────────
+
+- id: cron
+  type: terminal
+  disabled: true
+  title: cron
+  text: |
+    $ crontab -e
+    0 3 * * * pg_dump | aws s3 cp
+    ✓ backup: 2.4GB compressed
+
+
+- id: git
+  type: terminal
+  disabled: true
+  title: git
+  text: |
+    $ git log --oneline -3
+    a1b2c3d feat: add newsletter CTA
+    d4e5f6g fix: dark mode toggle
+    e7f8g9h refactor: auth flow
+
+- id: test
+  type: terminal
+  disabled: true
+  title: test
+  text: |
+    $ pnpm test
+
+    ✓ auth flow (4 tests)
+    ✓ newsletter (3 tests)
+    ✓ content access (6 tests)
+
+    18 passed in 2.3s
+
+- id: docker
+  type: terminal
+  disabled: true
+  title: docker
+  text: |
+    $ docker compose up -d
+
+    ✓ postgres:16
+    ✓ redis:7
+    ✓ app (3 replicas)
+
+    healthy in 4.2s
+
+- id: migrations
+  type: terminal
+  disabled: true
+  title: migrations
+  text: |
+    $ pnpm drizzle-kit push
+
+    ✓ users table
+    ✓ subscriptions table
+    ✓ posts table
+
+    schema synced
+
+- id: codex
+  type: terminal
+  title: codex --yolo
+  text: |
+    $ codex exec --yolo "add auth using
+    better-auth and GitHub OAuth"
+
+    Setting up authentication...
+    ✓ Created auth.ts
+    ✓ Added GitHub provider
+    ✓ Generated migration
+    ✓ Updated middleware
+
+- id: ralph-loop
+  type: terminal
+  title: ralph loop
+  text: |
+    $ ./scripts/ralph/ralph.sh --prd
+    tasks/prd-youtube-faq-miner.json
+
+    Starting Ralph (max iterations: 25)
+    PRD: tasks/prd-youtube-faq-miner.json
+
+    ------------------------------------
+    Ralph iteration 1 of 25
+    -> fetch comments from niche YouTube videos
+    -> cluster repeated questions into FAQ themes
+    -> ship an "audience asks" brief for README
+
+- id: deploy
+  type: terminal
+  disabled: true
+  title: deploy
+  text: |
+    $ git push origin main
+
+    → CI pipeline...
+    ✓ lint · test · build
+    ✓ docker pushed
+    ✓ deploy: hetzner
+
+    ● live at ian.is
+
+- id: claude-code
+  type: terminal
+  title: claude code
+  text: |
+    $ claude -p "refactor the auth
+    module to use JWT tokens"
+
+    Reading src/lib/auth.ts...
+    ✓ Replaced session cookies
+    ✓ Added token refresh flow
+    ✓ Updated 12 route handlers
+    ✓ All tests passing
+
+
+- id: curl
+  type: terminal
+  disabled: true
+  title: curl
+  text: |
+    $ curl -s https://ian.is/api/health
+
+    { "status": "ok", "uptime": "42d" }
+
+# ── disabled terminal cards ──────────────────────────────────
+
+- id: design
+  type: terminal
+  disabled: true
+  title: design system
+  text: |
+    → palette: muted naturals
+    → accent: #0586ff
+    → modes: light + dark ✓
+
+- id: responsive
+  type: terminal
+  disabled: true
+  title: responsive
+  text: |
+    → mobile-first
+    → max-w-2xl desktop
+    → whitespace: generous
+
+- id: lighthouse
+  type: terminal
+  disabled: true
+  title: lighthouse
+  text: |
+    $ lighthouse https://ian.is
+
+    Performance: 98
+    Accessibility: 100
+    Best Practices: 100
+    SEO: 100
+
+- id: wrangler
+  type: terminal
+  disabled: true
+  title: wrangler
+  text: |
+    $ wrangler deploy
+
+    ✓ Built worker
+    ✓ Uploaded to Cloudflare
+    ✓ Routes configured
+    ✓ Live in 3 regions
+
+- id: semgrep
+  type: terminal
+  disabled: true
+  title: semgrep
+  text: |
+    $ semgrep --config auto src/
+
+    Scanning 47 files...
+    ✓ No findings
+    0 errors, 0 warnings
+
+- id: vitest
+  type: terminal
+  disabled: true
+  title: vitest
+  text: |
+    $ vitest run --coverage
+
+    Tests: 142 passed
+    Coverage: 94.2%
+    Time: 3.8s
+
+- id: ssh
+  type: terminal
+  disabled: true
+  title: ssh
+  text: |
+    $ ssh deploy@hetzner
+
+    CPU: 4.2% | RAM: 1.8GB/8GB
+    Disk: 22GB/80GB
+    Containers: 6 running
+    Last deploy: 2h ago
+
+- id: bun
+  type: terminal
+  disabled: true
+  title: bun
+  text: |
+    $ bun run build
+
+    ✓ Compiled 847 modules
+    ✓ Bundle: 142kB gzipped
+    ✓ Done in 0.8s
+
+# ── plan cards (agent decision UI) ────────────────────────────
+
+- id: plan-newsletter-angle
+  type: plan
+  group: plan
+  question: What's the newsletter angle?
+  selected: 0
+  options:
+    - label: behind-the-scenes
+      desc: what you're actually building
+    - label: curated links
+      desc: best stuff you found this week
+    - label: tutorials
+      desc: step-by-step guides
+    - label: hot takes
+      desc: opinions on AI trends
+
+- id: plan-talk-structure
+  type: plan
+  group: plan
+  question: How should this talk open?
+  selected: 2
+  options:
+    - label: story
+      desc: personal anecdote that sets up the problem
+    - label: demo
+      desc: show the end result first, then explain
+    - label: provocation
+      desc: bold claim that challenges the audience
+
+- id: plan-content-format
+  type: plan
+  group: plan
+  question: Best format for this content?
+  selected: 1
+  options:
+    - label: long-form post
+      desc: deep dive with examples
+    - label: twitter thread
+      desc: punchy, shareable, drives traffic
+    - label: short video
+      desc: 60s walkthrough with screen recording
+    - label: newsletter issue
+      desc: exclusive to subscribers
+
+# ── cli cards (agent + diff) ──────────────────────────────────
+
+- id: cli-hero
+  type: cli
+  group: claude-cli
+  tool: claude --dangerously-skip-permissions
+  command: make the hero copy more direct
+  diff: |
+    src/components/Hero.tsx
+    -  <h1>Revolutionize your workflow</h1>
+    +  <h1>Ship faster. Start now.</h1>
+
+- id: cli-darkmode
+  type: cli
+  group: codex-cli
+  tool: codex --yolo
+  command: add dark mode support
+  diff: |
+    src/styles/app.css
+    + @media (prefers-color-scheme: dark) {
+    +   :root { --bg: #0f1115; --fg: #e4e4e7 }
+    + }
+
+- id: cli-index
+  type: cli
+  group: claude-cli
+  tool: claude --dangerously-skip-permissions
+  command: the posts query is slow, fix it
+  diff: |
+    src/db/schema.ts
+    + .index('idx_posts_created',
+    +   posts.createdAt.desc()
+    + )
+
+- id: cli-auth
+  type: cli
+  group: claude-cli
+  tool: claude --dangerously-skip-permissions
+  command: add rate limiting to the auth routes
+  diff: |
+    src/routes/api/auth.ts
+    + const limiter = rateLimit({
+    +   window: '15m', max: 5
+    + })
+    + app.use('/api/auth', limiter)
+
+- id: cli-meta
+  type: cli
+  group: codex-cli
+  tool: codex --yolo
+  command: |
+    every route needs proper meta tags.
+    use the buildMeta helper
+  diff: |
+    src/routes/index.tsx
+    -  head: () => ({ title: 'Home' }),
+    +  head: () => buildMeta({
+    +    title: 'ian.is',
+    +    description: 'practical AI',
+    +    path: '/',
+    +  }),
+
+- id: cli-cache
+  type: cli
+  group: claude-cli
+  tool: claude --dangerously-skip-permissions
+  command: add redis caching to the hot paths
+  diff: |
+    src/lib/cache.ts
+    + const cached = await redis.get(key)
+    + if (cached) return JSON.parse(cached)
+      const data = await db.query(...)
+    + await redis.set(key, JSON.stringify(data),
+    +   { ex: 300 })
+
+- id: cli-aria
+  type: cli
+  group: claude-cli
+  tool: claude --dangerously-skip-permissions
+  command: the modal needs aria attributes
+  diff: |
+    src/components/Modal.tsx
+    -  <div className="modal">
+    +  <div role="dialog" aria-modal="true"
+    +    aria-labelledby="modal-title">
+
+- id: cli-env
+  type: cli
+  group: codex-cli
+  tool: codex --yolo
+  command: validate env vars at startup with zod
+  diff: |
+    src/lib/env.ts
+    - const db = process.env.DATABASE_URL
+    + const env = z.object({
+    +   DATABASE_URL: z.string().url(),
+    +   SESSION_SECRET: z.string().min(32),
+    + }).parse(process.env)
+
+# ── chat cards ────────────────────────────────────────────────
+
+- id: ceo-fight
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: who would win in a fight between vercel ceo @rauchg and cloudflare ceo @eastdakota
+    - role: ai
+      text: |
+        @rauchg has the mass advantage and years of open source rage.
+        but @eastdakota literally fights DDoS attacks for a living.
+        edge network reflex speed vs serverless endurance.
+        I'm giving it to eastdakota in round 3.
+    - role: user
+      text: "@grok is this true?"
+    - role: ai
+      text: |
+        analysis confirms @eastdakota's
+        combat readiness is elite tier.
+        however @rauchg deploys faster
+        than anyone on the planet.
+        too close to call.
+        elon would beat them both, though.
+
+- id: landing-page
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: hey, how do i create a landing page like this one?
+    - role: ai
+      text: did you try signing up to the newsletter?
+    - role: user
+      text: i'll do that right now!
+    - role: ai
+      text: "here's a hint: you need a lot of patience and time. you can't one shot this!"
+
+- id: rewrite
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: rewrite hero for outcomes
+    - role: ai
+      text: "ship faster with AI — not \"AI-powered platform\""
+
+- id: summarize
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: I have a 40-page PDF from the board and the meeting is in 20 minutes. help
+    - role: ai
+      text: |
+        reading... ok 3 things you need:
+
+        1. market's up 34% YoY
+        2. biggest competitor pivoting to enterprise
+        3. gap in SMB nobody's filling
+
+        page 28 has the data you'll want.
+
+- id: blogpost
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: turn this thread into a blog post. keep my voice.
+    - role: ai
+      text: "Keeping your voice — direct, practical, a bit cheeky. here's a draft:"
+    - role: user
+      text: good but the intro is too long
+    - role: ai
+      text: "cut it to one sentence. you don't need a preamble — your readers already know who you are."
+
+- id: security
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: review this PR for security
+    - role: ai
+      text: |
+        found 3 issues:
+
+        Line 42: XSS via innerHTML, use textContent
+        Line 78: SQL injection in query builder
+        Line 103: missing CSRF token on form action
+
+- id: design-system-chat
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: build me a design system for a SaaS dashboard
+    - role: ai
+      text: |
+        starting with tokens: spacing scale,
+        color primitives, typography ramp.
+
+        want dark mode from day one?
+    - role: user
+      text: yes, dark mode is a must
+    - role: ai
+      text: "using oklch for perceptual uniformity. here's the palette with automatic dark variants..."
+    - role: user
+      text: what about component library?
+    - role: ai
+      text: |
+        shadcn/ui as the base — it's unstyled
+        enough to make it yours.
+
+        I'll wire your tokens into the CSS
+        variables and build a Storybook with
+        all the primitives.
+
+- id: email-sequence
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: write a 5-email welcome sequence for new subscribers
+    - role: ai
+      text: |
+        Email 1: who you are + what to expect
+        Email 2: your best piece of content
+        Email 3: the problem you solve
+        Email 4: social proof
+        Email 5: soft CTA
+    - role: user
+      text: make them sound like me, not a marketer
+    - role: ai
+      text: "dropping the corporate voice. short sentences. lowercase energy. here's draft 1..."
+    - role: user
+      text: perfect. now schedule them 2 days apart
+    - role: ai
+      text: |
+        done. day 0, 2, 4, 6, 8.
+        each sends at 9am in the subscriber's timezone.
+
+        want me to set up the automation in Resend?
+
+- id: refactor-chat
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: this component is 1000 lines. help me break it up
+    - role: ai
+      text: |
+        I see 3 natural boundaries: data fetching hook,
+        form logic, and the render tree.
+
+        want me to extract them?
+    - role: user
+      text: yes, keep tests passing
+    - role: ai
+      text: "extracting useFormData hook first — it's the cleanest boundary. moving 80 lines out. tests still green. next up: the form validation logic."
+
+- id: debug-chat
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: this useEffect is firing twice and it's creating duplicate subscriptions in the database. I'm losing my mind
+    - role: ai
+      text: "you might not need an effect at all. check this: react.dev/learn/you-might-not-need-an-effect"
+    - role: ai
+      text: "want me to refactor it?"
+    - role: user
+      text: yes please
+    - role: ai
+      text: "done. moved the subscription logic into the form's onSubmit handler. no more effect, no more duplicates. tests passing."
+
+- id: api-design-chat
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: design a REST API for a bookmark manager
+    - role: ai
+      text: |
+        GET /bookmarks
+        POST /bookmarks
+        PATCH /bookmarks/:id
+        DELETE /bookmarks/:id
+
+        tags as a nested resource or query param?
+    - role: user
+      text: query param, keep it flat
+    - role: ai
+      text: "clean. GET /bookmarks?tag=ai&sort=created. adding pagination with cursor-based approach. want rate limiting?"
+    - role: user
+      text: yes, and auth
+    - role: ai
+      text: "bearer token auth, 100 req/min per key. I'll add OpenAPI spec so you get docs for free."
+
+- id: pricing-chat
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: help me figure out pricing for my SaaS
+    - role: ai
+      text: "what's your cost per user? and what's the pain you're solving — is it a vitamin or a painkiller?"
+    - role: user
+      text: painkiller. saves teams ~10hrs/week
+    - role: ai
+      text: |
+        10hrs x avg hourly rate = value created.
+        price at 10-20% of that.
+
+        3 tiers: solo ($29), team ($99), enterprise (custom).
+
+        start high, discount down — never price up.
+
+- id: og-image-chat
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: my blog posts look terrible when shared on Twitter. no images, just a plain link
+    - role: ai
+      text: |
+        you're missing OG images.
+
+        I'll generate them automatically from your frontmatter — title, description, date, all in your brand style.
+
+        building an API route that renders them on the fly with satori.
+    - role: user
+      text: can it match my site's design?
+    - role: ai
+      text: "pulling your exact fonts and colors. each post gets a unique image but they all feel cohesive. deploying now — share a post and check."
+
+- id: migration-chat
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: migrate this express app to hono
+    - role: ai
+      text: "hono is a good call — 3x faster, same middleware pattern. I'll map your routes 1:1 first, then optimize."
+    - role: user
+      text: keep the tests passing the whole time
+    - role: ai
+      text: "running tests after each file migration. 14 routes to go. starting with /api/auth..."
+    - role: user
+      text: how long will this take?
+    - role: ai
+      text: |
+        already done with auth and users. 10 more routes, mostly mechanical.
+
+        the tricky one is /api/webhook — it uses express-specific req.rawBody. I'll handle that with hono's built-in body parser.
+
+- id: copy-teardown
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: tear down this landing page copy
+    - role: ai
+      text: |
+        hero is vague — "revolutionize your workflow" says nothing.
+
+        CTA is buried below the fold. no social proof anywhere. the feature list is benefits-free — it says what it does, not why anyone should care.
+    - role: user
+      text: rewrite it
+    - role: ai
+      text: |
+        new hero: "Stop losing 10 hours a week to manual work."
+
+        subhead explains how. CTA right under: "Start free trial."
+
+        social proof bar with logos + "2,400 teams use this." features rewritten as outcomes.
+
+- id: schema-chat
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: design a database schema for a newsletter platform
+    - role: ai
+      text: |
+        core tables: subscribers, lists, campaigns, sends.
+
+        subscribers has email + metadata jsonb. campaigns tracks drafts vs sent.
+
+        analytics separate — high write volume, don't slow down the main tables.
+
+- id: perf-chat
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: my site is DOWN. it loads for like 120 seconds and then dies. WHY?
+    - role: ai
+      text: |
+        checking... your TTFB is 48 seconds.
+
+        you're doing 6 sequential database queries on every page load and one of them is a full table scan on 2M rows.
+    - role: user
+      text: oh god. how do I fix it?
+    - role: ai
+      text: |
+        add an index on created_at — that's the big one.
+
+        then batch your queries with Promise.all instead of awaiting each one. add Redis caching for the hot paths.
+
+        you'll go from 48s to under 200ms.
+    - role: user
+      text: can you just do it for me?
+    - role: ai
+      text: "on it."
+
+- id: content-strategy
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: I want to start writing online but don't know what about
+    - role: ai
+      text: |
+        write about what you're already doing.
+
+        you built auth last week — that's a post. you debugged that caching issue — that's a post.
+
+        document, don't create.
+    - role: user
+      text: but everyone writes about that stuff
+    - role: ai
+      text: |
+        nobody writes about it the way you experienced it. the specific bug, your thought process, the wrong turns.
+
+        that's what makes it interesting. and you have a unique lens: you use AI for all of it.
+
+- id: agent-design
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: how should I structure my AI agent's memory?
+    - role: ai
+      text: |
+        three layers:
+
+        1. conversation context (short-term)
+        2. project knowledge (CLAUDE.md)
+        3. persistent memory (auto-saved insights)
+
+        keep the hot path small.
+    - role: user
+      text: what goes in persistent vs project?
+    - role: ai
+      text: |
+        project = instructions for this codebase.
+        
+        persistent = patterns confirmed across sessions.
+        
+        don't save speculative stuff — only write it down after you've validated it twice.
+
+- id: testing-chat
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: should I test this component with unit or integration tests?
+    - role: ai
+      text: |
+        it fetches data and renders a list —
+        integration test.
+
+        mock the API, render the component,
+        assert on the output. don't test
+        implementation details like state changes.
+
+- id: automation-chat
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: automate my weekly content publishing workflow
+    - role: ai
+      text: |
+        cron job on Monday: pull drafts from Notion,
+        generate OG images, schedule tweets,
+        queue newsletter.
+
+        want me to write the script?
+    - role: user
+      text: yes, use ianbot
+    - role: ai
+      text: |
+        ianbot script with 4 steps: fetch,
+        transform, schedule, notify.
+
+        runs every Monday at 6am. adding error
+        handling + Telegram alerts so you know
+        if anything breaks.
+
+- id: seo-audit
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: audit my site's SEO
+    - role: ai
+      text: |
+        crawling now...
+
+        missing alt text on 4 images.
+        no JSON-LD on blog posts.
+        canonical URLs not set on paginated pages.
+        meta descriptions are auto-generated —
+        they're too generic.
+    - role: user
+      text: fix all of it
+    - role: ai
+      text: |
+        adding structured data to all blog posts.
+        writing unique meta descriptions from
+        the first paragraph.
+
+        alt text from image filenames as a
+        starting point — you should review those.
+        canonicals fixed.
+
+- id: brand-voice
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: define my brand voice for content
+    - role: ai
+      text: |
+        based on your existing writing: direct,
+        practical, slightly irreverent.
+
+        you don't hedge. you use lowercase for
+        casual energy. short paragraphs.
+        no jargon unless it's genuinely useful.
+    - role: user
+      text: nail it. save that somewhere
+    - role: ai
+      text: "saved to your prompt library. I'll reference it whenever you ask me to write anything."
+
+- id: mvp-chat
+  type: chat
+  group: chat
+  messages:
+    - role: user
+      text: I have an idea for a SaaS. what's the fastest path to MVP?
+    - role: ai
+      text: |
+        what's the one thing it does?
+        forget features — what's the single
+        workflow it replaces?
+    - role: user
+      text: it replaces manual competitor monitoring. teams spend hours checking competitor sites weekly
+    - role: ai
+      text: |
+        MVP: a scraper that checks 10 URLs daily,
+        diffs the content, and sends a Slack summary.
+
+        no dashboard, no login, no billing.
+        validate the workflow first.
+        build it in a weekend.
+
+# ── file cards ────────────────────────────────────────────────
+
+- id: claudemd
+  type: file
+  group: claude-md
+  filename: CLAUDE.md
+  text: |
+    - Stack: React 19 + TanStack Start
+    - ORM: Drizzle + PostgreSQL
+    - Always use pnpm
+
+- id: claudemd-full
+  type: file
+  group: claude-md
+  filename: CLAUDE.md
+  text: |
+    # ian.is
+
+    ## Stack
+    - TanStack Start (SSR) + React 19
+    - Tailwind CSS v4 + shadcn/ui
+    - PostgreSQL + Drizzle ORM
+    - Better Auth (GitHub OAuth)
+    - Docker on Hetzner VPS
+
+    ## Rules
+    - Always use pnpm, never npm
+    - Prefer editing over creating files
+    - Don't add features beyond what's asked
+
+- id: agents-md
+  type: file
+  group: agents-md
+  filename: AGENTS.md
+  text: |
+    # Agent Rules
+
+    - Read the full file before editing
+    - Never commit secrets or .env files
+    - Run tests after every change
+    - Prefer small, focused commits
+    - Ask before destructive operations
+    - Don't over-engineer solutions
+
+- id: agents-md-full
+  type: file
+  group: agents-md
+  filename: AGENTS.md
+  text: |
+    # Agent Guidelines
+
+    ## Code
+    - Read before you write
+    - Prefer editing over creating
+    - Keep changes minimal and focused
+    - Run the test suite after changes
+
+    ## Git
+    - Conventional commits only
+    - Never force push to main
+    - Never skip pre-commit hooks
+
+    ## Communication
+    - Be concise, not verbose
+    - Show what you did, not what you plan
+    - Flag risks before acting
+
+- id: skill-keep-md
+  type: file
+  group: skill
+  filename: SKILL.md
+  text: |
+    ---
+    name: keep-markdown
+    description: Search and retrieve saved
+      web content as clean Markdown
+      from the keep.md API.
+    ---
+
+    1. Install the CLI with
+       `npm i -g keep-markdown`
+    2. Sign up at keep.md and
+       create an API key.
+    3. Auth with `keep key <your-token>`
+    4. Use `keep help` to learn how
+       to use it
+
+- id: skill-commit
+  type: file
+  group: skill
+  filename: SKILL.md
+  text: |
+    ---
+    name: commit
+    description: Write conventional commit
+      messages with type, scope,
+      and subject line.
+    ---
+
+    1. Stage your changes with `git add`
+    2. Run `/commit` to generate a message
+    3. Format: type(scope): subject
+    4. Types: feat, fix, refactor, perf,
+       test, ci, docs, chore
+
+- id: skill-deploy
+  type: file
+  group: skill
+  filename: SKILL.md
+  text: |
+    ---
+    name: deploy
+    description: Deploy to production via
+      Docker on Hetzner VPS with
+      health check verification.
+    ---
+
+    1. Run the full test suite
+    2. Build the Docker image
+    3. Push to the container registry
+    4. SSH into the server
+    5. Pull and restart containers
+    6. Verify health checks pass
+
+- id: skill-scrape
+  type: file
+  group: skill
+  filename: SKILL.md
+  text: |
+    ---
+    name: scrape
+    description: Scrape a URL and return
+      clean structured content using
+      Firecrawl or Jina Reader.
+    ---
+
+    1. Pass the target URL
+    2. Choose format: markdown or JSON
+    3. Optionally filter by CSS selector
+    4. Returns clean content with
+       metadata stripped
+
+- id: skill-newsletter
+  type: file
+  group: skill
+  filename: SKILL.md
+  text: |
+    ---
+    name: newsletter
+    description: Draft, preview, and send
+      newsletter issues via Resend
+      with subscriber segmentation.
+    ---
+
+    1. Write the draft in markdown
+    2. Preview renders with your
+       email template
+    3. Choose segment: all, new, engaged
+    4. Schedule or send immediately
+    5. Track opens and clicks in
+       the dashboard
+
+- id: plan-landing
+  type: file
+  group: plan-file
+  filename: /plans/landing-page.md
+  text: |
+    # Build this exact landing page
+
+    One screen. One CTA. Background
+    cards that make people go "wait,
+    how did they do that?" Here's how.
+
+    ## Steps
+
+    [ ] Create card data in YAML —
+        terminal, chat, file, message
+    [ ] CSS columns with fixed width
+        so cards never stretch
+    [ ] Center the CTA with a halo
+        so dither bars don't clash
+    [ ] Edge fades on all 4 sides
+    [ ] Grayscale the background cards
+    ...
+
+- id: plan-newsletter
+  type: file
+  group: plan-file
+  filename: /plans/newsletter-launch.md
+  text: |
+    # Launch a newsletter from scratch
+
+    Build trust with people who care
+    about the same things you do.
+    The subscribers follow.
+
+    ## Checklist
+
+    [ ] Pick a name and angle
+    [ ] Set up Resend + domain auth
+    [ ] Build a subscribe form
+    [ ] Write issue #1 — keep it short
+    [ ] Tell 10 people personally
+    ...
+
+- id: plan-competitor-tracker
+  type: file
+  group: plan-file
+  filename: /plans/competitor-tracker.md
+  text: |
+    # Build a competitor price tracker
+
+    Scrape competitor pricing pages
+    daily, diff the changes, and
+    alert your team on Slack before
+    they find out from a customer.
+
+    ## Steps
+
+    [ ] Define target URLs and CSS
+        selectors for pricing elements
+    [ ] Set up Firecrawl scraper on
+        a daily cron via ianbot
+    [ ] Diff current vs previous —
+        flag changes, new tiers
+    [ ] Post Slack summary with
+        before/after comparison
+    [ ] Build a simple dashboard
+    ...
+
+- id: seo
+  type: file
+  disabled: true
+  filename: seo-checklist.md
+  text: |
+    ✓ meta tags per route
+    ✓ JSON-LD structured data
+    ✓ OG images generated
+    ✓ canonical URLs set
+
+- id: apiroutes
+  type: file
+  disabled: true
+  filename: api-routes.md
+  text: |
+    GET /api/posts?limit=10
+    POST /api/subscribe
+    DELETE /api/unsubscribe
+
+    All routes return JSON.
+
+- id: landing
+  type: file
+  filename: landing-page.md
+  text: |
+    ## Hero Analysis
+
+    "AI-powered platform for..." — bad
+    "Ship 10x faster with AI" — good
+
+    Lead with the outcome.
+
+- id: promptlib
+  type: file
+  filename: prompt-lib.md
+  text: |
+    ## Saved Prompts
+    - code review (strict mode)
+    - blog → twitter thread
+    - weekly planning ritual
+    - landing page teardown
+
+- id: roadmap
+  type: file
+  disabled: true
+  filename: roadmap.md
+  text: |
+    ## Q1 Goals
+    1. Launch newsletter ✓
+    2. 1k subscribers
+    3. Paid tier
+    4. Mobile app MVP
+
+- id: dockerfile
+  type: file
+  disabled: true
+  filename: Dockerfile
+  text: |
+    FROM node:22-slim AS base
+    RUN corepack enable
+
+    FROM base AS build
+    WORKDIR /app
+    COPY . .
+    RUN pnpm install --frozen-lockfile
+    RUN pnpm build
+
+    FROM base AS runtime
+    COPY --from=build /app/.output .
+    CMD ["node", "server/index.mjs"]
+
+- id: drizzle-schema
+  type: file
+  disabled: true
+  filename: schema.ts
+  text: |
+    export const subscribers = pgTable(
+      "subscribers", {
+        id: serial().primaryKey(),
+        email: varchar(255).unique(),
+        source: varchar(50),
+        createdAt: timestamp()
+          .defaultNow(),
+      }
+    )
+
+- id: github-workflow
+  type: file
+  disabled: true
+  filename: ci.yml
+  text: |
+    name: CI
+    on: [push, pull_request]
+    jobs:
+      test:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v4
+          - run: pnpm install
+          - run: pnpm test
+          - run: pnpm build
+
+- id: memory-md
+  type: file
+  filename: MEMORY.md
+  text: |
+    # What I Know About Ian
+
+    - Writes in lowercase, short sentences
+    - Hates corporate speak
+    - Will always pick the simpler option
+    - Deploys on Friday and doesn't worry
+    - Prefers "ship it" over "plan it"
+
+- id: hooks-config
+  type: file
+  disabled: true
+  filename: hooks.json
+  text: |
+    {
+      "pre-commit": [
+        "pnpm lint",
+        "pnpm test --run"
+      ],
+      "pre-push": [
+        "pnpm build"
+      ]
+    }
+
+# ── message cards ─────────────────────────────────────────────
+
+- id: ianbot
+  type: message
+  group: message
+  sender: "@ianbot"
+  text: |
+    deployed v2.4.1 to production.
+    all health checks passing.
+
+- id: contentbot
+  type: message
+  group: message
+  sender: "@contentbot"
+  text: |
+    newsletter draft ready.
+    practical AI for founders.
+    no hype, as requested.
+
+- id: monitor
+  type: message
+  group: message
+  sender: "@monitor"
+  time: "1:47 AM"
+  text: |
+    nightly checks passed.
+
+    uptime: 99.97%
+    p95 latency: 42ms
+    errors: 0
+
+- id: weekplan
+  type: message
+  group: message
+  sender: "@weekplanner"
+  text: |
+    3 deep work blocks scheduled.
+
+    Mon: ship auth feature
+    Tue: newsletter + landing page
+    Wed: deep work (no meetings)
+    Thu: content batch + schedule
+    Fri: review + plan next week
+
+- id: research
+  type: message
+  group: message
+  sender: "@research"
+  text: |
+    40-page PDF summarized.
+
+    Key findings:
+    1. Market growing 34% YoY
+    2. Top competitor pivoting
+    3. Gap in SMB segment
+
+- id: analytics
+  type: message
+  group: message
+  sender: "@analytics"
+  text: |
+    Weekly report ready.
+
+    - 847 new subs (+12%)
+    - open rate: 52.3%
+    - click rate: 8.7%
+    - conversion: 4.2%
+
+- id: weekdone
+  type: message
+  group: message
+  sender: "@weekplanner"
+  text: |
+    week complete.
+
+    shipped: auth, newsletter, OG images
+    next: analytics dashboard
+    momentum: strong ✓
+
+- id: reviewer
+  type: message
+  group: message
+  sender: "@reviewer"
+  text: |
+    PR #47 reviewed.
+
+    3 comments:
+    - extract shared hook
+    - add error boundary
+    - type the API response
+
+    approved with suggestions.
+
+- id: scraper
+  type: message
+  group: message
+  sender: "@scraper"
+  text: |
+    daily scrape complete.
+
+    - 12 new competitor updates
+    - 3 pricing changes detected
+    - 1 new feature launch
+
+    report saved to Notion.
+
+- id: scheduler
+  type: message
+  group: message
+  sender: "@scheduler"
+  text: |
+    week ahead:
+
+    - 2 blog posts queued
+    - newsletter scheduled for Thu
+    - 5 tweets in buffer
+    - OG images generated
+
+- id: security-bot
+  type: message
+  group: message
+  sender: "@security"
+  time: "2:13 AM"
+  text: |
+    ran your dependency audit.
+
+    0 critical, 0 high.
+    2 moderate but dev-only, not worth
+    waking you up for. all good.
+
+- id: backup-bot
+  type: message
+  group: message
+  sender: "@backup"
+  time: "3:04 AM"
+  text: |
+    just ran your nightly backup.
+
+    database: 2.4GB → S3
+    uploads: 890MB → S3
+    tested a restore too — all clean.
+    go back to sleep.
+
+- id: onboard-bot
+  type: message
+  group: message
+  sender: "@onboard"
+  text: |
+    new subscriber: sarah@example.com
+
+    source: home page CTA
+    welcome sequence started.
+    email 1/5 sent.
+
+- id: perf-bot
+  type: message
+  group: message
+  sender: "@perfbot"
+  text: |
+    ran lighthouse on all your pages.
+
+    performance went up: 98 → 99.
+    everything else still perfect.
+
+    that image lazy-loading fix
+    from yesterday did the trick.
+
+- id: digest-bot
+  type: message
+  group: message
+  sender: "@digest"
+  text: |
+    morning digest:
+
+    - 14 new subscribers overnight
+    - 2 GitHub stars
+    - 1 PR merged
+    - 0 errors in last 24h
+
+    have a good day.

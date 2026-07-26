@@ -1,0 +1,26 @@
+---
+import type { HTMLAttributes } from 'astro/types'
+
+type Props = HTMLAttributes<'button'> & {
+  variant?: 'primary' | 'secondary'
+}
+
+const { variant = 'primary', class: className, ...props } = Astro.props as Props
+const variantClasses = {
+  primary: 'bg-primary text-primary-foreground hover:bg-primary-hover',
+  secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary-hover',
+}
+---
+
+<button
+  class:list={[
+    'inline-flex h-9 items-center justify-center rounded-lg border border-transparent px-4 py-2 text-sm font-medium transition-all',
+    'focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/20 focus-visible:outline-none',
+    'disabled:pointer-events-none disabled:opacity-50',
+    variantClasses[variant],
+    className,
+  ]}
+  {...props}
+>
+  <slot />
+</button>

@@ -1,0 +1,10 @@
+node_modules
+dist
+dist-test
+.turbo
+.git
+.env
+.env.*
+coverage
+*.log
+.DS_Store

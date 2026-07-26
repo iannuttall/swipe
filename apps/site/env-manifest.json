@@ -1,0 +1,7 @@
+{
+  "bindings": [],
+  "requiredRemote": ["NEWSLETTER_API_TOKEN", "NEWSLETTER_WEBHOOK_SECRET"],
+  "optionalRemote": ["NEWSLETTER_API_URL"],
+  "d1Migrations": [],
+  "r2Seeds": []
+}

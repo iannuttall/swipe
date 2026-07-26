@@ -1,0 +1,16 @@
+---
+import { getWebConfig } from '@/lib/config'
+
+const config = getWebConfig()
+---
+
+<header class="site-frame flex items-center py-5 text-foreground">
+  <nav aria-label="Breadcrumb" class="flex min-w-0 items-center text-lg font-medium">
+    <a
+      href={config.mainSiteUrl}
+      class="truncate text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+    >
+      {config.mainSiteName}
+    </a>
+  </nav>
+</header>

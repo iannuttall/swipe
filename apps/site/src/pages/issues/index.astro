@@ -1,0 +1,61 @@
+---
+export const prerender = true;
+
+import NewsletterSignup from "@/components/content/NewsletterSignup.astro";
+import PageHeader from "@/components/content/PageHeader.astro";
+import Layout from "@/layouts/Layout.astro";
+import { formatIssueDate, getVisibleIssues } from "@/lib/issues";
+
+const issues = await getVisibleIssues();
+const description =
+  "Every Swipe issue, with practical AI skills, prompts, tools, and workflows you can steal.";
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: "Swipe issues",
+  description,
+  url: new URL("/issues", Astro.site).toString(),
+};
+---
+
+<Layout
+  title="Issues"
+  description={description}
+  canonicalPath="/issues"
+  structuredData={schema}
+>
+  <PageHeader title="Issues" description={description} />
+
+  <div class="mt-10 border-y-2 border-foreground">
+    {
+      issues.length === 0 ? (
+        <p class="py-8 text-muted">No published issues yet.</p>
+      ) : (
+        <ol class="divide-y divide-border">
+          {issues.map((issue) => (
+            <li>
+              <a
+                href={`/issues/${issue.id}`}
+                class="grid gap-2 py-6 no-underline sm:grid-cols-[10rem_1fr] sm:gap-6"
+              >
+                <time class="font-mono text-sm text-muted" datetime={issue.data.pubDate.toISOString()}>
+                  {formatIssueDate(issue.data.pubDate)}
+                </time>
+                <span>
+                  <strong class="font-heading text-xl font-semibold">{issue.data.subject}</strong>
+                  {issue.data.preheader ? (
+                    <span class="mt-1 block text-muted">{issue.data.preheader}</span>
+                  ) : null}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      )
+    }
+  </div>
+
+  <div class="mt-14">
+    <NewsletterSignup source="swipe.md/issues" />
+  </div>
+</Layout>

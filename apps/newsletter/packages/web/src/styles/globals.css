@@ -1,0 +1,137 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Sans";
+  src: url("/fonts/sans-400.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: "Sans";
+  src: url("/fonts/sans-500.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 500;
+}
+@font-face {
+  font-family: "Sans";
+  src: url("/fonts/sans-600.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 600;
+}
+@font-face {
+  font-family: "Sans";
+  src: url("/fonts/sans-700.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 700;
+}
+@font-face {
+  font-family: "Sans Fallback";
+  src: local("Arial");
+  ascent-override: 89.79%;
+  descent-override: 22.36%;
+  line-gap-override: 0%;
+  size-adjust: 107.89%;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/JetBrainsMonoVF.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 100 800;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-background-raised: var(--background-raised);
+  --color-foreground: var(--foreground);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-foreground-soft: var(--foreground-soft);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-hover: var(--secondary-hover);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --font-sans: "Sans", "Sans Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+:root {
+  color-scheme: light dark;
+  --radius: 0.625rem;
+  --frame-max: 48rem;
+  --body-font-size: var(--text-lg);
+  --body-line-height: 1.6;
+  --background: light-dark(oklch(98.5% 0 0), oklch(20.5% 0 0));
+  --background-raised: light-dark(oklch(100% 0 0), oklch(24% 0 0));
+  --foreground: light-dark(oklch(27% 0 0), oklch(90% 0 0));
+  --foreground-muted: light-dark(oklch(45% 0 0), oklch(72% 0 0));
+  --foreground-soft: light-dark(oklch(60% 0 0), oklch(55% 0 0));
+  --border: light-dark(oklch(92% 0 0), oklch(28% 0 0));
+  --ring: light-dark(oklch(60.9% 0.126 221.723), oklch(78.9% 0.154 211.53));
+  --card: light-dark(oklch(100% 0 0), oklch(24% 0 0));
+  --card-foreground: var(--foreground);
+  --primary: light-dark(oklch(60.9% 0.126 221.723), oklch(78.9% 0.154 211.53));
+  --primary-hover: light-dark(oklch(54% 0.13 221.723), oklch(72% 0.16 211.53));
+  --primary-foreground: light-dark(oklch(98.5% 0 0), oklch(15% 0.05 211.53));
+  --secondary: light-dark(oklch(96% 0 0), oklch(28% 0 0));
+  --secondary-hover: light-dark(oklch(92% 0 0), oklch(34% 0 0));
+  --secondary-foreground: var(--foreground);
+  --muted: light-dark(oklch(96% 0 0), oklch(28% 0 0));
+}
+
+@layer base {
+  body {
+    color: var(--foreground);
+    font-size: var(--body-font-size);
+    line-height: var(--body-line-height);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+
+  code,
+  pre {
+    font-family: var(--font-mono);
+  }
+
+  button:not(:disabled),
+  [role="button"] {
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  .site-frame {
+    margin-inline: auto;
+    width: 100%;
+    max-width: var(--frame-max);
+    padding-inline: 1.5rem;
+  }
+
+  @media (width >= 64rem) {
+    .site-frame {
+      padding-inline: 2.5rem;
+    }
+  }
+}

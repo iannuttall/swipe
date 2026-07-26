@@ -1,0 +1,25 @@
+---
+import { NewsletterForm } from "@/components/NewsletterForm";
+
+interface Props {
+  source: string;
+  title?: string;
+  description?: string;
+}
+
+const {
+  source,
+  title = "Get the next issue",
+  description = "One useful idea a week, with enough detail to steal it.",
+} = Astro.props;
+---
+
+<section class="dotted-card p-6 sm:p-8">
+  <div class="grid gap-5 sm:grid-cols-[minmax(0,1fr)_minmax(17rem,0.8fr)] sm:items-end">
+    <div>
+      <h2 class="font-heading text-2xl font-semibold">{title}</h2>
+      <p class="mt-2 max-w-xl text-muted">{description}</p>
+    </div>
+    <NewsletterForm source={source} client:load buttonVariant="primary" />
+  </div>
+</section>

@@ -1,0 +1,31 @@
+---
+export const prerender = true;
+
+import PageHeader from "@/components/content/PageHeader.astro";
+import Layout from "@/layouts/Layout.astro";
+
+const description = "How Swipe handles newsletter and website data.";
+---
+
+<Layout title="Privacy" description={description} canonicalPath="/privacy">
+  <PageHeader title="Privacy" description={description} />
+  <article class="content-prose mt-10">
+    <h2>Email subscriptions</h2>
+    <p>
+      When you subscribe, Swipe stores your email address and the page that sent the
+      signup. It uses that information to send the newsletter and manage consent.
+    </p>
+    <p>
+      Delivery, bounce, complaint, and link-click events may be recorded so the list
+      stays healthy and sending problems can be fixed. Every email includes an
+      unsubscribe link.
+    </p>
+    <h2>Website data</h2>
+    <p>
+      The site does not require an account. Operational request logs may be retained
+      by the hosting provider for security and reliability.
+    </p>
+    <h2>Questions</h2>
+    <p>Reply to any Swipe email if you want to ask about or remove your data.</p>
+  </article>
+</Layout>

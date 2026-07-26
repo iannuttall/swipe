@@ -1,0 +1,30 @@
+{
+  "name": "email",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "packageManager": "pnpm@11.8.0",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "build": "turbo --root-turbo-json turbo.json run build --filter='@email/*'",
+    "clean": "turbo --root-turbo-json turbo.json run clean --filter='@email/*'",
+    "email:preview": "node scripts/react-email-preview.mjs",
+    "lint": "node scripts/check-file-lines.mjs && biome check . && turbo --root-turbo-json turbo.json run lint --filter='@email/*'",
+    "lint:fix": "biome check . --write",
+    "test": "turbo --root-turbo-json turbo.json run test --filter='@email/*'",
+    "typecheck": "turbo --root-turbo-json turbo.json run typecheck --filter='@email/*'"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.5",
+    "@email/core": "workspace:*",
+    "@react-email/ui": "6.9.1",
+    "@types/node": "^24.13.3",
+    "react": "^19.2.8",
+    "react-email": "^6.9.1",
+    "tsup": "^8.5.1",
+    "turbo": "^2.10.6",
+    "typescript": "^5.9.3"
+  }
+}

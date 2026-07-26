@@ -1,0 +1,15 @@
+---
+import { siteName } from "@/lib/site";
+---
+
+<header class="border-b border-border bg-foreground text-background">
+  <div class="site-frame flex items-center justify-between py-3">
+    <a class="font-mono text-sm underline underline-offset-2 hover:decoration-dotted" href="/">
+      {siteName.toLowerCase()}
+    </a>
+    <nav aria-label="Main navigation" class="flex items-center gap-4 text-sm">
+      <a class="underline underline-offset-2 hover:decoration-dotted" href="/issues">Issues</a>
+      <a class="underline underline-offset-2 hover:decoration-dotted" href="/about">About</a>
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,80 @@
+---
+export const prerender = true;
+
+import type { CollectionEntry } from "astro:content";
+import CodeCopy from "@/components/content/CodeCopy.astro";
+import NewsletterSignup from "@/components/content/NewsletterSignup.astro";
+import IssueSections from "@/components/issues/IssueSections.astro";
+import Layout from "@/layouts/Layout.astro";
+import { formatIssueDate, getVisibleIssues, issueReadingMinutes } from "@/lib/issues";
+import { parseIssueSections } from "@/lib/issues/parser";
+
+export async function getStaticPaths() {
+  const issues = await getVisibleIssues();
+  return issues.map((issue) => ({
+    params: { slug: issue.id },
+    props: { issue },
+  }));
+}
+
+type Props = { issue: CollectionEntry<"issues"> };
+const { issue } = Astro.props as Props;
+const path = `/issues/${issue.id}`;
+const readingMinutes = issueReadingMinutes(issue.body ?? "");
+const issueLabel = parseIssueSections(issue.body ?? "").find(
+  (section) => section.type === "header",
+)?.attrs.name;
+const description =
+  issue.data.description ?? issue.data.preheader ?? issue.data.subject;
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: issue.data.subject,
+  description,
+  datePublished: issue.data.pubDate.toISOString(),
+  dateModified: (issue.data.sentAt ?? issue.data.pubDate).toISOString(),
+  mainEntityOfPage: new URL(path, Astro.site).toString(),
+  publisher: {
+    "@type": "Organization",
+    name: "Swipe",
+    url: new URL("/", Astro.site).toString(),
+  },
+};
+---
+
+<Layout
+  title={issue.data.subject}
+  description={description}
+  canonicalPath={path}
+  ogType="article"
+  structuredData={schema}
+>
+  <article>
+    <header class="max-w-3xl border-b-2 border-foreground pb-8">
+      <p class="font-mono text-sm text-muted">
+        {issueLabel ? <span>{issueLabel} · </span> : null}
+        <time datetime={issue.data.pubDate.toISOString()}>
+          {formatIssueDate(issue.data.pubDate)}
+        </time>
+        <span> · {readingMinutes} min read</span>
+      </p>
+      <h1 class="mt-4 font-heading text-4xl leading-tight font-semibold tracking-tight sm:text-5xl">
+        {issue.data.subject}
+      </h1>
+      {issue.data.preheader ? <p class="mt-4 text-lg text-muted">{issue.data.preheader}</p> : null}
+      {issue.data.draft ? <p class="mt-3 font-mono text-sm">Draft preview</p> : null}
+    </header>
+
+    <div class="mt-10">
+      <IssueSections body={issue.body ?? ""} />
+    </div>
+    <CodeCopy />
+  </article>
+
+  <div class="mt-16">
+    <NewsletterSignup
+      source={`swipe.md/issues/${issue.id}`}
+      description="This went to subscribers first. Get the next useful thing in your inbox."
+    />
+  </div>
+</Layout>

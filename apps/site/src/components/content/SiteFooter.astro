@@ -1,0 +1,23 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-16 border-t border-border bg-card py-8 text-sm text-muted">
+  <div class="site-frame flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <p>&copy; {year} Swipe</p>
+    <nav aria-label="Footer navigation" class="flex flex-wrap gap-4">
+      <a class="underline underline-offset-2 hover:decoration-dotted" href="/issues">Issues</a>
+      <a class="underline underline-offset-2 hover:decoration-dotted" href="/about">About</a>
+      <a class="underline underline-offset-2 hover:decoration-dotted" href="/privacy">Privacy</a>
+      <a class="underline underline-offset-2 hover:decoration-dotted" href="/terms">Terms</a>
+      <a class="underline underline-offset-2 hover:decoration-dotted" href="/cookies">Cookies</a>
+      <a
+        class="underline underline-offset-2 hover:decoration-dotted"
+        href="https://ian.is"
+        rel="noreferrer"
+      >
+        An Ian Nuttall thing
+      </a>
+    </nav>
+  </div>
+</footer>

@@ -1,0 +1,32 @@
+{$APP_HOSTS} {
+  encode zstd gzip
+  import ./cloudflare-allowlist.snippet
+
+  @bad_host not host {$APP_HOSTS_LIST}
+  handle @bad_host {
+    respond 403
+  }
+
+  @health {
+    path /health /healthz /readyz
+  }
+
+  handle @health {
+    reverse_proxy {$APP_NAME}:{$APP_PORT} {
+      header_down -Cache-Control
+    }
+    header Cache-Control "no-store"
+  }
+
+  @web {
+    path / /unsubscribe* /_astro/* /fonts/* /favicon* /email-logo*
+  }
+
+  handle @web {
+    reverse_proxy {$APP_NAME}-web:{$WEB_PORT}
+  }
+
+  handle {
+    reverse_proxy {$APP_NAME}:{$APP_PORT}
+  }
+}

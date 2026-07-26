@@ -1,0 +1,105 @@
+---
+import Triangle from '@/components/Triangle.astro'
+
+interface Props {
+  appName: string
+  state: 'confirm' | 'done' | 'invalid'
+  token?: string
+}
+
+const { appName, state, token = '' } = Astro.props
+
+const farewells = [
+  'Parting is such sweet sorrow',
+  'Hello darkness my old friend',
+  'I hope you had the time of your life',
+  'Another one bites the dust',
+  "I'm not crying, you're crying",
+  "Guess I'll just send this to myself now",
+  'You were the best part of this list',
+  "Now you're just somebody that I used to know",
+  'Yesterday all my troubles seemed so far away',
+]
+
+const farewellIndex =
+  Array.from(token || appName).reduce((total, character) => total + character.charCodeAt(0), 0) %
+  farewells.length
+const farewell = farewells[farewellIndex]
+
+const copy = {
+  confirm: {
+    heading: `Unsubscribe from ${appName}`,
+    description: 'Are you sure you want to unsubscribe?',
+    button: 'Confirm unsubscribe',
+  },
+  done: {
+    heading: "You've been unsubscribed",
+    description: farewell,
+    button: null,
+  },
+  invalid: {
+    heading: 'Invalid unsubscribe link',
+    description: 'This unsubscribe link is invalid or has expired.',
+    button: null,
+  },
+}[state]
+
+const sectionClass = [
+  '@container relative w-full overflow-hidden bg-card',
+  'rounded-t-2xl border-x border-t border-black/[0.06] shadow-xs dark:border-white/10',
+]
+---
+
+<section class:list={sectionClass}>
+  <div class="grid grid-cols-1 @lg:grid-cols-[22rem_1fr]">
+    <div class="flex min-h-48 flex-col gap-5 p-6 @lg:p-8">
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2 text-foreground">
+          <Triangle aria-hidden="true" class="size-5 shrink-0" />
+          <div class="font-semibold">{copy.heading}</div>
+        </div>
+        <p class="text-pretty leading-snug text-foreground-muted">
+          {copy.description}
+        </p>
+      </div>
+
+      <div class="flex h-11 w-full items-start">
+        {copy.button ? (
+          <form method="post" class="w-full">
+            <button
+              type="submit"
+              class="inline-flex h-11 items-center justify-center rounded-full border border-border bg-background px-5 text-[15px] font-medium text-foreground outline-none transition-[color,box-shadow] hover:bg-secondary focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/20"
+            >
+              {copy.button}
+            </button>
+          </form>
+        ) : null}
+      </div>
+    </div>
+
+    <div class="relative hidden select-none @lg:block" aria-hidden="true">
+      <div class="absolute top-13 -right-11 flex aspect-[3/5] min-w-80 rotate-1 flex-col gap-4 rounded-lg bg-background-raised p-6 shadow-lg ring-[0.5px] ring-black/5 dark:bg-white/[0.06] dark:ring-white/10"></div>
+      <div class="absolute top-12 -right-12 flex aspect-[3/5] min-w-80 rotate-3 flex-col gap-4 rounded-lg bg-background-raised p-6 shadow-lg ring-[0.5px] ring-black/5 dark:bg-secondary dark:ring-white/10">
+        <div class="flex flex-col gap-0.5">
+          <div class="grid grid-cols-4 gap-2 font-mono text-xs text-foreground-soft">
+            <span>From:</span>
+            <span class="col-span-3">Ian</span>
+          </div>
+          <div class="grid grid-cols-4 gap-2 font-mono text-xs text-foreground-soft">
+            <span>To:</span>
+            <span class="col-span-3">you@gmail.com</span>
+          </div>
+        </div>
+        <div class="flex flex-col gap-1">
+          <div class="text-sm font-semibold text-foreground">Sorry to see you go</div>
+          <div class="text-sm text-foreground-muted">Sunday, July 5</div>
+        </div>
+        <div class="flex flex-col gap-3">
+          {['80%', '60%', '70%', '30%', '55%'].map((width) => (
+            <div class="h-2 rounded-full bg-foreground/10" style={`width: ${width}`}></div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

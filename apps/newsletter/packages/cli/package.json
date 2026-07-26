@@ -1,0 +1,30 @@
+{
+  "name": "@email/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "email": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup --config tsup.config.ts",
+    "clean": "rm -rf dist dist-test",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "rm -rf dist-test && tsc -p tsconfig.test.json && node --test \"dist-test/**/*.test.js\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.11.0",
+    "@email/api": "workspace:*",
+    "@email/core": "workspace:*",
+    "@email/mcp": "workspace:*",
+    "citty": "^0.1.6",
+    "picocolors": "^1.1.1",
+    "zod": "^4.4.3"
+  }
+}

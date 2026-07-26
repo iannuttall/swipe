@@ -1,0 +1,5 @@
+# Deliberately fake credentials in deleted legacy landing-page card examples.
+828bbc7bc73ff4f1dc0973e148deb05b80f62a06:content/home-cards-v1.yaml:generic-api-key:1127
+828bbc7bc73ff4f1dc0973e148deb05b80f62a06:content/home-cards-v1.yaml:generic-api-key:1129
+ef9bac80f73e51edf7729d9fa46d42cddde62d8b:content/home-cards.yaml:generic-api-key:1127
+ef9bac80f73e51edf7729d9fa46d42cddde62d8b:content/home-cards.yaml:generic-api-key:1129

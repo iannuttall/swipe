@@ -1,0 +1,26 @@
+---
+export const prerender = true;
+
+import PageHeader from "@/components/content/PageHeader.astro";
+import Layout from "@/layouts/Layout.astro";
+
+const description = "Basic terms for using Swipe and its newsletter.";
+---
+
+<Layout title="Terms" description={description} canonicalPath="/terms">
+  <PageHeader title="Terms" description={description} />
+  <article class="content-prose mt-10">
+    <p>
+      Swipe publishes practical examples, opinions, and links for general
+      information. Test anything you borrow before relying on it in your own work.
+    </p>
+    <p>
+      Do not misuse the site, interfere with its operation, or use its forms for
+      spam. Third-party tools and websites have their own terms and privacy policies.
+    </p>
+    <p>
+      The site and newsletter may change as the publication develops. These terms
+      may be updated when the product or its legal obligations change.
+    </p>
+  </article>
+</Layout>

@@ -1,0 +1,133 @@
+---
+import SiteFooter from "@/components/content/SiteFooter.astro";
+import SiteHeader from "@/components/content/SiteHeader.astro";
+import { siteDescription, siteName, siteUrl } from "@/lib/site";
+import "@/styles/app.css";
+import bricolage600Url from "@fontsource/bricolage-grotesque/files/bricolage-grotesque-latin-600-normal.woff2?url";
+import instrumentSans400Url from "@fontsource/instrument-sans/files/instrument-sans-latin-400-normal.woff2?url";
+import instrumentSans500Url from "@fontsource/instrument-sans/files/instrument-sans-latin-500-normal.woff2?url";
+import instrumentSans600Url from "@fontsource/instrument-sans/files/instrument-sans-latin-600-normal.woff2?url";
+import ibmPlexMono400Url from "@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2?url";
+import ibmPlexMono600ItalicUrl from "@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-600-italic.woff2?url";
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonicalPath?: string;
+  noIndex?: boolean;
+  ogType?: "website" | "article";
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
+  framed?: boolean;
+  showChrome?: boolean;
+}
+
+const {
+  title = siteName,
+  description = siteDescription,
+  canonicalPath = Astro.url.pathname,
+  noIndex = false,
+  ogType = "website",
+  structuredData,
+  framed = true,
+  showChrome = true,
+} = Astro.props;
+
+const fullTitle = title === siteName || title.startsWith(`${siteName} `) ? title : `${title} | ${siteName}`;
+const canonicalUrl = new URL(canonicalPath, Astro.site ?? siteUrl).toString();
+const structuredDataList = (Array.isArray(structuredData) ? structuredData : structuredData ? [structuredData] : []).filter(Boolean);
+const gradientTheme: "original" | "pink" = "original";
+const fontFaceCss = `
+  @font-face {
+    font-family: "Instrument Sans";
+    src: url("${instrumentSans400Url}") format("woff2");
+    font-display: swap;
+    font-style: normal;
+    font-weight: 400;
+  }
+  @font-face {
+    font-family: "Instrument Sans";
+    src: url("${instrumentSans500Url}") format("woff2");
+    font-display: swap;
+    font-style: normal;
+    font-weight: 500;
+  }
+  @font-face {
+    font-family: "Instrument Sans";
+    src: url("${instrumentSans600Url}") format("woff2");
+    font-display: swap;
+    font-style: normal;
+    font-weight: 600;
+  }
+  @font-face {
+    font-family: "Bricolage Grotesque";
+    src: url("${bricolage600Url}") format("woff2");
+    font-display: swap;
+    font-style: normal;
+    font-weight: 600;
+  }
+  @font-face {
+    font-family: "IBM Plex Mono";
+    src: url("${ibmPlexMono400Url}") format("woff2");
+    font-display: swap;
+    font-style: normal;
+    font-weight: 400;
+  }
+  @font-face {
+    font-family: "IBM Plex Mono";
+    src: url("${ibmPlexMono600ItalicUrl}") format("woff2");
+    font-display: swap;
+    font-style: italic;
+    font-weight: 600;
+  }
+`;
+---
+
+<!doctype html>
+<html lang="en" data-gradient={gradientTheme}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    {[
+      instrumentSans400Url,
+      instrumentSans500Url,
+      instrumentSans600Url,
+      bricolage600Url,
+      ibmPlexMono400Url,
+      ibmPlexMono600ItalicUrl,
+    ].map((href) => (
+      <link rel="preload" href={href} as="font" type="font/woff2" crossorigin="anonymous" />
+    ))}
+    <style is:inline set:html={fontFaceCss} />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    {noIndex ? <meta name="robots" content="noindex,nofollow" /> : <meta name="robots" content="index,follow" />}
+    <title>{fullTitle}</title>
+    {structuredDataList.map((entry) => <script is:inline type="application/ld+json" set:html={JSON.stringify(entry)} />)}
+    <slot name="head" />
+  </head>
+  <body>
+    <div class="flex min-h-screen flex-col bg-background text-foreground">
+      {showChrome ? <SiteHeader /> : null}
+      <main class="flex-1">
+        {
+          framed ? (
+            <div class="site-frame py-10 sm:py-14">
+              <slot />
+            </div>
+          ) : (
+            <slot />
+          )
+        }
+      </main>
+      {showChrome ? <SiteFooter /> : null}
+    </div>
+  </body>
+</html>

@@ -1,0 +1,54 @@
+---
+import UnsubscribeCard from '@/components/UnsubscribeCard.astro'
+import Layout from '@/layouts/Layout.astro'
+import { getWebConfig } from '@/lib/config'
+
+const config = getWebConfig()
+const token = Astro.params.token
+const isPost = Astro.request.method === 'POST'
+let state: 'confirm' | 'done' | 'invalid' = 'confirm'
+
+if (!token) {
+  state = 'invalid'
+} else if (isPost) {
+  try {
+    const response = await fetch(`${config.apiInternalUrl}/unsubscribe/${token}`, {
+      method: 'POST',
+    })
+    state = response.ok ? 'done' : 'invalid'
+  } catch {
+    state = 'invalid'
+  }
+}
+
+const title =
+  state === 'done'
+    ? 'Unsubscribed'
+    : state === 'invalid'
+      ? 'Invalid unsubscribe link'
+      : `Unsubscribe from ${config.appName}`
+const description =
+  state === 'done'
+    ? `You have been unsubscribed from ${config.appName}.`
+    : state === 'invalid'
+      ? 'This unsubscribe link is invalid or has expired.'
+      : `Confirm that you want to unsubscribe from ${config.appName}.`
+---
+
+<Layout title={title} description={description}>
+  <section class="flex flex-col border-b border-border bg-background pt-4 text-foreground">
+    <div class="site-frame">
+      <div class="flex flex-col gap-8 pt-16 sm:pt-24">
+        <div class="flex max-w-2xl flex-col gap-4">
+          <h1 class="max-w-xl text-pretty text-3xl font-medium -tracking-[0.5px] xl:text-4xl xl:-tracking-[0.7px]">
+            Unsubscribe
+          </h1>
+          <p class="text-pretty text-2xl/8 font-medium -tracking-[0.2px] text-foreground-muted xl:text-3xl/10 xl:-tracking-[0.4px]">
+            Manage your email preferences and unsubscribe from future emails.
+          </p>
+        </div>
+        <UnsubscribeCard appName={config.appName} state={state} token={token} />
+      </div>
+    </div>
+  </section>
+</Layout>

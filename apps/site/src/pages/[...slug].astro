@@ -1,0 +1,46 @@
+---
+export const prerender = true;
+
+import { getCollection, render, type CollectionEntry } from "astro:content";
+import Callout from "@/components/content/Callout.astro";
+import DottedCard from "@/components/content/DottedCard.astro";
+import PageHeader from "@/components/content/PageHeader.astro";
+import Layout from "@/layouts/Layout.astro";
+
+export async function getStaticPaths() {
+  const pages = await getCollection("pages");
+  return pages
+    .filter((page) => import.meta.env.DEV || page.data.draft !== true)
+    .map((page) => ({
+      params: { slug: page.id.replace(/\.(md|mdx)$/, "") },
+      props: { page },
+    }));
+}
+
+type Props = { page: CollectionEntry<"pages"> };
+const { page } = Astro.props as Props;
+const { Content } = await render(page);
+const path = `/${page.id.replace(/\.(md|mdx)$/, "")}`;
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: page.data.title,
+  description: page.data.description,
+  url: new URL(path, Astro.site).toString(),
+};
+---
+
+<Layout
+  title={page.data.title}
+  description={page.data.description}
+  canonicalPath={path}
+  structuredData={schema}
+>
+  <PageHeader
+    title={page.data.headline ?? page.data.title}
+    description={page.data.description}
+  />
+  <article class="content-prose mt-10">
+    <Content components={{ Callout, DottedCard }} />
+  </article>
+</Layout>

@@ -1,6 +1,36 @@
-node_modules/
+# build output
 dist/
 .astro/
+.turbo/
+
+# dependencies
+node_modules/
+
+# cloudflare / wrangler
 .wrangler/
+wrangler.deploy.jsonc
+wrangler.deploy.jsonc.tmp
+
+# secrets & env
 .dev.vars
+.dev.vars.*
+.env
+.env.*
+!.dev.vars.example
+!**/.dev.vars.example
+!.env.example
+!**/.env.example
+
+# generated and local runtime output
+coverage/
+apps/newsletter/rendered/
+apps/newsletter/rendered-email/
+.tmp/
+tmp/
+
+# personal working notes
+notes/
+
+# logs / os
+*.log
 .DS_Store

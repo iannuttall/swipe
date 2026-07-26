@@ -1,0 +1,163 @@
+name: ${COMPOSE_PROJECT_NAME:-email}
+
+x-email-env: &email-env
+  NODE_ENV: production
+  EMAIL_APP_NAME: ${EMAIL_APP_NAME:-Email}
+  DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+  BASE_URL: ${BASE_URL}
+  EMAIL_API_INTERNAL_URL: ${EMAIL_API_INTERNAL_URL:-http://app:3000}
+  API_TOKEN: ${API_TOKEN}
+  UNSUBSCRIBE_SECRET: ${UNSUBSCRIBE_SECRET}
+  TRACKING_SECRET: ${TRACKING_SECRET}
+  EMAIL_PROVIDER: ${EMAIL_PROVIDER:-ses}
+  EMAIL_FROM_EMAIL: ${EMAIL_FROM_EMAIL}
+  EMAIL_FROM_NAME: ${EMAIL_FROM_NAME}
+  EMAIL_TRACK_OPENS: ${EMAIL_TRACK_OPENS:-true}
+  EMAIL_SEND_RATE_PER_SECOND: ${EMAIL_SEND_RATE_PER_SECOND:-14}
+  AWS_REGION: ${AWS_REGION:-us-east-1}
+  AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+  AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+  AWS_SNS_WEBHOOK_SECRET: ${AWS_SNS_WEBHOOK_SECRET}
+  AWS_SNS_ALLOWED_TOPICS: ${AWS_SNS_ALLOWED_TOPICS}
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: ../..
+      dockerfile: apps/newsletter/Dockerfile
+      args:
+        BASE_URL: ${BASE_URL:-https://newsletter.example.com}
+      target: runner
+    image: ${APP_IMAGE:-email:local}
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      <<: *email-env
+      PORT: ${APP_PORT:-3000}
+    command: ["node", "dist/index.js", "api", "serve"]
+    ports:
+      - "${APP_HOST_BIND:-127.0.0.1}:${APP_HOST_PORT:-3001}:${APP_PORT:-3000}"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "const http=require('node:http');const port=process.env.PORT||3000;http.get('http://127.0.0.1:'+port+'/readyz',res=>process.exit(res.statusCode===200?0:1)).on('error',()=>process.exit(1));",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    networks:
+      default:
+      edge:
+        aliases:
+          - ${APP_NAME:-email}
+
+  web:
+    build:
+      context: ../..
+      dockerfile: apps/newsletter/Dockerfile
+      target: runner
+    image: ${APP_IMAGE:-email:local}
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: ${WEB_PORT:-3002}
+      APP_NAME: ${APP_NAME:-email}
+      EMAIL_APP_NAME: ${EMAIL_APP_NAME:-Email}
+      MAIN_SITE_NAME: ${MAIN_SITE_NAME:-}
+      MAIN_SITE_URL: ${MAIN_SITE_URL:-}
+      BASE_URL: ${BASE_URL}
+      EMAIL_API_INTERNAL_URL: ${EMAIL_API_INTERNAL_URL:-http://app:3000}
+    command: ["node", "web/dist/server/entry.mjs"]
+    ports:
+      - "${APP_HOST_BIND:-127.0.0.1}:${WEB_HOST_PORT:-3002}:${WEB_PORT:-3002}"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "const http=require('node:http');const port=process.env.PORT||3002;http.get('http://127.0.0.1:'+port+'/',res=>process.exit(res.statusCode<500?0:1)).on('error',()=>process.exit(1));",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    networks:
+      default:
+      edge:
+        aliases:
+          - ${APP_NAME:-email}-web
+
+  ops:
+    build:
+      context: ../..
+      dockerfile: apps/newsletter/Dockerfile
+      target: runner
+    image: ${APP_IMAGE:-email:local}
+    profiles: ["ops"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      <<: *email-env
+    command: ["node", "dist/index.js", "db", "migrate"]
+
+  worker:
+    build:
+      context: ../..
+      dockerfile: apps/newsletter/Dockerfile
+      target: runner
+    image: ${APP_IMAGE:-email:local}
+    profiles: ["sender"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      app:
+        condition: service_healthy
+    environment:
+      <<: *email-env
+    command:
+      [
+        "node",
+        "dist/index.js",
+        "worker",
+        "send",
+        "--yes",
+        "--batch-size",
+        "100",
+        "--interval-ms",
+        "10000",
+      ]
+
+networks:
+  edge:
+    external: true
+    name: edge
+
+volumes:
+  postgres-data:

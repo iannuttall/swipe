@@ -1,0 +1,20 @@
+---
+export const prerender = true;
+
+import PageHeader from "@/components/content/PageHeader.astro";
+import Layout from "@/layouts/Layout.astro";
+
+const description = "Cookie use on Swipe.";
+---
+
+<Layout title="Cookies" description={description} canonicalPath="/cookies">
+  <PageHeader title="Cookies" description={description} />
+  <article class="content-prose mt-10">
+    <p>Swipe does not currently use advertising or analytics cookies.</p>
+    <p>
+      The hosting and newsletter providers may process normal request data needed to
+      deliver the site and emails securely. This page will be updated before any
+      optional cookie-based analytics or advertising is introduced.
+    </p>
+  </article>
+</Layout>

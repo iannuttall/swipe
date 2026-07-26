@@ -1,0 +1,130 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: email
+      POSTGRES_USER: email
+      POSTGRES_PASSWORD: email
+    volumes:
+      - email-postgres:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-55433}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U email -d email"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ../..
+      dockerfile: apps/newsletter/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: 3000
+      APP_NAME: ${APP_NAME:-email}
+      EMAIL_APP_NAME: ${EMAIL_APP_NAME:-Email}
+      DATABASE_URL: postgresql://email:email@postgres:5432/email
+      BASE_URL: ${BASE_URL:-http://localhost:3000}
+      EMAIL_API_INTERNAL_URL: ${EMAIL_API_INTERNAL_URL:-http://api:3000}
+      API_TOKEN: ${API_TOKEN:-}
+      UNSUBSCRIBE_SECRET: ${UNSUBSCRIBE_SECRET:-}
+      TRACKING_SECRET: ${TRACKING_SECRET:-}
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-ses}
+      EMAIL_FROM_EMAIL: ${EMAIL_FROM_EMAIL:-}
+      EMAIL_FROM_NAME: ${EMAIL_FROM_NAME:-}
+      EMAIL_TRACK_OPENS: ${EMAIL_TRACK_OPENS:-true}
+      EMAIL_SEND_RATE_PER_SECOND: ${EMAIL_SEND_RATE_PER_SECOND:-14}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_SNS_WEBHOOK_SECRET: ${AWS_SNS_WEBHOOK_SECRET:-}
+      AWS_SNS_ALLOWED_TOPICS: ${AWS_SNS_ALLOWED_TOPICS:-}
+    command:
+      - sh
+      - -lc
+      - node dist/index.js db migrate && node dist/index.js api serve
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - node -e "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: ../..
+      dockerfile: apps/newsletter/Dockerfile
+    depends_on:
+      api:
+        condition: service_started
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3002
+      APP_NAME: ${APP_NAME:-email}
+      EMAIL_APP_NAME: ${EMAIL_APP_NAME:-Email}
+      MAIN_SITE_NAME: ${MAIN_SITE_NAME:-}
+      MAIN_SITE_URL: ${MAIN_SITE_URL:-}
+      BASE_URL: ${BASE_URL:-http://localhost:3002}
+      EMAIL_API_INTERNAL_URL: ${EMAIL_API_INTERNAL_URL:-http://api:3000}
+    command:
+      - node
+      - web/dist/server/entry.mjs
+    ports:
+      - "3002:3002"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - node -e "fetch('http://127.0.0.1:3002/').then(r=>process.exit(r.status<500?0:1)).catch(()=>process.exit(1))"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  worker:
+    build:
+      context: ../..
+      dockerfile: apps/newsletter/Dockerfile
+    profiles:
+      - sender
+    depends_on:
+      postgres:
+        condition: service_healthy
+      api:
+        condition: service_started
+    environment:
+      DATABASE_URL: postgresql://email:email@postgres:5432/email
+      APP_NAME: ${APP_NAME:-email}
+      EMAIL_APP_NAME: ${EMAIL_APP_NAME:-Email}
+      BASE_URL: ${BASE_URL:-http://localhost:3000}
+      EMAIL_API_INTERNAL_URL: ${EMAIL_API_INTERNAL_URL:-http://api:3000}
+      API_TOKEN: ${API_TOKEN:-}
+      UNSUBSCRIBE_SECRET: ${UNSUBSCRIBE_SECRET:-}
+      TRACKING_SECRET: ${TRACKING_SECRET:-}
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-ses}
+      EMAIL_FROM_EMAIL: ${EMAIL_FROM_EMAIL:-}
+      EMAIL_FROM_NAME: ${EMAIL_FROM_NAME:-}
+      EMAIL_TRACK_OPENS: ${EMAIL_TRACK_OPENS:-true}
+      EMAIL_SEND_RATE_PER_SECOND: ${EMAIL_SEND_RATE_PER_SECOND:-14}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_SNS_WEBHOOK_SECRET: ${AWS_SNS_WEBHOOK_SECRET:-}
+      AWS_SNS_ALLOWED_TOPICS: ${AWS_SNS_ALLOWED_TOPICS:-}
+    command:
+      - node
+      - dist/index.js
+      - worker
+      - send
+      - --yes
+      - --batch-size
+      - "100"
+      - --interval-ms
+      - "10000"
+
+volumes:
+  email-postgres:

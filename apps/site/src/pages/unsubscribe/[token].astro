@@ -1,0 +1,77 @@
+---
+export const prerender = false;
+
+import PageHeader from "@/components/content/PageHeader.astro";
+import {
+  fetchNewsletterOrigin,
+  isNewsletterToken,
+} from "@/lib/newsletter-origin";
+import Layout from "@/layouts/Layout.astro";
+
+const token = Astro.params.token;
+let state: "confirm" | "done" | "invalid" = isNewsletterToken(token)
+  ? "confirm"
+  : "invalid";
+
+if (state === "confirm" && Astro.request.method === "POST") {
+  try {
+    const upstream = await fetchNewsletterOrigin(
+      Astro.request,
+      `/unsubscribe/${encodeURIComponent(token!)}`,
+      "POST",
+    );
+    state = upstream.ok ? "done" : "invalid";
+  } catch {
+    state = "invalid";
+  }
+}
+
+const title =
+  state === "done"
+    ? "Unsubscribed"
+    : state === "invalid"
+      ? "Invalid unsubscribe link"
+      : "Unsubscribe";
+
+const copy = {
+  confirm: {
+    heading: "Unsubscribe from Swipe",
+    description: "Confirm that you no longer want to receive Swipe.",
+  },
+  done: {
+    heading: "You've been unsubscribed",
+    description: "You won't receive any more Swipe emails.",
+  },
+  invalid: {
+    heading: "This link is invalid",
+    description: "The unsubscribe link is invalid or has expired.",
+  },
+}[state];
+---
+
+<Layout
+  title={title}
+  description={copy.description}
+  canonicalPath={`/unsubscribe/${token ?? ""}`}
+  noIndex
+>
+  <PageHeader title={copy.heading} description={copy.description} />
+  <section class="dotted-card mt-10 max-w-2xl p-6 sm:p-8">
+    {
+      state === "confirm" ? (
+        <form method="post">
+          <button
+            type="submit"
+            class="h-11 bg-primary px-5 font-mono text-sm font-semibold text-primary-fg hover:bg-primary/90"
+          >
+            Confirm unsubscribe
+          </button>
+        </form>
+      ) : (
+        <a class="font-mono text-sm underline underline-offset-4" href="/">
+          Back to Swipe
+        </a>
+      )
+    }
+  </section>
+</Layout>

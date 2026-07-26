@@ -1,0 +1,202 @@
+name: Deploy Newsletter Production
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".dockerignore"
+      - ".github/workflows/deploy-newsletter-production.yml"
+      - "apps/newsletter/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-newsletter-production
+  cancel-in-progress: true
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  APP_NAME: email
+  # Keep the proven runtime hostname until the Swipe DNS/deliverability cutover.
+  APP_DOMAIN: list.ian.is
+  PUBLIC_BASE_URL: https://swipe.md
+  APP_PORT: "3000"
+  WEB_PORT: "3002"
+  DEPLOY_APP_DIR: /opt/apps/email
+  DEPLOY_CADDY_ROOT: /opt/caddy
+
+jobs:
+  deploy:
+    # The initial public-repo push must not replace the live Ian's List service.
+    # Set NEWSLETTER_DEPLOY_ENABLED=true after the deliberate handoff. A trusted
+    # workflow_dispatch remains available for an explicit deployment.
+    if: github.event_name == 'workflow_dispatch' || vars.NEWSLETTER_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Configure SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+
+      - name: Check deployed state
+        id: deployed
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          DEPLOYED_ID="$(ssh "$DEPLOY_USER@$DEPLOY_HOST" "test -f '$DEPLOY_APP_DIR/.deploy-state.json' && sed -n 's/.*\"deploymentId\": \"\\([^\"]*\\)\".*/\\1/p' '$DEPLOY_APP_DIR/.deploy-state.json' | head -n 1 || true")"
+          if [ "$DEPLOYED_ID" = "$GITHUB_SHA" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Deployment $GITHUB_SHA is already live."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Node
+        if: steps.deployed.outputs.skip != 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Build production image
+        if: steps.deployed.outputs.skip != 'true'
+        run: |
+          IMAGE_REF="${APP_NAME}:gha-$(printf '%s' "$GITHUB_SHA" | cut -c1-12)"
+          docker build --platform linux/amd64 --build-arg BASE_URL="${PUBLIC_BASE_URL}" -f apps/newsletter/Dockerfile -t "$IMAGE_REF" .
+          docker save "$IMAGE_REF" | gzip > email-image.tar.gz
+          printf 'IMAGE_REF=%s\n' "$IMAGE_REF" >> "$GITHUB_ENV"
+
+      - name: Sync app source
+        if: steps.deployed.outputs.skip != 'true'
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          ssh "$DEPLOY_USER@$DEPLOY_HOST" "install -d -m 755 $DEPLOY_APP_DIR && find $DEPLOY_APP_DIR -name '._*' -delete"
+          rsync -az --delete \
+            --compress-choice=zstd \
+            --filter='P .env.production' \
+            --include '/.dockerignore' \
+            --include '/package.json' \
+            --include '/pnpm-lock.yaml' \
+            --include '/pnpm-workspace.yaml' \
+            --include '/apps/' \
+            --include '/apps/newsletter/' \
+            --include '/apps/newsletter/Caddyfile' \
+            --include '/apps/newsletter/Dockerfile' \
+            --include '/apps/newsletter/biome.json' \
+            --include '/apps/newsletter/docker-compose.prod.yml' \
+            --include '/apps/newsletter/package.json' \
+            --include '/apps/newsletter/tsconfig.base.json' \
+            --include '/apps/newsletter/turbo.json' \
+            --include '/apps/newsletter/emails/***' \
+            --include '/apps/newsletter/migrations/***' \
+            --include '/apps/newsletter/packages/***' \
+            --include '/apps/newsletter/scripts/***' \
+            --exclude '.git' \
+            --exclude '._*' \
+            --exclude '__MACOSX' \
+            --exclude 'node_modules' \
+            --exclude '**/node_modules' \
+            --exclude 'dist' \
+            --exclude '**/dist' \
+            --exclude 'dist-test' \
+            --exclude '**/dist-test' \
+            --exclude '.turbo' \
+            --exclude '**/.turbo' \
+            --exclude '.astro' \
+            --exclude '**/.astro' \
+            --exclude '.wrangler' \
+            --exclude '**/.wrangler' \
+            --exclude '.tmp' \
+            --exclude '**/.tmp' \
+            --exclude 'tmp' \
+            --exclude '**/tmp' \
+            --exclude 'coverage' \
+            --exclude '**/coverage' \
+            --exclude '*.log' \
+            --exclude '.env' \
+            --exclude '.env.*' \
+            --exclude '.dev.vars' \
+            --exclude '.dev.vars.production' \
+            --exclude '*' \
+            -e "ssh" \
+            ./ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_APP_DIR/"
+
+      - name: Upload image
+        if: steps.deployed.outputs.skip != 'true'
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: scp email-image.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:/tmp/email-image.tar.gz"
+
+      - name: Deploy on server
+        if: steps.deployed.outputs.skip != 'true'
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          ssh "$DEPLOY_USER@$DEPLOY_HOST" "
+            set -euo pipefail
+            cd $DEPLOY_APP_DIR
+            test -f .env.production
+            docker load -i /tmp/email-image.tar.gz
+            rm -f /tmp/email-image.tar.gz
+            if grep -q '^APP_IMAGE=' .env.production; then
+              sed -i 's|^APP_IMAGE=.*|APP_IMAGE=${IMAGE_REF}|' .env.production
+            else
+              printf '\nAPP_IMAGE=%s\n' '${IMAGE_REF}' >> .env.production
+            fi
+            docker compose --env-file .env.production -f apps/newsletter/docker-compose.prod.yml run --rm ops
+            docker compose --env-file .env.production -f apps/newsletter/docker-compose.prod.yml up -d postgres app web
+            if command -v vps-docker-cleanup >/dev/null 2>&1; then
+              vps-docker-cleanup '${APP_NAME}'
+            else
+              docker image prune -f
+              docker builder prune -f --filter 'until=24h' || true
+              docker builder prune -a -f --keep-storage 4GB || true
+            fi
+            install -d -m 755 '${DEPLOY_CADDY_ROOT}/sites'
+            sed \
+              -e 's|{\$APP_HOSTS}|${APP_DOMAIN}|g' \
+              -e 's|{\$APP_HOSTS_LIST}|${APP_DOMAIN}|g' \
+              -e 's|{\$APP_DOMAIN}|${APP_DOMAIN}|g' \
+              -e 's|{\$APP_NAME}|${APP_NAME}|g' \
+              -e 's|{\$APP_PORT}|${APP_PORT}|g' \
+              -e 's|{\$WEB_PORT}|${WEB_PORT}|g' \
+              apps/newsletter/Caddyfile > '${DEPLOY_CADDY_ROOT}/sites/${APP_NAME}.caddy'
+            cd '${DEPLOY_CADDY_ROOT}'
+            docker compose -f docker-compose.yml exec -T caddy caddy reload --config /etc/caddy/Caddyfile
+          "
+
+      - name: Write deployed state
+        if: steps.deployed.outputs.skip != 'true'
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          cat > deploy-state.json <<JSON
+          {
+            "app": "${APP_NAME}",
+            "deploymentId": "${GITHUB_SHA}",
+            "gitSha": "${GITHUB_SHA}",
+            "sourceState": "clean",
+            "imageRef": "${IMAGE_REF}",
+            "deployedBy": "github-actions",
+            "deployedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          JSON
+          scp deploy-state.json "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_APP_DIR/.deploy-state.json"

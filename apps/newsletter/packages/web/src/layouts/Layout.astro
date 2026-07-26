@@ -1,0 +1,45 @@
+---
+import Header from '@/components/Header.astro'
+import { getWebConfig } from '@/lib/config'
+import '@/styles/globals.css'
+
+interface Props {
+  title?: string
+  description?: string
+  noIndex?: boolean
+}
+
+const config = getWebConfig()
+const {
+  title = config.appName,
+  description = `${config.appName} email preferences.`,
+  noIndex = true,
+} = Astro.props
+const canonicalUrl = new URL(Astro.url.pathname, config.baseUrl).toString()
+const fullTitle = title === config.appName ? title : `${title} | ${config.appName}`
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    {['/fonts/sans-400.woff2', '/fonts/sans-500.woff2', '/fonts/sans-600.woff2'].map((href) => (
+      <link rel="preload" href={href} as="font" type="font/woff2" crossorigin="anonymous" />
+    ))}
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="icon" type="image/png" href="/favicon-light.png?v=20260706-2" media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/png" href="/favicon-dark.png?v=20260706-2" media="(prefers-color-scheme: dark)" />
+    <link rel="apple-touch-icon" href="/favicon-light.png?v=20260706-2" />
+    {noIndex ? <meta name="robots" content="noindex,nofollow" /> : null}
+    <title>{fullTitle}</title>
+  </head>
+  <body class="min-h-screen bg-background antialiased">
+    <Header />
+    <main id="content" class="min-h-[calc(100vh-5rem)]">
+      <slot />
+    </main>
+  </body>
+</html>

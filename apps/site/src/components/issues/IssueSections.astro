@@ -1,0 +1,154 @@
+---
+import { renderIssueSections, sectionColors, tintStyle, heroDefaultColor } from "@/lib/issues/render";
+
+interface Props {
+  body: string;
+}
+
+const { body } = Astro.props;
+const sections = await renderIssueSections(body);
+
+const defaultClassifiedsButton = "Book yours ↗︎";
+const defaultClassifiedsButtonUrl = "https://swipe.md/advertise";
+const letters = "ABCDEFGHIJ";
+const tintedTypes = new Set(["box", "sponsor"]);
+
+function heroStyle(color: string | undefined) {
+  const background = color && /^#/.test(color) ? color : sectionColors(color).tint;
+  const resolved = color ? background : heroDefaultColor;
+  return `background-color: light-dark(${resolved}, color-mix(in oklab, ${resolved} 30%, var(--background-raised)))`;
+}
+---
+
+<div class="flex flex-col gap-10">
+  {
+    sections.map((section) => (
+      <section>
+        {section.title ? (
+          <h2 class="mb-5 flex items-center gap-2.5 text-[1.4375rem] leading-[1.6875rem] font-bold text-foreground">
+            <span aria-hidden="true" class="text-[1.3125rem] leading-none">
+              {section.marker}
+            </span>
+            {section.title}
+          </h2>
+        ) : null}
+
+        {section.type === "links" ? (
+          <ul class="m-0 flex list-none flex-col gap-8 p-0">
+            {section.items.map((item) => (
+              <li class="grid gap-1 sm:grid-cols-[13rem_1fr] sm:gap-6">
+                <div>
+                  <p class="m-0 text-xl leading-snug font-medium text-foreground">
+                    {item.url ? (
+                      <a
+                        href={item.url}
+                        class="underline underline-offset-2 hover:decoration-dotted"
+                      >
+                        {item.title}
+                      </a>
+                    ) : (
+                      item.title
+                    )}
+                    <span aria-hidden="true" class="text-foreground-soft"> ↗︎</span>
+                  </p>
+                  {item.tagline ? (
+                    <p class="issue-tagline m-0 mt-1">{item.tagline}</p>
+                  ) : null}
+                </div>
+                {item.descriptionHtml ? (
+                  <div class="content-prose" set:html={item.descriptionHtml} />
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        ) : section.type === "classifieds" ? (
+          <div class="grid gap-6 sm:grid-cols-[1fr_14rem]">
+            <div>
+              {section.itemsHtml.map((itemHtml, index) => (
+                <>
+                  <div class="content-prose" set:html={itemHtml} />
+                  {index < section.itemsHtml.length - 1 ? (
+                    <div
+                      class="my-4 h-[5px] w-full"
+                      style="background-color: light-dark(#F1F1F1, color-mix(in oklab, #F1F1F1 12%, var(--background-raised)))"
+                    />
+                  ) : null}
+                </>
+              ))}
+            </div>
+            <div class="flex flex-col items-start gap-3">
+              {section.attrs.note ? (
+                <p class="issue-tagline m-0">{section.attrs.note}</p>
+              ) : null}
+              <a
+                href={section.attrs["button-url"] ?? defaultClassifiedsButtonUrl}
+                class="inline-block rounded-[10px] bg-foreground px-4 py-2 text-base font-medium text-background no-underline hover:opacity-90"
+              >
+                {section.attrs.button ?? defaultClassifiedsButton}
+              </a>
+            </div>
+          </div>
+        ) : section.type === "quote" ? (
+          <blockquote class="m-0 border-l-2 border-border-strong pl-5">
+            <div class="content-prose text-foreground-muted" set:html={section.bodyHtml} />
+          </blockquote>
+        ) : section.type === "poll" ? (
+          <div class="rounded-lg p-6" style={tintStyle(section.attrs.color ?? "yellow")}>
+            {section.attrs.question ? (
+              <p class="m-0 mb-4 text-xl leading-snug font-medium text-foreground">
+                {section.attrs.question}
+              </p>
+            ) : null}
+            <ul class="m-0 flex list-none flex-col gap-2 p-0">
+              {section.itemsHtml.map((itemHtml, index) => (
+                <li class="flex items-center gap-3">
+                  <span
+                    aria-hidden="true"
+                    class="flex size-8 shrink-0 items-center justify-center rounded-sm text-sm font-semibold text-white"
+                    style={`background-color: ${sectionColors(section.attrs.color ?? "yellow").square}`}
+                  >
+                    {letters[index] ?? "•"}
+                  </span>
+                  <div class="content-prose issue-poll-option" set:html={itemHtml} />
+                </li>
+              ))}
+            </ul>
+            <p class="issue-tagline mt-4">
+              Polls run inside the email. Subscribe to vote on the next one.
+            </p>
+          </div>
+        ) : section.type === "hero" ? (
+          <div class="rounded-lg p-6" style={heroStyle(section.attrs.color)}>
+            {section.bodyHtml ? (
+              <div class="content-prose" set:html={section.bodyHtml} />
+            ) : null}
+            {section.attrs.image ? (
+              <img
+                src={section.attrs.image}
+                alt={section.attrs["image-alt"] ?? ""}
+                class="mt-4 w-full rounded-md"
+                loading="lazy"
+              />
+            ) : null}
+          </div>
+        ) : tintedTypes.has(section.type) ? (
+          <div class="rounded-lg p-6" style={tintStyle(section.attrs.color)}>
+            <div class="content-prose" set:html={section.bodyHtml} />
+          </div>
+        ) : (
+          <div class="content-prose" set:html={section.bodyHtml} />
+        )}
+      </section>
+    ))
+  }
+</div>
+
+<style>
+  /* Small grey line under link titles and inside notes, matching the email's
+     tagline treatment without fighting .content-prose specificity. */
+  .issue-tagline {
+    color: var(--foreground-soft);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+</style>

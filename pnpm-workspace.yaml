@@ -8,6 +8,9 @@ allowBuilds:
   sharp: true
   workerd: true
 
+minimumReleaseAgeExclude:
+  - '@paper-design/shaders@0.0.78'
+
 overrides:
   "@hono/node-server": 2.0.11
   esbuild: 0.28.1

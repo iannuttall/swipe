@@ -1,6 +1,7 @@
 ---
 import DitherCard from "@/components/DitherCard.astro";
 import NewsletterForm from "@/components/NewsletterForm.astro";
+import SignupPitch from "@/components/SignupPitch.astro";
 ---
 
 <div class="pointer-events-none absolute inset-0 z-20 flex items-center justify-center p-4 sm:p-8">
@@ -8,28 +9,8 @@ import NewsletterForm from "@/components/NewsletterForm.astro";
     class="pointer-events-auto w-full max-w-xl rounded-xl bg-background p-2.5 sm:p-3.5"
     style={{ boxShadow: "0 0 76px 52px var(--bg)" }}
   >
-    <DitherCard class="w-full" stripSize={20}>
-      <h1 class="mb-4 font-heading text-3xl leading-none font-semibold tracking-tighter sm:text-hero">
-        Swipe the best AI skills, prompts, and workflows.
-      </h1>
-      <p class="mb-6 max-w-lg text-lg leading-normal sm:text-xl">
-        <em
-          class="font-mono font-semibold"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right, var(--rainbow-auto-invert), var(--rainbow-auto-invert))",
-            backgroundClip: "text",
-            WebkitBackgroundClip: "text",
-            color: "transparent",
-            backgroundSize: "200% 100%",
-            animation: "rainbow-shift 3s linear infinite",
-          }}
-        >
-          The
-        </em>{" "}
-        newsletter to learn AI by stealing the cool ideas, skills, and tools you didn't know you
-        needed.
-      </p>
+    <DitherCard class="w-full" stripSize={20} seed="home-hero">
+      <SignupPitch as="h1" />
       <NewsletterForm source="home_v2_cta" />
     </DitherCard>
   </div>

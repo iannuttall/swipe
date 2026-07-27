@@ -1,15 +1,30 @@
 ---
+import DitherLine from "@/components/DitherLine.astro";
+
 interface Props {
   title: string;
   description?: string;
+  /** Small metadata line above the title, e.g. "Issue 001 · July 21, 2026". */
+  eyebrow?: string;
+  /** The dither separator between the header and the content below it. */
+  rule?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, eyebrow, rule = true }: Props = Astro.props;
 ---
 
-<header class="max-w-2xl">
-  <h1 class="font-heading text-4xl leading-tight font-semibold tracking-tight sm:text-5xl">
+<header class="pt-6 pb-2">
+  {/* Metadata sits at the same 12px mono as the archive rows. */}
+  {eyebrow ? <p class="mb-3 font-mono text-xs text-muted">{eyebrow}</p> : null}
+  <h1 class="font-heading text-[2.1rem] leading-[1.1] font-semibold tracking-tight text-pretty sm:text-[2.6rem]">
     {title}
   </h1>
-  {description ? <p class="mt-4 text-lg leading-7 text-muted">{description}</p> : null}
+  {
+    /* 20px against 17px body copy, so the standfirst separates by size and not
+       by colour alone. */
+    description ? (
+      <p class="mt-4 text-xl leading-relaxed text-muted text-pretty">{description}</p>
+    ) : null
+  }
+  {rule ? <DitherLine class="mt-8 text-dither" /> : null}
 </header>

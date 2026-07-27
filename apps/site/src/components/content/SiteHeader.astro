@@ -1,15 +1,33 @@
 ---
-import { siteName } from "@/lib/site";
+import SiteWordmark from "@/components/content/SiteWordmark.astro";
+
+// `/about` is unpublished for now, so it stays out of the nav.
+const links = [{ href: "/issues", label: "Issues" }];
+
+const current = Astro.url.pathname.replace(/\/$/, "");
 ---
 
-<header class="border-b border-border bg-foreground text-background">
-  <div class="site-frame flex items-center justify-between py-3">
-    <a class="font-mono text-sm underline underline-offset-2 hover:decoration-dotted" href="/">
-      {siteName.toLowerCase()}
-    </a>
-    <nav aria-label="Main navigation" class="flex items-center gap-4 text-sm">
-      <a class="underline underline-offset-2 hover:decoration-dotted" href="/issues">Issues</a>
-      <a class="underline underline-offset-2 hover:decoration-dotted" href="/about">About</a>
+<header class="pt-7 pb-2 sm:pt-9">
+  <div class="site-column flex items-center justify-between gap-6">
+    <SiteWordmark />
+    <nav aria-label="Main navigation" class="flex items-center gap-5 text-sm">
+      {
+        links.map((link) => {
+          const active = current === link.href || current.startsWith(`${link.href}/`);
+          return (
+            <a
+              href={link.href}
+              aria-current={active ? "page" : undefined}
+              class:list={[
+                "no-underline transition-colors",
+                active ? "text-foreground" : "text-muted hover:text-foreground",
+              ]}
+            >
+              {link.label}
+            </a>
+          );
+        })
+      }
     </nav>
   </div>
 </header>

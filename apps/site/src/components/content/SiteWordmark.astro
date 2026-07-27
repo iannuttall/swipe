@@ -1,0 +1,24 @@
+---
+import { siteName } from "@/lib/site";
+
+/**
+ * Single swap point for site identity. Replace the span below with the logo
+ * mark when it exists; nothing else needs to change.
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<a
+  href="/"
+  class:list={[
+    "font-mono text-sm text-foreground no-underline transition-opacity hover:opacity-70",
+    className,
+  ]}
+  aria-label={`${siteName} home`}
+>
+  <span>{siteName.toLowerCase()}</span>
+</a>

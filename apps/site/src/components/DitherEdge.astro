@@ -1,0 +1,38 @@
+---
+/**
+ * Static dither edge for inner pages. The animated WebGL dither is
+ * homepage-only; see `Dither.astro`.
+ *
+ * Colour comes from `currentColor` via a mask rather than a plain
+ * background-image. The source markup inverted the image under a `dark:` class
+ * variant, but this site switches theme on `prefers-color-scheme`, so a class
+ * variant would never fire. Masking also lets one asset take the panel's own
+ * colour instead of assuming black.
+ */
+interface Props {
+  /**
+   * `down` keeps the solid edge at the top, dissolving downward — use it below
+   * a panel. `up` flips it, for the edge above a panel.
+   */
+  direction?: "down" | "up";
+  /**
+   * Height in pixels. `mask-size: auto 100%` scales the square tile to this,
+   * so height sets the dot size too. 32 matches the tile's intended density.
+   */
+  height?: number;
+  class?: string;
+}
+
+const { direction = "down", height = 32, class: className } = Astro.props;
+---
+
+<div
+  class:list={[
+    "dither-edge",
+    direction === "up" ? "dither-edge-up" : "dither-edge-down",
+    className,
+  ]}
+  style={`height:${height}px`}
+  aria-hidden="true"
+>
+</div>

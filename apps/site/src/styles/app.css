@@ -122,7 +122,61 @@ html[data-gradient='pink'] {
   display: none !important;
 }
 
-.dither-strip {
+/* Archive row. Hovering inverts the whole row rather than tinting one element,
+   so the palette variables are reassigned and every descendant follows —
+   `text-muted` and friends resolve against the inverted values. */
+.issue-row {
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.issue-row:hover,
+.issue-row:focus-visible {
+  background-color: var(--card-inv-bg);
+  color: var(--card-inv-fg);
+  --fg: var(--card-inv-fg);
+  --muted: color-mix(in oklch, var(--card-inv-fg) 65%, transparent);
+  --primary: var(--primary-inv);
+  outline: none;
+}
+
+/* Static dither edge used on inner pages. The tile is solid along its top and
+   dissolves to sparse dots downward, so it reads as a panel breaking apart into
+   the page. Driven as a mask rather than a background-image so it takes
+   currentColor and therefore works in both themes from one asset. */
+.dither-edge {
+  width: 100%;
+  background-color: currentColor;
+  mask-image: url('/dither.svg');
+  mask-repeat: repeat-x;
+  mask-size: auto 100%;
+  mask-position: center;
+  -webkit-mask-image: url('/dither.svg');
+  -webkit-mask-repeat: repeat-x;
+  -webkit-mask-size: auto 100%;
+  -webkit-mask-position: center;
+}
+
+/* Flipped so the solid edge sits at the bottom, meeting a panel below it. */
+.dither-edge-up {
+  scale: 1 -1;
+}
+
+/* Overlap the panel by a pixel so no hairline of page background shows through
+   at fractional device pixel ratios. */
+.dither-edge-up {
+  margin-bottom: -1px;
+}
+
+.dither-edge-down {
+  margin-top: -1px;
+}
+
+/* Stand-in for the WebGL dithering shader. Visible before the shader mounts,
+   and permanently when WebGL or JavaScript is unavailable. */
+.dither {
+  width: 100%;
   background-color: var(--bg);
   background-image:
     radial-gradient(circle at 25% 25%, var(--dither) 0 0.8px, transparent 1px),
@@ -131,8 +185,12 @@ html[data-gradient='pink'] {
   background-size: 4px 4px;
 }
 
-.dither-strip-reverse {
+.dither-reverse {
   background-position: 2px 2px, 0 0;
+}
+
+.dither[data-dither-ready] {
+  background-image: none;
 }
 
 .subscribe-button {
@@ -242,6 +300,24 @@ body {
   }
 }
 
+/* The single reading column shared by pages, issues, and future tool pages.
+   Narrow enough to hold a comfortable measure at the 17px body size. */
+.site-column {
+  width: min(100% - 2.5rem, 42rem);
+  margin-inline: auto;
+}
+
+@media (min-width: 640px) {
+  .site-column {
+    width: min(100% - 4rem, 42rem);
+  }
+}
+
+/* Lets a block break out of the reading column without leaving it. */
+.column-bleed {
+  margin-inline: calc(var(--bleed, 1.5rem) * -1);
+}
+
 .dotted-card {
   position: relative;
   isolation: isolate;
@@ -313,13 +389,15 @@ body {
 }
 
 .content-prose a {
-  color: inherit;
+  color: var(--primary);
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s ease;
 }
 
 .content-prose a:hover {
-  text-decoration-style: dotted;
+  text-decoration-style: solid;
 }
 
 .content-prose code {
@@ -329,11 +407,16 @@ body {
   font-size: 0.88em;
 }
 
+/* Quiet inset panel shared by callouts and code blocks. Square and borderless
+   so it separates by tone alone, matching the flat surfaces elsewhere. */
+.surface-muted {
+  background: color-mix(in oklab, var(--muted) 12%, transparent);
+}
+
 .content-prose pre {
   overflow-x: auto;
-  border: 2px solid var(--border-strong);
-  background: var(--card);
-  padding: 1rem;
+  background: color-mix(in oklab, var(--muted) 12%, transparent);
+  padding: 1rem 1.1rem;
   font-family: var(--font-mono);
   font-size: 0.875rem;
   line-height: 1.6;
@@ -346,8 +429,8 @@ body {
 }
 
 .content-prose blockquote {
-  border-left: 3px solid var(--border-strong);
-  padding-left: 1rem;
+  border-left: 2px solid var(--border);
+  padding-left: 1.1rem;
   color: var(--foreground-soft);
 }
 
@@ -358,18 +441,7 @@ body {
 
 .code-frame {
   position: relative;
-  isolation: isolate;
   margin: 1.5rem 0;
-}
-
-.code-frame::after {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  inset: 7px -7px -7px 7px;
-  background-color: var(--dither);
-  background-image: radial-gradient(var(--background) 1px, transparent 1px);
-  background-size: 4px 4px;
 }
 
 .code-frame pre {
@@ -379,16 +451,29 @@ body {
 
 .code-copy {
   position: absolute;
-  top: 0.7rem;
-  right: 0.7rem;
+  top: 0.6rem;
+  right: 0.6rem;
   display: grid;
   width: 2rem;
   height: 2rem;
   cursor: pointer;
   place-items: center;
-  border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--fg);
+  border: 0;
+  /* Bare icon rather than a button: no fill, no chrome, just the mark. Shiki
+     renders code blocks on its own dark theme in both site themes, so the
+     colours are keyed to that surface, not to the page palette. */
+  background: none;
+  color: rgb(255 255 255 / 0.45);
+  transition: color 0.15s ease;
+}
+
+.code-copy:hover,
+.code-copy:focus-visible {
+  color: rgb(255 255 255 / 1);
+}
+
+.code-copy.copied {
+  color: var(--primary);
 }
 
 .code-copy-check {

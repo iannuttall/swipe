@@ -2,6 +2,7 @@
 export const prerender = true;
 Astro.response.status = 404;
 
+import PageHeader from "@/components/content/PageHeader.astro";
 import Layout from "@/layouts/Layout.astro";
 ---
 
@@ -11,10 +12,11 @@ import Layout from "@/layouts/Layout.astro";
   canonicalPath="/404"
   noIndex
 >
-  <div class="max-w-xl">
-    <h1 class="font-heading text-4xl font-semibold">Page not found</h1>
-    <p class="mt-4 text-lg text-muted">
-      That link goes nowhere. Try the <a class="underline underline-offset-2" href="/issues">issue archive</a>.
-    </p>
-  </div>
+  <PageHeader
+    title="Page not found"
+    description="That link goes nowhere."
+  />
+  <p class="mt-8 text-lg">
+    Try the <a class="underline underline-offset-2" href="/issues">issue archive</a>.
+  </p>
 </Layout>

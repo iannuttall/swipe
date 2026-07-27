@@ -26,36 +26,39 @@ const schema = {
 >
   <PageHeader title="Issues" description={description} />
 
-  <div class="mt-10 border-y-2 border-foreground">
-    {
-      issues.length === 0 ? (
-        <p class="py-8 text-muted">No published issues yet.</p>
-      ) : (
-        <ol class="divide-y divide-border">
-          {issues.map((issue) => (
-            <li>
-              <a
-                href={`/issues/${issue.id}`}
-                class="grid gap-2 py-6 no-underline sm:grid-cols-[10rem_1fr] sm:gap-6"
-              >
-                <time class="font-mono text-sm text-muted" datetime={issue.data.pubDate.toISOString()}>
-                  {formatIssueDate(issue.data.pubDate)}
-                </time>
-                <span>
-                  <strong class="font-heading text-xl font-semibold">{issue.data.subject}</strong>
-                  {issue.data.preheader ? (
-                    <span class="mt-1 block text-muted">{issue.data.preheader}</span>
-                  ) : null}
-                </span>
-              </a>
-            </li>
-          ))}
-        </ol>
-      )
-    }
-  </div>
-
-  <div class="mt-14">
+  <div class="mt-10">
     <NewsletterSignup source="swipe.md/issues" />
   </div>
+
+  {
+    issues.length === 0 ? (
+      <p class="mt-12 text-muted">No published issues yet.</p>
+    ) : (
+      <ol class="mt-12 border-2 border-border-strong bg-card">
+        {issues.map((issue, index) => (
+          <li class:list={[index > 0 && "border-t-2 border-border-strong"]}>
+            <a
+              href={`/issues/${issue.id}`}
+              class="issue-row block px-5 py-6 no-underline sm:px-6"
+            >
+              <time
+                class="font-mono text-xs text-muted"
+                datetime={issue.data.pubDate.toISOString()}
+              >
+                {formatIssueDate(issue.data.pubDate)}
+              </time>
+              <p class="mt-2 font-heading text-xl leading-snug font-semibold tracking-tight text-pretty">
+                {issue.data.subject}
+              </p>
+              {issue.data.preheader ? (
+                <p class="mt-1.5 text-base leading-normal text-muted text-pretty">
+                  {issue.data.preheader}
+                </p>
+              ) : null}
+            </a>
+          </li>
+        ))}
+      </ol>
+    )
+  }
 </Layout>

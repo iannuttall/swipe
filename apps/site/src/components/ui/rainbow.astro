@@ -1,0 +1,25 @@
+---
+import type { HTMLTag } from "astro/types";
+
+interface Props {
+  as?: HTMLTag;
+  class?: string;
+}
+
+const { as: Tag = "em", class: className }: Props = Astro.props;
+---
+
+<Tag
+  class:list={[className]}
+  style={{
+    backgroundImage:
+      "linear-gradient(to right, var(--rainbow-auto-invert), var(--rainbow-auto-invert))",
+    backgroundClip: "text",
+    WebkitBackgroundClip: "text",
+    color: "transparent",
+    backgroundSize: "200% 100%",
+    animation: "rainbow-shift 3s linear infinite",
+  }}
+>
+  <slot />
+</Tag>

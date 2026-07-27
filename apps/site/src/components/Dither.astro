@@ -1,0 +1,51 @@
+---
+/**
+ * A dithered surface. Renders a CSS dot pattern that the WebGL shader replaces
+ * once it mounts, so the element reads correctly with no JS and no WebGL.
+ */
+interface Props {
+  /** Height of the surface. Strips use a number of pixels; `rule` is thinner. */
+  height?: number;
+  /** Custom property names the shader reads its two colours from. */
+  back?: string;
+  front?: string;
+  /** Stable per-instance seed. Two strips on one card must differ. */
+  seed?: string;
+  /** Pin the pattern instead of letting the seed choose one. */
+  shape?: "simplex" | "warp" | "wave" | "ripple" | "dots" | "swirl" | "sphere";
+  /** Dither grid size in pixels. */
+  pxSize?: number;
+  /** Zoom level. Higher fits more pattern into the strip. Seeded when unset. */
+  scale?: number;
+  /** Offsets the fallback dot grid so stacked strips do not look tiled. */
+  reverse?: boolean;
+  class?: string;
+}
+
+const {
+  height = 20,
+  back = "--bg",
+  front = "--fg",
+  seed = "dither",
+  shape,
+  pxSize = 3,
+  scale,
+  reverse = false,
+  class: className,
+} = Astro.props;
+---
+
+<div
+  class:list={["dither", reverse && "dither-reverse", className]}
+  style={`height:${height}px`}
+  data-dither
+  data-paper-shader
+  data-dither-seed={seed}
+  data-dither-back={back}
+  data-dither-front={front}
+  data-dither-shape={shape}
+  data-dither-px-size={String(pxSize)}
+  data-dither-scale={scale === undefined ? undefined : String(scale)}
+  aria-hidden="true"
+>
+</div>

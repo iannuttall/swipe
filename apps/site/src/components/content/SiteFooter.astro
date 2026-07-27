@@ -1,23 +1,70 @@
 ---
+import DitherEdge from "@/components/DitherEdge.astro";
+
 const year = new Date().getFullYear();
+
+// `/about` and `/advertise` are unpublished for now, so they stay out of here.
+const links = [
+  { href: "/issues", label: "Issues" },
+  { href: "/privacy", label: "Privacy" },
+  { href: "/terms", label: "Terms" },
+  { href: "/cookies", label: "Cookies" },
+];
+
+// Ways to describe a project; one is picked at random on each load. Every entry
+// has to read naturally in "an Ian Nuttall ___". Shared with the `seo` site.
+const projectThings = [
+  "joint", "jam", "vibe", "thing", "thang", "production", "creation",
+  "contraption", "invention", "endeavour", "venture", "operation", "undertaking",
+  "experiment", "side quest", "side hustle", "passion project", "pet project",
+  "labor of love", "science project", "art project", "fever dream", "brainchild",
+  "obsession", "fixation", "racket", "scheme", "caper", "escapade", "romp",
+  "odyssey", "saga", "gambit", "shindig", "jamboree", "extravaganza", "spectacle",
+  "situation", "expedition", "rabbit hole", "weekend build", "mixtape", "remix",
+  "b-side", "deep cut", "banger", "slopfest", "clanger", "faff", "folly",
+  "hackjob", "eval", "gpt wrapper", "vibe code", "hallucination", "token burner",
+  "prompt spiral", "ting", "groove", "number", "bit", "doodle", "sketch", "zine",
+  "manifesto", "love letter", "special", "original",
+];
 ---
 
-<footer class="mt-16 border-t border-border bg-card py-8 text-sm text-muted">
-  <div class="site-frame flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-    <p>&copy; {year} Swipe</p>
-    <nav aria-label="Footer navigation" class="flex flex-wrap gap-4">
-      <a class="underline underline-offset-2 hover:decoration-dotted" href="/issues">Issues</a>
-      <a class="underline underline-offset-2 hover:decoration-dotted" href="/about">About</a>
-      <a class="underline underline-offset-2 hover:decoration-dotted" href="/privacy">Privacy</a>
-      <a class="underline underline-offset-2 hover:decoration-dotted" href="/terms">Terms</a>
-      <a class="underline underline-offset-2 hover:decoration-dotted" href="/cookies">Cookies</a>
-      <a
-        class="underline underline-offset-2 hover:decoration-dotted"
-        href="https://ian.is"
-        rel="noreferrer"
-      >
-        An Ian Nuttall thing
-      </a>
-    </nav>
+<div class="mt-20">
+  {/* The page dissolving into the footer, same treatment as the signup card. */}
+  <div class="text-[color:var(--primary)]">
+    <DitherEdge direction="up" />
   </div>
-</footer>
+
+  <footer class="bg-primary py-6 text-base text-white selection:bg-white/25 selection:text-white">
+    <div
+      class="site-column flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6"
+    >
+      <p>
+        &copy; {year} Swipe, an{" "}
+        <a
+          class="underline underline-offset-2 hover:decoration-dotted"
+          href="https://ian.is"
+          rel="noreferrer"
+        >
+          Ian Nuttall
+        </a>{" "}
+        <span data-project-thing>joint</span>
+      </p>
+      <nav aria-label="Footer navigation" class="flex flex-wrap gap-x-5 gap-y-2">
+        {
+          links.map((link) => (
+            <a class="underline underline-offset-2 hover:decoration-dotted" href={link.href}>
+              {link.label}
+            </a>
+          ))
+        }
+      </nav>
+    </div>
+  </footer>
+</div>
+
+<script is:inline define:vars={{ projectThings }}>
+  const thing = document.querySelector("[data-project-thing]");
+  if (thing) {
+    thing.textContent = projectThings[Math.floor(Math.random() * projectThings.length)];
+  }
+</script>

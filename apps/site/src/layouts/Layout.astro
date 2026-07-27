@@ -19,6 +19,8 @@ interface Props {
   structuredData?: Record<string, unknown> | Record<string, unknown>[];
   framed?: boolean;
   showChrome?: boolean;
+  /** `column` is the single reading column used by pages, issues, and tools. */
+  width?: "column" | "frame";
 }
 
 const {
@@ -30,6 +32,7 @@ const {
   structuredData,
   framed = true,
   showChrome = true,
+  width = "column",
 } = Astro.props;
 
 const fullTitle = title === siteName || title.startsWith(`${siteName} `) ? title : `${title} | ${siteName}`;
@@ -119,7 +122,7 @@ const fontFaceCss = `
       <main class="flex-1">
         {
           framed ? (
-            <div class="site-frame py-10 sm:py-14">
+            <div class:list={[width === "frame" ? "site-frame" : "site-column", "pt-8 sm:pt-12"]}>
               <slot />
             </div>
           ) : (

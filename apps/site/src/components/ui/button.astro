@@ -15,19 +15,23 @@ const {
 } = Astro.props as Props;
 
 const variants = {
-  default: "bg-foreground text-background",
+  default: "bg-foreground text-background hover:opacity-90",
   primary: "bg-primary text-primary-fg hover:bg-primary/90",
 };
 
+// Type treatment lives here rather than in the base so callers can pick a size
+// without fighting a base class. `class:list` concatenates, it does not merge,
+// so two competing text-transform utilities would be resolved by stylesheet
+// order instead of by intent.
 const sizes = {
-  default: "h-10 px-4 py-1.5",
-  hero: "h-12 px-6",
+  default: "h-10 px-4 text-sm font-medium",
+  hero: "h-12 px-6 font-heading text-base font-semibold",
 };
 ---
 
 <button
   class:list={[
-    "shrink-0 cursor-pointer whitespace-nowrap rounded-none text-xs uppercase tracking-widest disabled:cursor-not-allowed disabled:opacity-60",
+    "shrink-0 cursor-pointer rounded-none whitespace-nowrap transition-opacity disabled:cursor-not-allowed disabled:opacity-60",
     variants[variant],
     sizes[size],
     className,

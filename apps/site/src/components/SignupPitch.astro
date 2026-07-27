@@ -1,0 +1,29 @@
+---
+import Rainbow from "@/components/ui/rainbow.astro";
+
+/**
+ * The newsletter pitch. Shared by the homepage hero and the signup card on
+ * inner pages so the two cannot drift in wording or treatment.
+ *
+ * Assumes an inverted dark panel around it — it inherits `--fg` rather than
+ * setting its own colour.
+ */
+interface Props {
+  /** `h1` on the homepage, `h2` where the card is not the page's subject. */
+  as?: "h1" | "h2";
+  id?: string;
+}
+
+const { as: Heading = "h2", id }: Props = Astro.props;
+---
+
+<Heading
+  id={id}
+  class="mb-4 font-heading text-3xl leading-none font-semibold tracking-tighter text-pretty sm:text-hero"
+>
+  Swipe the best AI skills, prompts, and workflows.
+</Heading>
+<p class="mb-6 max-w-lg text-lg leading-normal sm:text-xl">
+  <Rainbow class="font-mono font-semibold">The</Rainbow>{" "}
+  newsletter to learn AI by stealing the cool ideas, skills, and tools you didn't know you needed.
+</p>

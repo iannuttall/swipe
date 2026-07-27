@@ -1,25 +1,41 @@
 ---
+import DitherEdge from "@/components/DitherEdge.astro";
 import NewsletterForm from "@/components/NewsletterForm.astro";
+import SignupPitch from "@/components/SignupPitch.astro";
 
 interface Props {
   source: string;
-  title?: string;
-  description?: string;
 }
 
-const {
-  source,
-  title = "Get the next issue",
-  description = "One useful idea a week, with enough detail to steal it.",
-} = Astro.props;
+const { source } = Astro.props;
+const titleId = `signup-${source.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;
+
+// The edges take currentColor, so the wrapper carries the panel's background
+// colour rather than its text colour.
+const panelStyle = {
+  backgroundColor: "var(--card-inv-bg)",
+  color: "var(--card-inv-fg)",
+  "--bg": "var(--card-inv-bg)",
+  "--fg": "var(--card-inv-fg)",
+  "--primary": "var(--primary-inv)",
+  "--primary-fg": "var(--primary-inv-fg)",
+  "--border": "color-mix(in oklch, var(--card-inv-fg) 25%, transparent)",
+  "--muted": "color-mix(in oklch, var(--card-inv-fg) 60%, transparent)",
+};
 ---
 
-<section class="dotted-card p-6 sm:p-8">
-  <div class="grid gap-5 sm:grid-cols-[minmax(0,1fr)_minmax(17rem,0.8fr)] sm:items-end">
-    <div>
-      <h2 class="font-heading text-2xl font-semibold">{title}</h2>
-      <p class="mt-2 max-w-xl text-muted">{description}</p>
-    </div>
-    <NewsletterForm source={source} compact />
+{/* The whole card is nothing but a pitch, so it comes out once subscribed. */}
+<section
+  aria-labelledby={titleId}
+  x-data="newsletterShell"
+  x-cloak
+  x-show="!subscribed"
+  class="flex flex-col text-[color:var(--card-inv-bg)]"
+>
+  <DitherEdge direction="up" />
+  <div class="px-7 py-7 sm:px-8 sm:py-8" style={panelStyle}>
+    <SignupPitch as="h2" id={titleId} />
+    <NewsletterForm source={source} />
   </div>
+  <DitherEdge direction="down" />
 </section>

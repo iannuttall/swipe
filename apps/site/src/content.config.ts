@@ -24,6 +24,8 @@ const pages = defineCollection({
     pubDate: z.coerce.date().optional(),
     updatedDate: z.coerce.date().optional(),
     draft: z.boolean().default(false),
+    /** Set false on pages where a signup card would be inappropriate. */
+    signup: z.boolean().default(true),
   }),
 });
 

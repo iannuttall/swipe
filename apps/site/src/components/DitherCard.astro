@@ -1,18 +1,18 @@
 ---
+import Dither from "@/components/Dither.astro";
+
 interface Props {
   class?: string;
   stripSize?: number;
+  /** Distinguishes the two strips of one card from those of another. */
+  seed?: string;
 }
 
-const {
-  class: className,
-  stripSize = 16,
-} = Astro.props;
-const stripStyle = `height:${stripSize}px`;
+const { class: className, stripSize = 16, seed = "card" } = Astro.props;
 ---
 
 <div class:list={["flex flex-col", className]}>
-  <div class="dither-strip w-full" style={stripStyle}></div>
+  <Dither height={stripSize} back="--bg" front="--fg" seed={`${seed}-top`} />
   <div
     class="flex-1 px-7 py-7 sm:px-8 sm:py-8"
     style={{
@@ -28,5 +28,5 @@ const stripStyle = `height:${stripSize}px`;
   >
     <slot />
   </div>
-  <div class="dither-strip dither-strip-reverse w-full" style={stripStyle}></div>
+  <Dither height={stripSize} back="--bg" front="--fg" seed={`${seed}-bottom`} reverse />
 </div>

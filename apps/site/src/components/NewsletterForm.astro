@@ -16,7 +16,7 @@ const {
 const inputId = `newsletter-${source.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;
 ---
 
-<div x-data={`newsletterSignup(${JSON.stringify({ source })})`}>
+<div x-data={`newsletterSignup(${JSON.stringify({ source })})`} x-cloak x-show="visible">
   <p x-cloak x-show="status === 'success'" class="text-sm" role="status">
     you're in - check your inbox.
   </p>
@@ -42,11 +42,8 @@ const inputId = `newsletter-${source.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}
       type="submit"
       variant="primary"
       size={compact ? "default" : "hero"}
-      x-bind:disabled="status === 'loading' || !ready"
-      class:list={[
-        !compact &&
-          "subscribe-button font-heading text-base font-semibold normal-case tracking-normal text-white",
-      ]}
+      x-bind:disabled="status === 'loading'"
+      class:list={[!compact && "subscribe-button text-white"]}
     >
       <span x-text={`status === 'loading' ? 'Sending...' : ${JSON.stringify(buttonText)}`}>
         {buttonText}

@@ -4,7 +4,9 @@ export const prerender = true;
 import { getCollection, render, type CollectionEntry } from "astro:content";
 import Callout from "@/components/content/Callout.astro";
 import DottedCard from "@/components/content/DottedCard.astro";
+import NewsletterSignup from "@/components/content/NewsletterSignup.astro";
 import PageHeader from "@/components/content/PageHeader.astro";
+import IssueSections from "@/components/issues/IssueSections.astro";
 import Layout from "@/layouts/Layout.astro";
 
 export async function getStaticPaths() {
@@ -40,7 +42,16 @@ const schema = {
     title={page.data.headline ?? page.data.title}
     description={page.data.description}
   />
-  <article class="content-prose mt-10">
-    <Content components={{ Callout, DottedCard }} />
+  {
+    page.data.signup === false ? null : (
+      <div class="mt-10">
+        <NewsletterSignup source={`swipe.md${path}`} />
+      </div>
+    )
+  }
+
+  <article class="content-prose mt-12">
+    {/* IssueSections lets a page render real issue blocks, e.g. ad mockups. */}
+    <Content components={{ Callout, DottedCard, IssueSections }} />
   </article>
 </Layout>

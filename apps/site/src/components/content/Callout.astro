@@ -6,9 +6,9 @@ interface Props {
 const { title } = Astro.props;
 ---
 
-<aside class="my-6 border-2 border-foreground bg-card p-5">
-  {title ? <p class="mb-2 font-mono text-sm font-semibold">{title}</p> : null}
-  <div class="content-prose">
+<aside class="surface-muted my-7 px-5 py-5 sm:px-6">
+  {title ? <p class="mb-2 font-heading text-base font-semibold">{title}</p> : null}
+  <div class="content-prose text-[1rem]">
     <slot />
   </div>
 </aside>

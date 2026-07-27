@@ -18,3 +18,11 @@ import BackgroundCards from "@/components/home/BackgroundCards.astro";
   <HomeHero />
   <BackgroundCards />
 </main>
+
+<script>
+  // The WebGL dither is homepage-only, so the shader library stays out of every
+  // other page's bundle. Inner pages use the static SVG edge instead.
+  import setupDither from "@/scripts/dither";
+
+  setupDither();
+</script>

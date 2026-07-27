@@ -1,4 +1,4 @@
-export type ContactStatus = 'active' | 'unsubscribed' | 'suppressed'
+export type ContactStatus = 'pending' | 'active' | 'unsubscribed' | 'suppressed'
 export type SubscriptionStatus = 'subscribed' | 'unsubscribed'
 export type SuppressionReason =
   | 'unsubscribe'
@@ -29,6 +29,8 @@ export type MessageStatus =
   | 'skipped'
 
 export type EventType =
+  | 'contact.confirmation_requested'
+  | 'contact.confirmed'
   | 'contact.subscribed'
   | 'contact.unsubscribed'
   | 'contact.suppressed'

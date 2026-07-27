@@ -25,6 +25,27 @@ export class FakePlatform implements EmailPlatform {
     return { id: 'contact_1' }
   }
 
+  async confirmSubscription() {
+    return {
+      confirmed: true,
+      alreadyConfirmed: false,
+      status: 'confirmed' as const,
+      purpose: 'double_opt_in' as const,
+    }
+  }
+
+  async prepareMigrationConfirmations() {
+    return { ...confirmationReport(), created: 1 }
+  }
+
+  async getConfirmationReport() {
+    return confirmationReport()
+  }
+
+  async unsubscribeUnconfirmedMigration(input: { execute?: boolean }) {
+    return { matched: 1, unsubscribed: input.execute ? 1 : 0 }
+  }
+
   async exportContacts(): Promise<{ contacts: []; suppressions: [] }> {
     return { contacts: [], suppressions: [] }
   }
@@ -252,9 +273,23 @@ function doctorReport() {
     apiAuthConfigured: true,
     trackingConfigured: true,
     unsubscribeConfigured: true,
+    confirmationConfigured: true,
     snsWebhookConfigured: true,
     snsTopicAllowlistConfigured: true,
     ready: true,
+  }
+}
+
+function confirmationReport() {
+  return {
+    purpose: 'swipe_migration' as const,
+    batchKey: 'swipe-migration-2026',
+    total: 1,
+    pending: 1,
+    confirmed: 0,
+    expired: 0,
+    cancelled: 0,
+    activeUnconfirmed: 1,
   }
 }
 

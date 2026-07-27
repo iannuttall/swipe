@@ -196,6 +196,8 @@ The site uses these Cloudflare Worker secrets:
 
 - `NEWSLETTER_API_TOKEN` authorizes signup requests to the newsletter service.
 - `NEWSLETTER_WEBHOOK_SECRET` rejects invalid SES webhook paths at the edge.
+- `TURNSTILE_SITE_KEY` renders the subscriber confirmation check.
+- `TURNSTILE_SECRET_KEY` validates the check before a subscription changes.
 
 `NEWSLETTER_API_URL` is an optional Worker variable for the private newsletter
 origin. It currently defaults to `https://list.ian.is` during migration.
@@ -225,13 +227,13 @@ are same-origin Worker routes that proxy to the VPS service. There is no public
 
 ## Ian's List transition
 
-The existing `ian.is` install remains the sender for one final Ian's List
-email. That message comes from the familiar sender and asks readers to
-whitelist Swipe.
+The final Ian's List email uses a per-contact Swipe confirmation link. Existing
+active contacts remain active during the response window. After the deadline,
+an operator reviews a dry run and explicitly unsubscribes non-confirmers in the
+exact migration batch.
 
-The code in this repo is the Swipe-branded successor. Its VPS origin stays on
-the proven `list.ian.is` hostname until the new sender identity, DNS, webhook,
-and deliverability setup are ready.
+See [the subscriber confirmation guide](docs/subscriber-confirmation.md) for
+the setup and commands.
 
 ## Security checks
 

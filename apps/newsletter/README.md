@@ -49,6 +49,10 @@ EMAIL_API_INTERNAL_URL=http://app:3000
 API_TOKEN=change-me
 UNSUBSCRIBE_SECRET=change-me
 TRACKING_SECRET=change-me
+CONFIRMATION_SECRET=change-me
+EMAIL_CONFIRMATION_BASE_URL=https://swipe.md
+EMAIL_CONFIRMATION_TTL_HOURS=72
+EMAIL_DOUBLE_OPT_IN=true
 EMAIL_PROVIDER=ses
 EMAIL_FROM_EMAIL=hello@swipe.md
 EMAIL_FROM_NAME="Swipe"
@@ -199,6 +203,9 @@ email contact tag person@example.com --tag high-value --json
 email contact external-id person@example.com --provider stripe --external-id cus_123 --json
 email purchase record --email person@example.com --provider stripe --external-id pi_123 --idempotency-key stripe:pi_123 --product-key course --amount-cents 50000 --currency USD --json
 email audience preview --contact-tag high-value --json
+email confirmation prepare --yes --batch-key KEY --expires-at ISO --json
+email confirmation report --purpose swipe_migration --batch-key KEY --json
+email confirmation unsubscribe-unconfirmed --batch-key KEY --expired-before ISO --json
 email template list --json
 email template render --subject "Hello" --body-file draft.md --out-dir rendered --json
 email draft create --subject "Hello" --body-file draft.md --json
@@ -317,6 +324,10 @@ Public routes:
 Protected routes:
 
 - `POST /api/subscribe`
+- `POST /api/confirmations/confirm`
+- `POST /api/confirmations/migration/prepare`
+- `GET /api/confirmations/report`
+- `POST /api/confirmations/migration/unsubscribe-unconfirmed`
 - `GET /api/doctor`
 - `GET /api/ops/checklist`
 - `POST /api/ops/recover-stuck`
@@ -431,6 +442,18 @@ They are allowed to explicitly resubscribe later.
 Suppressions are hard safety blocks for provider hard bounces, complaints,
 manual blocks, invalid emails, and blocked domains. Sending checks both contact
 status and active suppressions.
+
+## Subscriber Confirmation
+
+New production signups use double opt-in by default. A new contact remains
+`pending` and is excluded from audiences until its signed link is confirmed.
+Existing active contacts do not receive another confirmation email.
+
+Migration campaigns use the same signed request records without making active
+contacts pending. The cleanup command is a dry run unless `--yes` is present.
+
+The public page, Turnstile setup, migration commands, and cleanup checks are in
+[the subscriber confirmation guide](../../docs/subscriber-confirmation.md).
 
 ## SES SNS Webhooks
 

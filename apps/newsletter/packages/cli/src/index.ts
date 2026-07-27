@@ -22,6 +22,7 @@ import {
   parseArgs,
 } from './args.js'
 import { parseCanarySteps } from './canary-steps.js'
+import { runConfirmationCommand } from './confirmation-commands.js'
 import { gmailAliases } from './gmail-aliases.js'
 import { usage } from './help.js'
 import { seedGmailSubscriberIntelligence } from './seed-intelligence.js'
@@ -122,6 +123,9 @@ async function dispatch(parsed: ParsedArgs, input: CliRunInput): Promise<unknown
   const platform = runtime.platform
 
   try {
+    const confirmation = await runConfirmationCommand(parsed, platform)
+    if (confirmation.handled) return confirmation.result
+
     if (area === 'doctor') {
       return await platform.doctor()
     }

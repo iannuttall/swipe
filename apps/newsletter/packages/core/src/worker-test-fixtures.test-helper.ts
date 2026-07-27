@@ -1,11 +1,7 @@
-import type {
-  CanaryState,
-  ConfirmationReport,
-  DoctorReport,
-  ProductionOpsChecklist,
-  QueueSummary,
-  RecentContacts,
-} from '@email/core'
+import type { CanaryState, RecentContacts } from './platform-contracts.js'
+import type { ProductionOpsChecklist } from './production-ops.js'
+import type { DoctorReport } from './readiness.js'
+import type { QueueSummary } from './store.js'
 
 export function doctorReport(): DoctorReport {
   return {
@@ -23,6 +19,23 @@ export function doctorReport(): DoctorReport {
     snsTopicAllowlistConfigured: true,
     ready: true,
   }
+}
+
+export function confirmationReport() {
+  return {
+    purpose: 'swipe_migration' as const,
+    batchKey: 'swipe-migration-2026',
+    total: 1,
+    pending: 1,
+    confirmed: 0,
+    expired: 0,
+    cancelled: 0,
+    activeUnconfirmed: 1,
+  }
+}
+
+export function recentContacts(): RecentContacts {
+  return { since: new Date(0).toISOString(), days: 7, signups: 0, contacts: [] }
 }
 
 export function opsChecklist(): ProductionOpsChecklist {
@@ -73,37 +86,5 @@ export function canaryState(): CanaryState {
     },
     cohorts: [],
     nextStep: 50,
-  }
-}
-
-export function confirmationReport(): ConfirmationReport {
-  return {
-    purpose: 'swipe_migration',
-    batchKey: 'swipe-migration-2026',
-    total: 1,
-    pending: 1,
-    confirmed: 0,
-    expired: 0,
-    cancelled: 0,
-    activeUnconfirmed: 1,
-  }
-}
-
-export function recentContacts(input?: {
-  days?: number
-  limit?: number
-}): RecentContacts {
-  return {
-    since: '2026-07-12T00:00:00.000Z',
-    days: input?.days ?? 7,
-    signups: 1,
-    contacts: [
-      {
-        email: 'new@example.com',
-        source: 'ian.is',
-        status: 'active',
-        subscribedAt: '2026-07-18T12:00:00.000Z',
-      },
-    ],
   }
 }

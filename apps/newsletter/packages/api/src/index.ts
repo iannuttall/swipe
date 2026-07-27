@@ -23,6 +23,7 @@ import {
   sendPlanSchema,
 } from './audience-input.js'
 import { isAuthorized, safeEqual } from './auth.js'
+import { registerConfirmationRoutes } from './confirmation-routes.js'
 import { transparentGif } from './responses.js'
 import { registerTemplateRoutes } from './template-routes.js'
 import { unsubscribePage } from './unsubscribe-page.js'
@@ -245,6 +246,8 @@ export function createApp(input: ApiInput = {}) {
       201,
     )
   })
+
+  registerConfirmationRoutes(app, platform)
 
   app.get('/api/doctor', async (c) => c.json(await platform.doctor()))
 

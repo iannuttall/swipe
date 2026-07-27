@@ -27,6 +27,7 @@ describe('production ops checklist', () => {
         apiAuthConfigured: true,
         trackingConfigured: true,
         unsubscribeConfigured: true,
+        confirmationConfigured: true,
         snsWebhookConfigured: false,
         snsTopicAllowlistConfigured: false,
         ready: false,

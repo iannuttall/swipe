@@ -14,6 +14,7 @@ import {
   tags,
 } from './db/schema.js'
 import { getEmailDomain, normalizeEmail } from './email-address.js'
+import { PostgresConfirmationStore } from './postgres-confirmation-store.js'
 import {
   getPostgresBroadcastLinkStats,
   getPostgresBroadcastStats,
@@ -101,7 +102,11 @@ import type {
 } from './types.js'
 
 export class PostgresEmailStore implements EmailStore {
-  constructor(private readonly db: Database) {}
+  readonly confirmations: PostgresConfirmationStore
+
+  constructor(private readonly db: Database) {
+    this.confirmations = new PostgresConfirmationStore(db)
+  }
 
   async upsertContact(input: ContactInput): Promise<ContactRecord> {
     const email = normalizeEmail(input.email)

@@ -1,3 +1,4 @@
+import type { ConfirmationStore } from './confirmation-types.js'
 import type {
   AudienceFilter,
   AudienceResolution,
@@ -255,6 +256,7 @@ export interface QueueSummary {
 }
 
 export interface EmailStore {
+  readonly confirmations: ConfirmationStore
   upsertContact(input: ContactInput): Promise<ContactRecord>
   getContact(id: string): Promise<ContactRecord | undefined>
   findContactByEmail(email: string): Promise<ContactRecord | undefined>

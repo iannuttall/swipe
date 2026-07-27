@@ -1,0 +1,52 @@
+---
+import { env } from "cloudflare:workers";
+import Layout from "@/layouts/Layout.astro";
+import { isNewsletterToken } from "@/lib/newsletter-origin";
+
+export const prerender = false;
+
+const token = Astro.params.token;
+const siteKey = env.TURNSTILE_SITE_KEY ?? "";
+const validLink = isNewsletterToken(token);
+
+Astro.response.headers.set("cache-control", "no-store");
+Astro.response.headers.set("referrer-policy", "no-referrer");
+---
+
+<Layout
+  title="Confirm your Swipe subscription"
+  description="Confirm that you want to receive Swipe."
+  canonicalPath="/confirm"
+  noIndex
+>
+  <meta slot="head" name="referrer" content="no-referrer" />
+  <script
+    slot="head"
+    is:inline
+    src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+    async
+    defer
+  ></script>
+
+  <section class="mx-auto max-w-xl py-16 text-center">
+    <h1 class="text-4xl font-semibold tracking-tight">Confirm your subscription</h1>
+    {
+      validLink && siteKey ? (
+        <div
+          class="mt-6"
+          x-data={`subscriptionConfirmation(${JSON.stringify({ token, siteKey })})`}
+        >
+          <p x-text="message">Checking this confirmation link...</p>
+          <div x-ref="turnstile" class="mt-6 flex justify-center" />
+          <p x-show="status === 'success'" class="mt-6">
+            <a href="/" class="underline">Go to Swipe</a>
+          </p>
+        </div>
+      ) : (
+        <p class="mt-6">
+          This confirmation link is invalid. Use the latest link from your inbox.
+        </p>
+      )
+    }
+  </section>
+</Layout>

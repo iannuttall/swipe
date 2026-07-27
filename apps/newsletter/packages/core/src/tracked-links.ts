@@ -10,6 +10,7 @@ export async function rewriteTrackedLinks(input: {
   draftMetadata: Record<string, unknown>
   store: Pick<EmailStore, 'createLink'>
   baseUrl: string
+  excludedUrlPrefixes?: string[]
 }): Promise<string> {
   let linkIndex = 0
   const links: Array<ReturnType<EmailStore['createLink']>> = []
@@ -19,6 +20,9 @@ export async function rewriteTrackedLinks(input: {
       if (isUntrackedLink(`${beforeHref} ${afterHref}`)) return match
       const originalUrl = decodeHtmlAttribute(escapedOriginalUrl)
       if (originalUrl.startsWith(`${input.baseUrl}/unsubscribe/`)) {
+        return match
+      }
+      if (input.excludedUrlPrefixes?.some((prefix) => originalUrl.startsWith(prefix))) {
         return match
       }
       const linkId = crypto.randomUUID()

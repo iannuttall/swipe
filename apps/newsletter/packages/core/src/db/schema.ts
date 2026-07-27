@@ -14,12 +14,20 @@ import {
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core'
+import {
+  confirmationPurposeEnum,
+  confirmationStatusEnum,
+  contactStatusEnum,
+  eventTypeEnum,
+} from './confirmation-enums.js'
 
-export const contactStatusEnum = pgEnum('contact_status', [
-  'active',
-  'unsubscribed',
-  'suppressed',
-])
+export {
+  confirmationPurposeEnum,
+  confirmationStatusEnum,
+  contactStatusEnum,
+  eventTypeEnum,
+}
+
 export const subscriptionStatusEnum = pgEnum('subscription_status', [
   'subscribed',
   'unsubscribed',
@@ -52,24 +60,6 @@ export const messageStatusEnum = pgEnum('message_status', [
   'complained',
   'skipped',
 ])
-export const eventTypeEnum = pgEnum('event_type', [
-  'contact.subscribed',
-  'contact.unsubscribed',
-  'contact.suppressed',
-  'contact.tagged',
-  'contact.purchase_recorded',
-  'message.planned',
-  'message.queued',
-  'message.sent',
-  'message.failed',
-  'message.bounced',
-  'message.complained',
-  'engagement.opened',
-  'engagement.clicked',
-  'engagement.opened_by_bot',
-  'engagement.clicked_by_bot',
-])
-
 const timestamps = {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true })
@@ -103,6 +93,42 @@ export const contacts = pgTable(
     uniqueIndex('contacts_email_unique').on(table.email),
     index('contacts_status_idx').on(table.status),
     index('contacts_domain_idx').on(table.emailDomain),
+  ],
+)
+
+export const confirmationRequests = pgTable(
+  'confirmation_requests',
+  {
+    id: uuid('id').primaryKey(),
+    contactId: uuid('contact_id')
+      .notNull()
+      .references(() => contacts.id, { onDelete: 'cascade' }),
+    purpose: confirmationPurposeEnum('purpose').notNull(),
+    batchKey: text('batch_key'),
+    tokenHash: text('token_hash').notNull(),
+    status: confirmationStatusEnum('status').notNull().default('pending'),
+    source: text('source').notNull(),
+    requestedAt: timestamp('requested_at', { withTimezone: true }).notNull(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    confirmedAt: timestamp('confirmed_at', { withTimezone: true }),
+    confirmedIpHash: text('confirmed_ip_hash'),
+    confirmedUserAgent: text('confirmed_user_agent'),
+    confirmedSourceUrl: text('confirmed_source_url'),
+    metadata: jsonb('metadata').$type<Record<string, unknown>>().notNull().default({}),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex('confirmation_requests_token_hash_unique').on(table.tokenHash),
+    uniqueIndex('confirmation_requests_contact_purpose_batch_unique')
+      .on(table.contactId, table.purpose, table.batchKey)
+      .where(sql`${table.batchKey} is not null`),
+    index('confirmation_requests_contact_purpose_idx').on(table.contactId, table.purpose),
+    index('confirmation_requests_batch_status_idx').on(
+      table.purpose,
+      table.batchKey,
+      table.status,
+    ),
+    index('confirmation_requests_expires_idx').on(table.expiresAt),
   ],
 )
 

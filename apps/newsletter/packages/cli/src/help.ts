@@ -27,6 +27,12 @@ Commands:
   email contact links EMAIL_OR_ID [--limit N] [--json]
   email contact topics EMAIL_OR_ID [--limit N] [--json]
 
+  Confirmations:
+  email confirmation prepare --yes --batch-key KEY --expires-at ISO [--source SOURCE] [--json]
+  email confirmation report [--purpose double_opt_in|swipe_migration] [--batch-key KEY] [--json]
+  email confirmation unsubscribe-unconfirmed --batch-key KEY --expired-before ISO [--yes] [--source SOURCE] [--json]
+      Runs as a dry run unless --yes is present.
+
   Purchases and audiences:
   email purchase record (--email EMAIL | --contact-id ID) --product-key KEY --amount-cents N --currency USD [--provider PROVIDER] [--external-id ID] [--idempotency-key KEY] [--json]
   email audience preview [--audience-file PATH] [--contact-tag TAG] [--topic TOPIC] [--purchased-product KEY] [--min-ltv-cents N] [--currency USD] [--json]

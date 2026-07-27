@@ -1,5 +1,6 @@
 import crypto from 'node:crypto'
 import { getEmailDomain, normalizeEmail } from './email-address.js'
+import { MemoryConfirmationStore } from './memory-confirmation-store.js'
 import { getMemoryLinkSummaryInsights } from './memory-store-analytics.js'
 import { matchesMemoryAudience } from './memory-store-audience.js'
 import { getMemoryEngagement } from './memory-store-engagement.js'
@@ -74,6 +75,7 @@ export class MemoryEmailStore implements EmailStore {
   readonly canaryCohorts = new Map<string, CanaryCohortRecord>()
   readonly messages = new Map<string, MessageRecord>()
   readonly events: EventRecord[] = []
+  readonly confirmations = new MemoryConfirmationStore(this.contacts, this.events)
   readonly links = new Map<string, LinkRecord>()
   readonly linkRollups = new Map<string, LinkInsight>()
   readonly contactLinkRollups = new Map<string, ContactLinkInsight>()

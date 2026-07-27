@@ -7,10 +7,16 @@ import {
 } from './canary-service.js'
 import type { AppConfig } from './config.js'
 import { requireSecret } from './config.js'
+import { previewConfirmationDraft } from './confirmation-draft.js'
 import {
-  subscribeContact,
-  unsubscribeContact as unsubscribeContactByOperator,
-} from './contact-consent.js'
+  confirmSubscription,
+  prepareMigrationConfirmations,
+  subscribeWithConfirmation,
+  unsubscribeUnconfirmedMigration,
+} from './confirmation-service.js'
+import type { ConfirmationPurpose } from './confirmation-types.js'
+import { unsubscribeContact as unsubscribeContactByOperator } from './contact-consent.js'
+import { sendQueuedMessage } from './message-sender.js'
 import type {
   CanaryState,
   ContactAnalytics,
@@ -27,7 +33,7 @@ import type {
 import { buildProductionOpsChecklist } from './production-ops.js'
 import type { EmailProvider } from './providers.js'
 import type { DoctorReport } from './readiness.js'
-import { emptyEngagement, recipientStatusFromMessage } from './recipient-engagement.js'
+import { emptyEngagement } from './recipient-engagement.js'
 import { renderDraftEmail } from './render.js'
 import { ProviderAcceptedPersistenceError } from './send-errors.js'
 import { createProviderSendThrottle } from './send-rate.js'
@@ -43,7 +49,6 @@ import type {
   LinkInsight,
   LinkStats,
   LinkSummaryInsight,
-  MessageRecord,
   QueueSummary,
 } from './store.js'
 import {
@@ -56,13 +61,9 @@ import {
   type PurchaseRecord,
   type RollupRebuildResult,
 } from './subscriber-intelligence.js'
-import { rewriteTrackedLinks } from './tracked-links.js'
 import {
   classifyTrackingRequest,
-  createTrackingToken,
-  injectOpenPixel,
   ipHash,
-  replaceUnsubscribeUrl,
   tokenHash,
   verifyTrackingToken,
 } from './tracking.js'
@@ -79,12 +80,41 @@ export class CoreEmailPlatform implements EmailPlatform {
     },
   ) {}
 
-  async subscribe(input: {
-    email: string
-    name?: string
+  async subscribe(input: { email: string; name?: string; source?: string }) {
+    return subscribeWithConfirmation(this.deps, input)
+  }
+
+  async confirmSubscription(input: {
+    token: string
+    ip?: string
+    userAgent?: string
+    sourceUrl?: string
+  }) {
+    return confirmSubscription(this.deps, input)
+  }
+
+  async prepareMigrationConfirmations(input: {
+    batchKey: string
+    expiresAt: Date
     source?: string
-  }): Promise<{ id: string }> {
-    return subscribeContact(this.deps.store, input)
+  }) {
+    return prepareMigrationConfirmations(this.deps, input)
+  }
+
+  async getConfirmationReport(input: {
+    purpose: ConfirmationPurpose
+    batchKey?: string
+  }) {
+    return this.deps.store.confirmations.report(input)
+  }
+
+  async unsubscribeUnconfirmedMigration(input: {
+    batchKey: string
+    expiredBefore: Date
+    execute?: boolean
+    source?: string
+  }) {
+    return unsubscribeUnconfirmedMigration(this.deps.store, input)
   }
 
   async unsubscribeContact(input: {
@@ -175,6 +205,7 @@ export class CoreEmailPlatform implements EmailPlatform {
       apiAuthConfigured: Boolean(this.deps.config.apiToken),
       trackingConfigured: Boolean(this.deps.config.trackingSecret),
       unsubscribeConfigured: Boolean(this.deps.config.unsubscribeSecret),
+      confirmationConfigured: Boolean(this.deps.config.confirmation.secret),
       snsWebhookConfigured: Boolean(this.deps.config.aws.snsWebhookSecret),
       snsTopicAllowlistConfigured,
     }
@@ -189,6 +220,7 @@ export class CoreEmailPlatform implements EmailPlatform {
         report.apiAuthConfigured,
         report.trackingConfigured,
         report.unsubscribeConfigured,
+        report.confirmationConfigured,
         sesReady,
       ].every(Boolean),
     }
@@ -571,7 +603,7 @@ export class CoreEmailPlatform implements EmailPlatform {
   }> {
     const draft = await this.requireDraft(input.draftId)
     const rendered = await renderDraftEmail(
-      draft,
+      previewConfirmationDraft(draft, this.deps.config),
       input.status ? { status: input.status } : {},
     )
     const fromName = draft.fromName ?? this.deps.config.email.fromName
@@ -626,7 +658,7 @@ export class CoreEmailPlatform implements EmailPlatform {
       }
       try {
         await waitForProviderSlot()
-        await this.sendMessage(message)
+        await sendQueuedMessage(this.deps, message)
         sent += 1
       } catch (error) {
         if (error instanceof ProviderAcceptedPersistenceError) {
@@ -821,84 +853,6 @@ export class CoreEmailPlatform implements EmailPlatform {
       processed += 1
     }
     return { processed }
-  }
-
-  private async sendMessage(message: MessageRecord): Promise<void> {
-    const broadcast = await this.deps.store.getBroadcast(message.broadcastId)
-    if (!broadcast) throw new Error(`Broadcast not found: ${message.broadcastId}`)
-    const draft = await this.requireDraft(broadcast.draftId)
-    const recipientStatus = recipientStatusFromMessage(message)
-    const rendered = await renderDraftEmail(
-      draft,
-      recipientStatus ? { status: recipientStatus } : {},
-    )
-    const trackingSecret = requireSecret(
-      this.deps.config.trackingSecret,
-      'TRACKING_SECRET',
-    )
-    const unsubscribeSecret = requireSecret(
-      this.deps.config.unsubscribeSecret,
-      'UNSUBSCRIBE_SECRET',
-    )
-    const openToken = createTrackingToken(
-      { kind: 'open', messageId: message.id, contactId: message.contactId },
-      trackingSecret,
-    )
-    const unsubscribeToken = createTrackingToken(
-      { kind: 'unsubscribe', messageId: message.id, contactId: message.contactId },
-      unsubscribeSecret,
-    )
-    const htmlWithUnsubscribe = replaceUnsubscribeUrl(
-      rendered.html,
-      unsubscribeToken,
-      this.deps.config,
-    )
-    const htmlWithClicks = await rewriteTrackedLinks({
-      html: htmlWithUnsubscribe,
-      message,
-      secret: trackingSecret,
-      draftMetadata: draft.metadata ?? {},
-      store: this.deps.store,
-      baseUrl: this.deps.config.baseUrl,
-    })
-    const html = this.deps.config.tracking.trackOpens
-      ? injectOpenPixel(htmlWithClicks, openToken, this.deps.config)
-      : htmlWithClicks
-    const fromName = draft.fromName ?? this.deps.config.email.fromName
-    const result = await this.deps.provider.send({
-      to: message.toEmail,
-      fromEmail: this.defaultFromEmail(draft.fromEmail),
-      subject: rendered.subject,
-      html,
-      text: rendered.text,
-      ...(fromName ? { fromName } : {}),
-      ...(draft.replyTo ? { replyTo: draft.replyTo } : {}),
-      headers: [
-        {
-          name: 'List-Unsubscribe',
-          value: `<${this.deps.config.baseUrl}/unsubscribe/${unsubscribeToken}>`,
-        },
-        { name: 'List-Unsubscribe-Post', value: 'List-Unsubscribe=One-Click' },
-      ],
-    })
-    try {
-      await this.deps.store.updateMessage({
-        id: message.id,
-        status: 'sent',
-        provider: result.provider,
-        providerMessageId: result.providerMessageId,
-      })
-      await this.deps.store.recordEvent({
-        type: 'message.sent',
-        contactId: message.contactId,
-        broadcastId: message.broadcastId,
-        messageId: message.id,
-        source: result.provider,
-        metadata: { providerMessageId: result.providerMessageId },
-      })
-    } catch (error) {
-      throw new ProviderAcceptedPersistenceError(result, error)
-    }
   }
 
   private async findContact(emailOrId: string): Promise<ContactRecord | undefined> {

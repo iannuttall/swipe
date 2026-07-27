@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import type { SendPlanPreview } from './broadcast-planning.js'
 import type { EmailPlatform } from './platform.js'
-import type { CanaryState, RecentContacts } from './platform-contracts.js'
+import type { CanaryState } from './platform-contracts.js'
 import type { ProductionOpsChecklist } from './production-ops.js'
 import type { DoctorReport } from './readiness.js'
 import type { QueueSummary } from './store.js'
@@ -12,6 +12,14 @@ import type {
   PurchaseRecord,
 } from './subscriber-intelligence.js'
 import { runSendWorker, runSendWorkerOnce } from './worker.js'
+import {
+  canaryState,
+  confirmationReport,
+  doctorReport,
+  opsChecklist,
+  queueSummary,
+  recentContacts,
+} from './worker-test-fixtures.test-helper.js'
 
 describe('send worker', () => {
   it('runs one send batch', async () => {
@@ -72,12 +80,32 @@ class FakePlatform implements EmailPlatform {
     return { id: 'contact_1' }
   }
 
+  async confirmSubscription() {
+    return {
+      confirmed: true,
+      alreadyConfirmed: false,
+      status: 'confirmed' as const,
+    }
+  }
+
+  async prepareMigrationConfirmations() {
+    return { ...confirmationReport(), created: 1 }
+  }
+
+  async getConfirmationReport() {
+    return confirmationReport()
+  }
+
+  async unsubscribeUnconfirmedMigration(input: { execute?: boolean }) {
+    return { matched: 1, unsubscribed: input.execute ? 1 : 0 }
+  }
+
   async exportContacts(): Promise<{ contacts: []; suppressions: [] }> {
     return { contacts: [], suppressions: [] }
   }
 
-  async recentContacts(): Promise<RecentContacts> {
-    return { since: new Date(0).toISOString(), days: 7, signups: 0, contacts: [] }
+  async recentContacts() {
+    return recentContacts()
   }
 
   async importContacts(): Promise<{ imported: number; suppressed: number }> {
@@ -273,73 +301,5 @@ class FakePlatform implements EmailPlatform {
 
   async handleProviderEvents(): Promise<{ processed: number }> {
     return { processed: 1 }
-  }
-}
-
-function doctorReport() {
-  return {
-    appName: 'email',
-    env: 'test',
-    provider: 'test',
-    baseUrl: 'http://localhost',
-    databaseConfigured: true,
-    fromEmailConfigured: true,
-    apiAuthConfigured: true,
-    trackingConfigured: true,
-    unsubscribeConfigured: true,
-    snsWebhookConfigured: true,
-    snsTopicAllowlistConfigured: true,
-    ready: true,
-  }
-}
-
-function opsChecklist(): ProductionOpsChecklist {
-  return {
-    appName: 'email',
-    env: 'test',
-    provider: 'test',
-    baseUrl: 'http://localhost',
-    ready: true,
-    generatedAt: new Date(0),
-    settings: {
-      trackOpens: true,
-      defaultDurationHours: 20,
-      defaultBatchSize: 1000,
-      maxProviderRatePerSecond: 14,
-    },
-    checks: [],
-    rollout: [],
-    emergency: [],
-  }
-}
-
-function queueSummary(): QueueSummary {
-  return {
-    generatedAt: new Date(0),
-    plannedDue: 0,
-    plannedFuture: 0,
-    sending: 0,
-    staleSending: 0,
-    failed: 0,
-    bounced: 0,
-    complained: 0,
-    recentBounces: 0,
-    recentComplaints: 0,
-  }
-}
-
-function canaryState(): CanaryState {
-  return {
-    campaign: {
-      id: 'canary_1',
-      draftId: 'draft_1',
-      status: 'active',
-      audience: {},
-      deliveryPolicy: {},
-      steps: [50, 'all'],
-      createdAt: new Date(0),
-    },
-    cohorts: [],
-    nextStep: 50,
   }
 }

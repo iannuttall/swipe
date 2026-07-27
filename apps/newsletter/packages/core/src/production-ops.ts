@@ -78,6 +78,13 @@ export function buildProductionOpsChecklist(input: {
       'UNSUBSCRIBE_SECRET is set.',
       'Set UNSUBSCRIBE_SECRET so unsubscribe links are signed.',
     ),
+    requiredCheck(
+      'confirmation_secret',
+      'Confirmation secret configured',
+      Boolean(input.doctor.confirmationConfigured),
+      'CONFIRMATION_SECRET is set.',
+      'Set CONFIRMATION_SECRET so subscription confirmation links are signed.',
+    ),
     {
       id: 'base_url',
       title: 'Public base URL',

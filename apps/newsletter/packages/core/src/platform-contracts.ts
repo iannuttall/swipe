@@ -1,4 +1,5 @@
 import type { SendPlanPreview } from './broadcast-planning.js'
+import type { ConfirmationPurpose, ConfirmationReport } from './confirmation-types.js'
 import type { ProductionOpsChecklist } from './production-ops.js'
 import type { DoctorReport } from './readiness.js'
 import type { NormalizedProviderEvent } from './ses-webhooks.js'
@@ -33,11 +34,37 @@ import type {
 } from './types.js'
 
 export interface EmailPlatform {
-  subscribe(input: {
-    email: string
-    name?: string
+  subscribe(input: { email: string; name?: string; source?: string }): Promise<{
+    id: string
+    status?: 'active' | 'pending'
+    confirmationSent?: boolean
+  }>
+  confirmSubscription(input: {
+    token: string
+    ip?: string
+    userAgent?: string
+    sourceUrl?: string
+  }): Promise<{
+    confirmed: boolean
+    alreadyConfirmed: boolean
+    status: 'confirmed' | 'expired' | 'invalid'
+    purpose?: ConfirmationPurpose
+  }>
+  prepareMigrationConfirmations(input: {
+    batchKey: string
+    expiresAt: Date
     source?: string
-  }): Promise<{ id: string }>
+  }): Promise<ConfirmationReport & { created: number }>
+  getConfirmationReport(input: {
+    purpose: ConfirmationPurpose
+    batchKey?: string
+  }): Promise<ConfirmationReport>
+  unsubscribeUnconfirmedMigration(input: {
+    batchKey: string
+    expiredBefore: Date
+    execute?: boolean
+    source?: string
+  }): Promise<{ matched: number; unsubscribed: number }>
   unsubscribeContact(input: {
     emailOrId: string
     broadcastId?: string

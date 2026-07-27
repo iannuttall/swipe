@@ -10,14 +10,15 @@ import type {
   PurchaseRecord,
   QueueSummary,
   QueueSummaryRequest,
-  RecentContacts,
   SendPlanPreview,
 } from '@email/core'
 import {
   canaryState,
+  confirmationReport,
   doctorReport,
   opsChecklist,
   queueSummary,
+  recentContacts,
 } from './fake-platform-fixtures.test-helper.js'
 
 export class FakePlatform implements EmailPlatform {
@@ -57,6 +58,27 @@ export class FakePlatform implements EmailPlatform {
     return { id: 'contact_1' }
   }
 
+  async confirmSubscription() {
+    return {
+      confirmed: true,
+      alreadyConfirmed: false,
+      status: 'confirmed' as const,
+      purpose: 'double_opt_in' as const,
+    }
+  }
+
+  async prepareMigrationConfirmations() {
+    return { ...confirmationReport(), created: 1 }
+  }
+
+  async getConfirmationReport() {
+    return confirmationReport()
+  }
+
+  async unsubscribeUnconfirmedMigration(input: { execute?: boolean }) {
+    return { matched: 1, unsubscribed: input.execute ? 1 : 0 }
+  }
+
   async unsubscribeContact(input: {
     emailOrId: string
     broadcastId?: string
@@ -72,24 +94,9 @@ export class FakePlatform implements EmailPlatform {
 
   recentContactsInput: { days?: number; limit?: number } | undefined = undefined
 
-  async recentContacts(input?: {
-    days?: number
-    limit?: number
-  }): Promise<RecentContacts> {
+  async recentContacts(input?: { days?: number; limit?: number }) {
     this.recentContactsInput = input
-    return {
-      since: '2026-07-12T00:00:00.000Z',
-      days: input?.days ?? 7,
-      signups: 1,
-      contacts: [
-        {
-          email: 'new@example.com',
-          source: 'ian.is',
-          status: 'active',
-          subscribedAt: '2026-07-18T12:00:00.000Z',
-        },
-      ],
-    }
+    return recentContacts(input)
   }
 
   async importContacts(input?: {

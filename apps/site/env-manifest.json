@@ -1,6 +1,11 @@
 {
   "bindings": [],
-  "requiredRemote": ["NEWSLETTER_API_TOKEN", "NEWSLETTER_WEBHOOK_SECRET"],
+  "requiredRemote": [
+    "NEWSLETTER_API_TOKEN",
+    "NEWSLETTER_WEBHOOK_SECRET",
+    "TURNSTILE_SECRET_KEY",
+    "TURNSTILE_SITE_KEY"
+  ],
   "optionalRemote": ["NEWSLETTER_API_URL"],
   "d1Migrations": [],
   "r2Seeds": []

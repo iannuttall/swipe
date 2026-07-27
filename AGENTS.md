@@ -58,7 +58,8 @@ Use `pnpm`, not npm.
 - Moving code does not require moving the existing Postgres database or SES
   configuration at the same time.
 - The existing `ian.is` install sends the final Ian's List transition email.
-  Do not use the Swipe copy for that announcement.
+  The message uses Swipe confirmation links, but the familiar Ian's List
+  sender remains in place for that announcement.
 - The newsletter production workflow still targets the existing service domain
   during migration. Change its public hostname only as a deliberate DNS and
   email-deliverability cutover.
@@ -75,6 +76,9 @@ Use `pnpm`, not npm.
 - Public newsletter APIs belong on `swipe.md`. Do not create a public
   `list.swipe.md` surface.
 - `apps/site/src/pages/api/subscribe.ts` proxies signups to the newsletter VPS.
+- `apps/site/src/pages/confirm/[token].astro` runs the managed Turnstile check.
+- `apps/site/src/pages/api/confirm.ts` validates Turnstile before calling the
+  protected newsletter confirmation API.
 - `apps/site/src/pages/api/webhooks/[secret]/ses.ts` proxies the public SES SNS
   endpoint to the VPS.
 - The public webhook shape is `/api/webhooks/<secret>/ses`.
@@ -86,8 +90,9 @@ Use `pnpm`, not npm.
   screenshots, docs, issues, and command output.
 - `NEWSLETTER_API_URL` may continue pointing at `https://list.ian.is` as the
   private origin during migration.
-- Keep `docs/email-setup.md` and `docs/email-operations.md` current when DNS,
-  SES, SNS, IAM, Mailroom, Gmail, or webhook behavior changes.
+- Keep `docs/email-setup.md`, `docs/email-operations.md`, and
+  `docs/subscriber-confirmation.md` current when email or confirmation behavior
+  changes.
 
 ## Runtime
 
@@ -135,6 +140,11 @@ Use `pnpm`, not npm.
   output, `.astro`, `.wrangler`, `dist`, or `node_modules`.
 - Issue send commands publish and send real email. They require explicit
   confirmation and must retain the existing double-send guard.
+- Opening a subscriber confirmation URL must never mutate consent. The site
+  must validate Turnstile server-side before posting the signed token to the
+  protected newsletter API.
+- Migration cleanup must remain a dry run unless `--yes` is present. It may
+  only target one exact expired batch.
 - Run `pnpm security:check`, `pnpm swipe site check`, and
   `pnpm swipe check newsletter` before publishing sensitive changes.
 - Public pull requests must not receive production secrets.

@@ -8,6 +8,7 @@ export interface DoctorReport {
   apiAuthConfigured: boolean
   trackingConfigured: boolean
   unsubscribeConfigured: boolean
+  confirmationConfigured: boolean
   snsWebhookConfigured: boolean
   snsTopicAllowlistConfigured: boolean
   ready: boolean

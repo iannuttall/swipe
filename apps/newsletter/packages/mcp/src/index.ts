@@ -15,6 +15,7 @@ import {
   deliveryPolicyFromTool,
   deliveryPolicySchema,
 } from './audience-tools.js'
+import { registerConfirmationTools } from './confirmation-tools.js'
 import { registerTemplateTools } from './template-tools.js'
 
 export const version = '0.1.0'
@@ -98,6 +99,7 @@ export function createMcpServer(input: McpInput = {}) {
   )
 
   registerTemplateTools(server, result)
+  registerConfirmationTools(server, platform, result)
 
   server.registerTool(
     'email_create_draft',

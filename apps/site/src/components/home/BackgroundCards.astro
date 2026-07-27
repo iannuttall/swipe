@@ -1,0 +1,41 @@
+---
+import BackgroundCard from "@/components/home/BackgroundCard.astro";
+import { getCardPool } from "@/data/home-cards";
+
+const supportedTypes = new Set(["chat", "terminal", "file", "message", "plan"]);
+const cards = getCardPool().filter((card) => supportedTypes.has(card.type));
+
+function shapeClass(card: (typeof cards)[number]) {
+  if (!["chat", "message"].includes(card.type)) return "w-full";
+  const hash = [...card.id].reduce((value, char) => value * 31 + char.charCodeAt(0), 0);
+  return `w-11/12 ${Math.abs(hash) % 2 === 0 ? "ml-auto" : "mr-auto"}`;
+}
+---
+
+<div
+  x-data="backgroundCards"
+  aria-hidden="true"
+  class="p-3"
+  style={{
+    columnWidth: "280px",
+    columnGap: "12px",
+    height: "150dvh",
+    opacity: 0,
+    transition: "opacity 650ms ease-in",
+  }}
+>
+  <div x-ref="grid" class="contents">
+    {
+      cards.map((card) => (
+        <div
+          data-background-card
+          data-group={card.group ?? card.type}
+          class:list={["overflow-hidden", shapeClass(card)]}
+          style={{ breakInside: "avoid", marginBottom: "12px" }}
+        >
+          <BackgroundCard card={card} />
+        </div>
+      ))
+    }
+  </div>
+</div>

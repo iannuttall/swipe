@@ -1,6 +1,7 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "swipe",
+  "account_id": "ab5ec097e2579c5f3639612c755e6f15",
   "compatibility_date": "2026-06-30",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "main": "./src/worker.ts",

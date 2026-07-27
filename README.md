@@ -15,6 +15,8 @@
 <p align="center">
   <a href="https://swipe.md">Website</a>
   ·
+  <a href="docs/README.md">Docs</a>
+  ·
   <a href="SECURITY.md">Security</a>
   ·
   <a href="LICENSE">License</a>
@@ -37,8 +39,8 @@ This is a monorepo for the Swipe site, issue archive, newsletter system, and
 local operator tools.
 
 `apps/site` is the public `swipe.md` site. It is an Astro 7 app built for
-Cloudflare Workers. The homepage keeps its React-based card treatment. Shared
-pages, issue pages, and Markdown/MDX content use Astro components.
+Cloudflare Workers. Pages and shared components use Astro. Alpine handles the
+signup form and homepage background cards.
 
 `apps/newsletter` is the newsletter platform. It runs on a VPS with Node,
 Postgres, Docker, Caddy, and Amazon SES. It includes the Hono API, operator CLI,
@@ -198,11 +200,18 @@ The site uses these Cloudflare Worker secrets:
 `NEWSLETTER_API_URL` is an optional Worker variable for the private newsletter
 origin. It currently defaults to `https://list.ian.is` during migration.
 
+The complete Cloudflare Email Routing, Mailroom, Gmail, SES, IAM, SNS, DNS, and
+webhook setup is in [the email runbook](docs/email-setup.md). Use
+[the operations guide](docs/email-operations.md) for tests and credential
+rotation.
+
 ## How deploys are split
 
 The site and newsletter deploy independently.
 
 The site deploys to Cloudflare Workers from `apps/site`.
+The homepage and content pages are prerendered. The Worker runs only API,
+tracking, and unsubscribe routes that need request-time behavior.
 
 The newsletter deploys to the existing VPS service from `apps/newsletter`.
 The GitHub Action is path-filtered so site-only changes do not deploy it.
@@ -249,6 +258,7 @@ apps/
     packages/web/          Astro unsubscribe/preferences pages
 packages/
   swipe/                   Small local helper CLI
+docs/                      Setup and operations runbooks
 ```
 
 ## Agent notes

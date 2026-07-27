@@ -16,6 +16,7 @@ parallel copies.
 - `apps/newsletter/packages/mcp`: stdio MCP server.
 - `apps/newsletter/packages/web`: unsubscribe and other public service pages.
 - `packages/swipe`: the local `swipe` command for site, issue, and newsletter operations.
+- `docs`: operator setup, testing, rotation, and troubleshooting guides.
 - `skills`: project-specific agent workflows when they become stable enough to keep.
 
 ## Ownership
@@ -85,14 +86,16 @@ Use `pnpm`, not npm.
   screenshots, docs, issues, and command output.
 - `NEWSLETTER_API_URL` may continue pointing at `https://list.ian.is` as the
   private origin during migration.
+- Keep `docs/email-setup.md` and `docs/email-operations.md` current when DNS,
+  SES, SNS, IAM, Mailroom, Gmail, or webhook behavior changes.
 
 ## Runtime
 
 - The site is Astro 7 on the Cloudflare adapter.
 - Static content routes should prerender. API routes and request-time behavior
   stay SSR.
-- React remains for the existing homepage and interactive form. Prefer Astro
-  for shared page structure and content.
+- Pages and components use Astro. Alpine owns small client interactions such as
+  the signup form and homepage background cards.
 - The newsletter is Node 24 with Postgres, Hono, React Email, Docker, Caddy,
   Amazon SES, and an explicit sender worker.
 - `nodejs_compat` is required in `apps/site/wrangler.jsonc`.
@@ -107,8 +110,8 @@ Use `pnpm`, not npm.
 - Keep common SEO metadata, navigation, and footer behavior in the root layout.
 - Follow `~/blueprints/workers/references/content-rules.md` for public copy.
 - Follow `~/blueprints/workers/references/design-rules.md` for public UI.
-- Prefer Astro components for page structure and content. Keep React for the
-  existing landing-page experience and interactions that genuinely need it.
+- Prefer Astro components for page structure and content. Keep client-side
+  JavaScript inside small Alpine modules.
 - Reuse page headers, framed surfaces, prose styles, signup, and code treatment
   instead of recreating them per page.
 

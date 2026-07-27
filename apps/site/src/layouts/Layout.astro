@@ -129,5 +129,13 @@ const fontFaceCss = `
       </main>
       {showChrome ? <SiteFooter /> : null}
     </div>
+    <script>
+      import Alpine from "alpinejs";
+      import setupAlpine from "@/scripts/alpine";
+
+      setupAlpine(Alpine);
+      window.Alpine = Alpine;
+      Alpine.start();
+    </script>
   </body>
 </html>

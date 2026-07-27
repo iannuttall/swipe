@@ -14,7 +14,7 @@ export function toCardVersion(value: unknown): CardVersion {
     : DEFAULT_CARD_VERSION
 }
 
-export type CardDef =
+export type CardDef = { group?: string } & (
   | { id: string; type: 'terminal'; title: string; text: string }
   | { id: string; type: 'chat'; messages: { role: 'user' | 'ai'; text: string }[] }
   | { id: string; type: 'file'; filename: string; text: string }
@@ -63,6 +63,7 @@ export type CardDef =
       text: string
       result: string
     }
+)
 
 // YAML block scalars add a trailing newline — strip it
 function trimText(card: Record<string, unknown>): CardDef {
@@ -208,4 +209,8 @@ export function getCardsForSeed(
 ): CardDef[] {
   const seed = toSeed(seedInput)
   return selectWithLimits(CARD_SETS[version], seed, GROUP_LIMITS[version]).map(trimText)
+}
+
+export function getCardPool(version: CardVersion = DEFAULT_CARD_VERSION): CardDef[] {
+  return CARD_SETS[version].map(trimText)
 }

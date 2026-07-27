@@ -1,0 +1,32 @@
+---
+interface Props {
+  class?: string;
+  stripSize?: number;
+}
+
+const {
+  class: className,
+  stripSize = 16,
+} = Astro.props;
+const stripStyle = `height:${stripSize}px`;
+---
+
+<div class:list={["flex flex-col", className]}>
+  <div class="dither-strip w-full" style={stripStyle}></div>
+  <div
+    class="flex-1 px-7 py-7 sm:px-8 sm:py-8"
+    style={{
+      backgroundColor: "var(--card-inv-bg)",
+      color: "var(--card-inv-fg)",
+      "--bg": "var(--card-inv-bg)",
+      "--fg": "var(--card-inv-fg)",
+      "--primary": "var(--primary-inv)",
+      "--primary-fg": "var(--primary-inv-fg)",
+      "--border": "color-mix(in oklch, var(--card-inv-fg) 25%, transparent)",
+      "--muted": "color-mix(in oklch, var(--card-inv-fg) 60%, transparent)",
+    }}
+  >
+    <slot />
+  </div>
+  <div class="dither-strip dither-strip-reverse w-full" style={stripStyle}></div>
+</div>

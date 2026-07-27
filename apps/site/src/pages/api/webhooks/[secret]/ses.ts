@@ -26,6 +26,28 @@ function safeEqual(left: string, right: string): boolean {
   return difference === 0;
 }
 
+function readSnsMetadata(body: ArrayBuffer) {
+  try {
+    const parsed = JSON.parse(new TextDecoder().decode(body));
+    return {
+      type: typeof parsed.Type === "string" ? parsed.Type : "unknown",
+      topicArn:
+        typeof parsed.TopicArn === "string" ? parsed.TopicArn : "unknown",
+    };
+  } catch {
+    return { type: "unknown", topicArn: "unknown" };
+  }
+}
+
+function readUpstreamError(body: string) {
+  try {
+    const parsed = JSON.parse(body);
+    return typeof parsed.error === "string" ? parsed.error : "unknown";
+  } catch {
+    return "unknown";
+  }
+}
+
 export async function POST({ params, request }: APIContext) {
   const expectedSecret = env.NEWSLETTER_WEBHOOK_SECRET;
   if (!expectedSecret) {
@@ -46,6 +68,7 @@ export async function POST({ params, request }: APIContext) {
   if (body.byteLength > MAX_BODY_BYTES) {
     return json({ error: "Payload is too large." }, 413);
   }
+  const metadata = readSnsMetadata(body);
 
   const upstreamUrl = new URL(
     `/api/webhooks/${encodeURIComponent(suppliedSecret)}/ses`,
@@ -72,8 +95,18 @@ export async function POST({ params, request }: APIContext) {
       body,
       redirect: "manual",
     });
+    const upstreamBody = upstream.ok ? upstream.body : await upstream.text();
 
-    return new Response(upstream.body, {
+    if (!upstream.ok) {
+      console.error("SES webhook upstream rejected the request.", {
+        type: metadata.type,
+        topicArn: metadata.topicArn,
+        status: upstream.status,
+        error: readUpstreamError(upstreamBody as string),
+      });
+    }
+
+    return new Response(upstreamBody, {
       status: upstream.status,
       headers: {
         "content-type":

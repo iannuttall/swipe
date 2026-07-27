@@ -1,0 +1,64 @@
+---
+import Button from "@/components/ui/button.astro";
+import Input from "@/components/ui/input.astro";
+
+interface Props {
+  source: string;
+  buttonText?: string;
+  compact?: boolean;
+}
+
+const {
+  source,
+  buttonText = "Subscribe",
+  compact = false,
+} = Astro.props;
+const inputId = `newsletter-${source.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;
+---
+
+<div x-data={`newsletterSignup(${JSON.stringify({ source })})`}>
+  <p x-cloak x-show="status === 'success'" class="text-sm" role="status">
+    you're in - check your inbox.
+  </p>
+
+  <form
+    x-show="status !== 'success'"
+    x-on:submit.prevent="submit"
+    class="flex flex-col gap-2 sm:flex-row sm:items-end"
+  >
+    <label for={inputId} class="sr-only">Email address</label>
+    <Input
+      id={inputId}
+      name="email"
+      type="email"
+      size={compact ? "default" : "hero"}
+      x-model="email"
+      x-bind:aria-invalid="status === 'error' ? 'true' : 'false'"
+      placeholder="sam@openai.com"
+      autocomplete="email"
+      required
+    />
+    <Button
+      type="submit"
+      variant="primary"
+      size={compact ? "default" : "hero"}
+      x-bind:disabled="status === 'loading' || !ready"
+      class:list={[
+        !compact &&
+          "subscribe-button font-heading text-base font-semibold normal-case tracking-normal text-white",
+      ]}
+    >
+      <span x-text={`status === 'loading' ? 'Sending...' : ${JSON.stringify(buttonText)}`}>
+        {buttonText}
+      </span>
+    </Button>
+    <p
+      x-cloak
+      x-show="status === 'error'"
+      x-text="message"
+      class="text-sm sm:basis-full"
+      role="alert"
+    >
+    </p>
+  </form>
+</div>

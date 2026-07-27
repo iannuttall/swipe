@@ -15,7 +15,8 @@ pnpm site:deploy:dry-run
 
 ## Rules
 
-- Keep the existing homepage composition and React background-card island intact.
+- Keep the existing homepage composition and Alpine background-card behavior
+  intact.
 - Use Astro components for shared site chrome, content pages, issue pages, and tools.
 - Keep canonical metadata, Open Graph tags, structured data, navigation, and
   footer behavior in `src/layouts/Layout.astro`.
@@ -34,11 +35,15 @@ pnpm site:deploy:dry-run
 - Keep the Worker `NEWSLETTER_WEBHOOK_SECRET` equal to the VPS
   `AWS_SNS_WEBHOOK_SECRET`. The Worker rejects invalid paths at the edge, while
   the VPS still owns SNS topic allowlisting and signature verification.
+- Keep Astro's global `security.checkOrigin` disabled. SNS sends webhook POSTs
+  as `text/plain` without a browser `Origin` header, so Astro otherwise rejects
+  them before the secret and signature checks run.
 - Never log or display the complete webhook URL.
 - `NEWSLETTER_API_URL` may stay on `https://list.ian.is` as the private origin
   during migration. Do not create a public `list.swipe.md` surface.
-- Do not add `assets.run_worker_first`; use a Cloudflare Redirect Rule for
-  `www.swipe.md` to `swipe.md`.
+- Keep the homepage prerendered. Use Alpine for its form and background-card
+  behavior. Do not add a client framework or route `/` through the Worker.
+- Use a Cloudflare Redirect Rule for `www.swipe.md` to `swipe.md`.
 - Keep `nodejs_compat` enabled because Astro server output uses `process`.
 - Do not deploy or attach Cloudflare routes unless the user asks.
 - Use `pnpm`, not npm.

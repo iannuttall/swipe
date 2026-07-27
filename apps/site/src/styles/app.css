@@ -118,6 +118,23 @@ html[data-gradient='pink'] {
   to { background-position: 100% center; }
 }
 
+[x-cloak] {
+  display: none !important;
+}
+
+.dither-strip {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(circle at 25% 25%, var(--dither) 0 0.8px, transparent 1px),
+    radial-gradient(circle at 75% 75%, var(--dither) 0 0.8px, transparent 1px);
+  background-position: 0 0, 2px 2px;
+  background-size: 4px 4px;
+}
+
+.dither-strip-reverse {
+  background-position: 2px 2px, 0 0;
+}
+
 .subscribe-button {
   background-color: var(--primary);
   background-image: none;

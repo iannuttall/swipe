@@ -1,5 +1,5 @@
 ---
-import { NewsletterForm } from "@/components/NewsletterForm";
+import NewsletterForm from "@/components/NewsletterForm.astro";
 
 interface Props {
   source: string;
@@ -20,6 +20,6 @@ const {
       <h2 class="font-heading text-2xl font-semibold">{title}</h2>
       <p class="mt-2 max-w-xl text-muted">{description}</p>
     </div>
-    <NewsletterForm source={source} client:load buttonVariant="primary" />
+    <NewsletterForm source={source} compact />
   </div>
 </section>

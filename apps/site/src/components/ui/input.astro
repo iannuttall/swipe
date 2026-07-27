@@ -1,0 +1,30 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+type Props = Omit<HTMLAttributes<"input">, "size"> & {
+  size?: "default" | "hero";
+  "x-model"?: string;
+  "x-bind:aria-invalid"?: string;
+};
+
+const {
+  size = "default",
+  class: className,
+  ...props
+} = Astro.props as Props;
+
+const sizes = {
+  default: "h-10 text-sm",
+  hero: "h-12 text-base",
+};
+---
+
+<input
+  class:list={[
+    "w-full min-w-0 rounded-none border-0 bg-foreground/5 px-3 py-2 font-medium outline-none transition-shadow placeholder:text-muted",
+    "shadow-[inset_0_-2px_0_var(--color-border)] focus-visible:shadow-[inset_0_-2px_0_var(--primary)]",
+    sizes[size],
+    className,
+  ]}
+  {...props}
+/>

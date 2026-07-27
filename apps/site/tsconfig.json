@@ -6,8 +6,6 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "jsx": "react-jsx",
-    "jsxImportSource": "react",
-    "types": ["astro/client", "node", "react", "react-dom"]
+    "types": ["astro/client", "node"]
   }
 }

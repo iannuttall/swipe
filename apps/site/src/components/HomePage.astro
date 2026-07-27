@@ -1,14 +1,6 @@
 ---
-import { BackgroundCards } from '@/components/BackgroundCards'
-import { HomeHero } from '@/components/HomeHero'
-import type { CardVersion } from '@/data/home-cards'
-
-type Props = {
-  backgroundSeed: number
-  cardVersion?: CardVersion
-}
-
-const { backgroundSeed, cardVersion } = Astro.props
+import HomeHero from "@/components/HomeHero.astro";
+import BackgroundCards from "@/components/home/BackgroundCards.astro";
 ---
 
 <main class="relative h-dvh overflow-hidden">
@@ -23,6 +15,6 @@ const { backgroundSeed, cardVersion } = Astro.props
   >
   </div>
 
-  <HomeHero client:idle />
-  <BackgroundCards seed={backgroundSeed} version={cardVersion} />
+  <HomeHero />
+  <BackgroundCards />
 </main>

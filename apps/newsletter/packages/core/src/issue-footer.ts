@@ -41,7 +41,15 @@ export function issueFooter(
             'Unsubscribe',
           ),
           ' | ',
-          address(),
+          h(
+            Link,
+            {
+              className: 'issue-footer-address',
+              href: '#',
+              style: footerStyles.addressLink,
+            },
+            address(),
+          ),
         ),
       ),
     ),
@@ -87,5 +95,11 @@ const footerStyles = {
     textDecoration: 'underline',
     textDecorationStyle: 'dotted' as const,
     textUnderlineOffset: '3px',
+  },
+  addressLink: {
+    color: barebonesColors.fg3,
+    cursor: 'text',
+    pointerEvents: 'none' as const,
+    textDecoration: 'none',
   },
 }

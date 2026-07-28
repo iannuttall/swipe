@@ -291,7 +291,12 @@ export const issueMsoHeadHtml =
   '<!--[if mso]><style>table,td,p,h1,h2,h3,span,a,div{font-family:Helvetica,Arial,sans-serif !important;}</style><![endif]-->'
 
 export const issueResponsiveCss = `
-  /* Apple Mail auto-links postal addresses in blue. Keep footer metadata grey. */
+  /* Own the postal-address anchor so iOS cannot replace it with a blue map link. */
+  .issue-footer-address,
+  .issue-footer-address:link,
+  .issue-footer-address:visited,
+  .issue-footer-address:hover,
+  .issue-footer-address:active,
   .issue-footer-meta a[x-apple-data-detectors] {
     color: #7B7D81 !important;
     text-decoration: none !important;

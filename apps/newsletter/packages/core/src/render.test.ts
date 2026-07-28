@@ -91,6 +91,10 @@ describe('renderDraft', () => {
       /slightly greyed out, 13 pixel unsubscribe link[\s\S]*Unsubscribe[\s\S]*20-22/,
     )
     assert.match(rendered.html, /href="{{unsubscribeUrl}}"[^>]*style="[^"]*color:#7B7D81/)
+    assert.match(
+      rendered.html,
+      /class="issue-footer-address"[^>]*href="#"[^>]*style="[^"]*color:#7B7D81[^"]*pointer-events:none[^"]*text-decoration:none/,
+    )
     assert.doesNotMatch(rendered.html, /Sent by/)
     assert.doesNotMatch(rendered.html, /Advertise in Swipe/)
     assert.doesNotMatch(rendered.html, /Browse older issues/)

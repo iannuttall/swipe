@@ -30,8 +30,8 @@ env:
 
 jobs:
   deploy:
-    # Keep automatic deploys off until the private Swipe origin is ready.
-    # A trusted workflow_dispatch remains available for an explicit deployment.
+    # Automatic deploys are controlled by the repository variable. A trusted
+    # workflow_dispatch remains available for an explicit deployment.
     if: github.event_name == 'workflow_dispatch' || vars.NEWSLETTER_DEPLOY_ENABLED == 'true'
     runs-on: ubuntu-latest
     permissions:

@@ -9,9 +9,9 @@ const sourcePath = resolve(
   'apps/newsletter/emails/static/swipe-email-logo-source.svg',
 )
 const lightOutput = resolve(root, 'apps/site/public/email/swipe-email-logo@2x.png')
-const universalOutput = resolve(
+const whitePanelOutput = resolve(
   root,
-  'apps/site/public/email/swipe-email-logo-universal@2x.png',
+  'apps/site/public/email/swipe-email-logo-on-white@2x.png',
 )
 const magick = '/opt/homebrew/bin/magick'
 const fonttools = '/opt/homebrew/bin/fonttools'
@@ -22,8 +22,7 @@ const workDir = mkdtempSync(join(tmpdir(), 'swipe-email-logo-'))
 const variableFont = join(workDir, 'BricolageGrotesque-variable.ttf')
 const staticFont = join(workDir, 'BricolageGrotesque-SemiBold.ttf')
 const lightSourcePath = join(workDir, 'swipe-email-logo-light.svg')
-const textMask = join(workDir, 'swipe-email-logo-text-mask.png')
-const textHalo = join(workDir, 'swipe-email-logo-text-halo.png')
+const whitePanelSourcePath = join(workDir, 'swipe-email-logo-on-white.svg')
 
 try {
   execFileSync('curl', ['-fsSL', fontUrl, '-o', variableFont])
@@ -38,17 +37,28 @@ try {
   ])
 
   const lightSource = readFileSync(sourcePath, 'utf8')
+  const whitePanelSource = lightSource.replace(
+    'viewBox="0 0 170 52" width="170" height="52">',
+    [
+      'viewBox="-2 0.5 149.5 52" width="149.5" height="52">',
+      '  <rect x="-2" y="0.5" width="149.5" height="52" rx="8" fill="#FFFFFF"/>',
+    ].join('\n'),
+  )
+  if (whitePanelSource === lightSource) {
+    throw new Error('Could not add the white email-logo panel to the source SVG')
+  }
   writeFileSync(lightSourcePath, lightSource)
-  renderLogo(lightSourcePath, lightOutput)
-  addTextHalo(lightOutput, universalOutput)
+  writeFileSync(whitePanelSourcePath, whitePanelSource)
+  renderLogo(lightSourcePath, lightOutput, '340x104!')
+  renderLogo(whitePanelSourcePath, whitePanelOutput, '299x104!')
 
   console.log(`Wrote ${lightOutput}`)
-  console.log(`Wrote ${universalOutput}`)
+  console.log(`Wrote ${whitePanelOutput}`)
 } finally {
   rmSync(workDir, { recursive: true, force: true })
 }
 
-function renderLogo(source, output) {
+function renderLogo(source, output, size) {
   execFileSync(magick, [
     '-background',
     'none',
@@ -58,51 +68,7 @@ function renderLogo(source, output) {
     staticFont,
     source,
     '-resize',
-    '340x104!',
-    '-strip',
-    output,
-  ])
-}
-
-function addTextHalo(source, output) {
-  execFileSync(magick, [
-    source,
-    '-crop',
-    '220x104+120+0',
-    '+repage',
-    '-alpha',
-    'extract',
-    '-morphology',
-    'Dilate',
-    'Diamond:2',
-    textMask,
-  ])
-  execFileSync(magick, [
-    '-size',
-    '220x104',
-    'xc:white',
-    textMask,
-    '-alpha',
-    'off',
-    '-compose',
-    'CopyOpacity',
-    '-composite',
-    textHalo,
-  ])
-  execFileSync(magick, [
-    '-size',
-    '340x104',
-    'xc:none',
-    textHalo,
-    '-geometry',
-    '+120+0',
-    '-compose',
-    'over',
-    '-composite',
-    source,
-    '-compose',
-    'over',
-    '-composite',
+    size,
     '-strip',
     output,
   ])

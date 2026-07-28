@@ -9,6 +9,7 @@ import {
   TestEmailProvider,
 } from './providers.js'
 import { MemoryEmailStore } from './store.js'
+import { welcomeEmailContent } from './welcome-template.js'
 
 function makePlatform(
   input: {
@@ -88,7 +89,7 @@ describe('subscriber confirmations', () => {
     )
     assert.equal(provider.sent.length, 2)
     const welcome = provider.sent[1]
-    assert.equal(welcome?.subject, "You're on Swipe")
+    assert.equal(welcome?.subject, welcomeEmailContent.subject)
     assert.equal(welcome?.fromName, 'Swipe')
     assert.equal(welcome?.replyTo, 'ian@swipe.md')
     assert.match(welcome?.html ?? '', /move it from Promotions to Primary/)
@@ -245,7 +246,7 @@ describe('subscriber confirmations', () => {
       'active',
     )
     assert.equal(swipe.provider.sent.length, 1)
-    assert.equal(swipe.provider.sent[0]?.subject, "You're on Swipe")
+    assert.equal(swipe.provider.sent[0]?.subject, welcomeEmailContent.subject)
     assert.deepEqual(
       await swipe.platform.getConfirmationReport({
         purpose: 'swipe_invite',

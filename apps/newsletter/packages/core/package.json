@@ -9,6 +9,14 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./react-email-templates": {
+      "types": "./dist/react-email-templates.d.ts",
+      "import": "./dist/react-email-templates.js"
+    },
+    "./welcome-content": {
+      "types": "./dist/welcome-content.d.ts",
+      "import": "./dist/welcome-content.js"
     }
   },
   "files": [

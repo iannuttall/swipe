@@ -291,9 +291,9 @@ export const issueMsoHeadHtml =
   '<!--[if mso]><style>table,td,p,h1,h2,h3,span,a,div{font-family:Helvetica,Arial,sans-serif !important;}</style><![endif]-->'
 
 export const issueResponsiveCss = `
-  /* Apple Mail auto-links postal addresses in blue. Keep the plain footer ink. */
-  a[x-apple-data-detectors], .issue-address, .issue-address a {
-    color: #14171E !important;
+  /* Apple Mail auto-links postal addresses in blue. Keep footer metadata grey. */
+  .issue-footer-meta a[x-apple-data-detectors] {
+    color: #7B7D81 !important;
     text-decoration: none !important;
   }
   /* Dotted by default, solid on hover — the inverse of what this used to do,

@@ -1,9 +1,9 @@
 import { readFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { DefaultEmail, parseWelcomeEmailContent } from '@email/core'
+import { join } from 'node:path'
+import { DefaultEmail } from '@email/core/react-email-templates'
+import { parseWelcomeEmailContent } from '@email/core/welcome-content'
 
-const contentPath = join(dirname(fileURLToPath(import.meta.url)), 'welcome.md')
+const contentPath = join(process.cwd(), 'emails', 'welcome.md')
 const welcomeEmailContent = parseWelcomeEmailContent(readFileSync(contentPath, 'utf8'))
 
 export default function WelcomeEmailPreview() {

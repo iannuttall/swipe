@@ -1,7 +1,6 @@
 import { createElement as h } from 'react'
 import { Column, Img, Link, Row, Section, Text } from 'react-email'
 import { emailAssetUrl } from './email-assets.js'
-import { issueColors } from './issue-palette.js'
 import type { IssueSection } from './issue-parser.js'
 import { barebonesColors, fontFamily } from './react-email-styles.js'
 
@@ -22,21 +21,27 @@ export function issueFooter(
         { className: 'issue-footer-cell', style: footerStyles.cell },
         h(Img, {
           className: 'swipe-logo',
-          src: emailAssetUrl('email/swipe-email-logo-universal@2x.png'),
+          src: emailAssetUrl('email/swipe-email-logo-on-white@2x.png'),
           alt: 'Swipe',
-          width: 105,
+          width: 92,
           height: 32,
           style: footerStyles.logo,
         }),
-        h(Text, { className: 'issue-address', style: footerStyles.address }, address()),
         h(
           Text,
-          { style: footerStyles.unsubscribeLine },
+          { style: footerStyles.copy },
+          "Don't want these emails any more? No worries. Here's a slightly greyed out, 13 pixel unsubscribe link for you.",
+        ),
+        h(
+          Text,
+          { className: 'issue-footer-meta', style: footerStyles.meta },
           h(
             Link,
             { href: '{{unsubscribeUrl}}', style: footerStyles.link },
             'Unsubscribe',
           ),
+          ' | ',
+          address(),
         ),
       ),
     ),
@@ -61,23 +66,24 @@ const footerStyles = {
     border: 0,
     outline: 'none',
   },
-  address: {
-    margin: '0 0 3px',
-    color: barebonesColors.fg,
+  copy: {
+    margin: '0 0 8px',
+    color: barebonesColors.fg3,
     fontFamily,
-    fontSize: '15px',
+    fontSize: '16px',
     lineHeight: '23px',
     textAlign: 'left' as const,
   },
-  unsubscribeLine: {
+  meta: {
     margin: 0,
+    color: barebonesColors.fg3,
     fontFamily,
-    fontSize: '15px',
+    fontSize: '16px',
     lineHeight: '23px',
     textAlign: 'left' as const,
   },
   link: {
-    color: issueColors.accentInk,
+    color: barebonesColors.fg3,
     textDecoration: 'underline',
     textDecorationStyle: 'dotted' as const,
     textUnderlineOffset: '3px',

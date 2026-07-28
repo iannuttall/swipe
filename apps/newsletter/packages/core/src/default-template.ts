@@ -154,9 +154,9 @@ function headerRow(header: IssueSection | undefined, minutes?: number) {
         }),
         h(Img, {
           className: 'swipe-logo',
-          src: emailAssetUrl('email/swipe-email-logo-universal@2x.png'),
+          src: emailAssetUrl('email/swipe-email-logo-on-white@2x.png'),
           alt: 'Swipe',
-          width: 137,
+          width: 121,
           height: 42,
           style: defaultEmailStyles.logo,
         }),

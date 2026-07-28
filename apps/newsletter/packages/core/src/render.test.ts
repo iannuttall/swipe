@@ -81,11 +81,16 @@ describe('renderDraft', () => {
     assert.match(rendered.html, /Classifieds/)
     assert.match(
       rendered.html,
-      /https:\/\/swipe\.md\/email\/swipe-email-logo-universal@2x\.png/,
+      /https:\/\/swipe\.md\/email\/swipe-email-logo-on-white@2x\.png/,
     )
+    assert.doesNotMatch(rendered.html, /swipe-email-logo-universal/)
     assert.doesNotMatch(rendered.html, /swipe-email-logo-dark/)
     assert.doesNotMatch(rendered.html, /swipe-email-logo\.gif/)
-    assert.match(rendered.html, /20-22[\s\S]*Unsubscribe/)
+    assert.match(
+      rendered.html,
+      /slightly greyed out, 13 pixel unsubscribe link[\s\S]*Unsubscribe[\s\S]*20-22/,
+    )
+    assert.match(rendered.html, /href="{{unsubscribeUrl}}"[^>]*style="[^"]*color:#7B7D81/)
     assert.doesNotMatch(rendered.html, /Sent by/)
     assert.doesNotMatch(rendered.html, /Advertise in Swipe/)
     assert.doesNotMatch(rendered.html, /Browse older issues/)
@@ -163,10 +168,10 @@ describe('renderDraft', () => {
     assert.match(rendered.html, /you can paste straight into/)
     assert.ok(
       rendered.html.indexOf('In this issue') <
-        rendered.html.indexOf('hr-center-universal@2x.png'),
+        rendered.html.indexOf('hr-center-on-white@2x.png'),
     )
     assert.ok(
-      rendered.html.indexOf('hr-center-universal@2x.png') <
+      rendered.html.indexOf('hr-center-on-white@2x.png') <
         rendered.html.indexOf('New and early'),
     )
     assert.match(rendered.text, /AgentGrade/)

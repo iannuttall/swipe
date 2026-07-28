@@ -33,6 +33,7 @@ export * from './store.js'
 export * from './subscriber-intelligence.js'
 export * from './tracking.js'
 export * from './types.js'
+export * from './welcome-content.js'
 export * from './welcome-template.js'
 export * from './worker.js'
 

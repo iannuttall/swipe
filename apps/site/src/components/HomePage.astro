@@ -3,6 +3,44 @@ import HomeHero from "@/components/HomeHero.astro";
 import BackgroundCards from "@/components/home/BackgroundCards.astro";
 ---
 
+<!--
+  The visual homepage is intentionally noisy. The Markdown build selects this
+  inert template instead, giving agents a short, hand-authored description of
+  the publication without shipping the decorative background-card copy.
+-->
+<template data-agent-content>
+  <article>
+    <h1>Swipe</h1>
+
+    <p>
+      Swipe is a weekly publication by Ian Nuttall for people who want useful
+      AI skills, prompts, tools, and workflows they can put to work.
+    </p>
+
+    <h2>What Swipe publishes</h2>
+
+    <p>
+      Each issue finds an early or overlooked AI idea, tests it, and explains
+      what is worth stealing. The useful part is kept in the email and public
+      archive, with examples and a clear verdict where possible.
+    </p>
+
+    <h2>Read Swipe</h2>
+
+    <p>
+      The <a href="/issues">Swipe issue archive</a> contains permanent web
+      versions of every published issue.
+    </p>
+
+    <h2>Who Swipe is for</h2>
+
+    <p>
+      Swipe is written for founders, marketers, operators, product people,
+      and developers who use AI as part of how they work.
+    </p>
+  </article>
+</template>
+
 <main class="relative h-dvh overflow-hidden">
   <div
     class="pointer-events-none absolute inset-0 z-10"

@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "astro dev",
     "dev:cf": "wrangler dev",
-    "build": "pnpm build:sitemap && node scripts/check-issue-parity.mjs && astro build",
+    "build": "pnpm build:sitemap && node scripts/check-issue-parity.mjs && astro build && node scripts/check-agent-artifacts.mjs",
     "build:sitemap": "node scripts/build-sitemap.mjs",
     "check": "astro check",
     "deploy": "pnpm build && wrangler deploy",
@@ -21,6 +21,7 @@
     "@fontsource/bricolage-grotesque": "^5.3.0",
     "@fontsource/ibm-plex-mono": "^5.3.0",
     "@fontsource/instrument-sans": "^5.3.0",
+    "@iannuttall/seo-graph-astro": "^0.0.3",
     "@paper-design/shaders": "^0.0.78",
     "@tailwindcss/vite": "^4.3.3",
     "alpinejs": "^3.15.12",

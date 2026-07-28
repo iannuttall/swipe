@@ -50,3 +50,18 @@ pnpm site:deploy:dry-run
 - Keep `nodejs_compat` enabled because Astro server output uses `process`.
 - Do not deploy or attach Cloudflare routes unless the user asks.
 - Use `pnpm`, not npm.
+
+## Agent discovery
+
+- Agent Markdown is self-managed. `agentMarkdown()` emits deterministic `.md`
+  twins, `agent-routes.json`, and `llms.txt` at build time.
+- The homepage Markdown comes from the inert `data-agent-content` template in
+  `HomePage.astro`. Keep decorative homepage cards out of the agent document.
+- Cloudflare Markdown for Agents stays off. It is paid and does not give Swipe
+  control over the converted output.
+- Two zone-level URL Rewrite Rules negotiate `Accept: text/markdown` by
+  rewriting canonical page paths to their static `.md` twins.
+- Manage the rules with
+  `workers rules rewrites put-markdown swipe [--dry-run]`. Do not add Worker
+  rewrite logic or enable Worker-first asset routing.
+- Keep `public/_headers` and `CLOUDFLARE.md` current when agent delivery changes.

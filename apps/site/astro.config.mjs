@@ -2,7 +2,9 @@
 import { defineConfig } from "astro/config";
 import cloudflare from "@astrojs/cloudflare";
 import mdx from "@astrojs/mdx";
+import { agentMarkdown } from "@iannuttall/seo-graph-astro";
 import tailwindcss from "@tailwindcss/vite";
+import { llmsTxt } from "./llms.config.mjs";
 
 export default defineConfig({
   site: "https://swipe.md",
@@ -11,7 +13,12 @@ export default defineConfig({
   security: {
     checkOrigin: false,
   },
-  integrations: [mdx()],
+  integrations: [
+    mdx(),
+    agentMarkdown({
+      llmsTxt,
+    }),
+  ],
   session: {
     driver: {
       entrypoint: new URL("./src/lib/session/noop-driver.ts", import.meta.url),

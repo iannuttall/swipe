@@ -1,7 +1,8 @@
 ---
 import SiteFooter from "@/components/content/SiteFooter.astro";
 import SiteHeader from "@/components/content/SiteHeader.astro";
-import { siteDescription, siteName, siteUrl } from "@/lib/site";
+import OgTemplate from "@/components/OgTemplate.astro";
+import { siteDescription, siteName, siteUrl, toOgImageUrl } from "@/lib/site";
 import "@/styles/app.css";
 import bricolage600Url from "@fontsource/bricolage-grotesque/files/bricolage-grotesque-latin-600-normal.woff2?url";
 import instrumentSans400Url from "@fontsource/instrument-sans/files/instrument-sans-latin-400-normal.woff2?url";
@@ -16,11 +17,16 @@ interface Props {
   canonicalPath?: string;
   noIndex?: boolean;
   ogType?: "website" | "article";
+  ogTitle?: string;
+  ogDescription?: string;
   structuredData?: Record<string, unknown> | Record<string, unknown>[];
   framed?: boolean;
   showChrome?: boolean;
+  titleTemplate?: boolean;
   /** `column` is the single reading column used by pages, issues, and tools. */
   width?: "column" | "frame";
+  /** Preload the issue typeface only on pages that actually use it. */
+  preloadInter?: boolean;
 }
 
 const {
@@ -29,16 +35,37 @@ const {
   canonicalPath = Astro.url.pathname,
   noIndex = false,
   ogType = "website",
+  ogTitle,
+  ogDescription,
   structuredData,
   framed = true,
   showChrome = true,
+  titleTemplate = true,
   width = "column",
+  preloadInter = false,
 } = Astro.props;
 
-const fullTitle = title === siteName || title.startsWith(`${siteName} `) ? title : `${title} | ${siteName}`;
+const fullTitle =
+  !titleTemplate || title === siteName || title.startsWith(`${siteName} `)
+    ? title
+    : `${title} | ${siteName}`;
+const fullOgTitle = ogTitle ?? title;
+const fullOgDescription = ogDescription ?? description;
 const canonicalUrl = new URL(canonicalPath, Astro.site ?? siteUrl).toString();
+const ogImageUrl = toOgImageUrl(canonicalUrl);
 const structuredDataList = (Array.isArray(structuredData) ? structuredData : structuredData ? [structuredData] : []).filter(Boolean);
+const isOgPreview = Astro.url.searchParams.has("og");
 const gradientTheme: "original" | "pink" = "original";
+const interUrl = "/fonts/InterVF.woff2";
+const fontPreloads = [
+  instrumentSans400Url,
+  instrumentSans500Url,
+  instrumentSans600Url,
+  bricolage600Url,
+  ibmPlexMono400Url,
+  ibmPlexMono600ItalicUrl,
+];
+if (preloadInter) fontPreloads.push(interUrl);
 const fontFaceCss = `
   @font-face {
     font-family: "Instrument Sans";
@@ -60,6 +87,21 @@ const fontFaceCss = `
     font-display: swap;
     font-style: normal;
     font-weight: 600;
+  }
+  @font-face {
+    font-family: "Inter";
+    src: url("${interUrl}") format("woff2");
+    font-display: swap;
+    font-style: normal;
+    font-weight: 100 900;
+  }
+  @font-face {
+    font-family: "Inter Fallback";
+    src: local("Arial");
+    ascent-override: 89.79%;
+    descent-override: 22.36%;
+    line-gap-override: 0%;
+    size-adjust: 107.89%;
   }
   @font-face {
     font-family: "Bricolage Grotesque";
@@ -92,53 +134,80 @@ const fontFaceCss = `
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
-    {[
-      instrumentSans400Url,
-      instrumentSans500Url,
-      instrumentSans600Url,
-      bricolage600Url,
-      ibmPlexMono400Url,
-      ibmPlexMono600ItalicUrl,
-    ].map((href) => (
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png?v=20260728" />
+    <link rel="apple-touch-icon" href="/favicon.png?v=20260728" />
+    {fontPreloads.map((href) => (
       <link rel="preload" href={href} as="font" type="font/woff2" crossorigin="anonymous" />
     ))}
     <style is:inline set:html={fontFaceCss} />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:type" content={ogType} />
-    <meta property="og:title" content={fullTitle} />
-    <meta property="og:description" content={description} />
+    <meta property="og:title" content={fullOgTitle} />
+    <meta property="og:description" content={fullOgDescription} />
     <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={fullOgTitle} />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={fullTitle} />
-    <meta name="twitter:description" content={description} />
+    <meta name="twitter:title" content={fullOgTitle} />
+    <meta name="twitter:description" content={fullOgDescription} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:image:alt" content={fullOgTitle} />
     {noIndex ? <meta name="robots" content="noindex,nofollow" /> : <meta name="robots" content="index,follow" />}
     <title>{fullTitle}</title>
+    {
+      isOgPreview ? (
+        <style is:inline>
+          astro-dev-toolbar,
+          cpdown-notification {
+            display: none !important;
+          }
+        </style>
+      ) : null
+    }
     {structuredDataList.map((entry) => <script is:inline type="application/ld+json" set:html={JSON.stringify(entry)} />)}
     <slot name="head" />
   </head>
-  <body>
-    <div class="flex min-h-screen flex-col bg-background text-foreground">
-      {showChrome ? <SiteHeader /> : null}
-      <main class="flex-1">
-        {
-          framed ? (
-            <div class:list={[width === "frame" ? "site-frame" : "site-column", "pt-8 sm:pt-12"]}>
-              <slot />
-            </div>
-          ) : (
-            <slot />
-          )
-        }
-      </main>
-      {showChrome ? <SiteFooter /> : null}
-    </div>
-    <script>
-      import Alpine from "alpinejs";
-      import setupAlpine from "@/scripts/alpine";
+  <body class:list={[isOgPreview ? "m-0 overflow-hidden" : ""]}>
+    {
+      isOgPreview ? (
+        <OgTemplate title={fullOgTitle} description={fullOgDescription} />
+      ) : (
+        <>
+          <div class="flex min-h-screen flex-col bg-background text-foreground">
+            {showChrome ? <SiteHeader /> : null}
+            <main class="flex-1">
+              {
+                framed ? (
+                  <div class:list={[width === "frame" ? "site-frame" : "site-column", "pt-8 sm:pt-12"]}>
+                    <slot />
+                  </div>
+                ) : (
+                  <slot />
+                )
+              }
+            </main>
+            {showChrome ? <SiteFooter /> : null}
+          </div>
+          <footer hidden aria-hidden="true" data-agent-markdown="exclude">
+            <template data-og-template data-og-width="1200" data-og-height="630">
+              <OgTemplate title={fullOgTitle} description={fullOgDescription} />
+            </template>
+          </footer>
+          <script is:inline>
+            window.__OG_READY__ = true;
+          </script>
+          <script>
+            import Alpine from "alpinejs";
+            import setupAlpine from "@/scripts/alpine";
 
-      setupAlpine(Alpine);
-      window.Alpine = Alpine;
-      Alpine.start();
-    </script>
+            setupAlpine(Alpine);
+            window.Alpine = Alpine;
+            Alpine.start();
+          </script>
+        </>
+      )
+    }
   </body>
 </html>

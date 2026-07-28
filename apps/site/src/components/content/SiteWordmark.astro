@@ -1,10 +1,4 @@
 ---
-import { siteName } from "@/lib/site";
-
-/**
- * Single swap point for site identity. Replace the span below with the logo
- * mark when it exists; nothing else needs to change.
- */
 interface Props {
   class?: string;
 }
@@ -15,10 +9,14 @@ const { class: className } = Astro.props;
 <a
   href="/"
   class:list={[
-    "font-mono text-sm text-foreground no-underline transition-opacity hover:opacity-70",
+    "block w-11 no-underline",
     className,
   ]}
-  aria-label={`${siteName} home`}
+  aria-label="Swipe home"
 >
-  <span>{siteName.toLowerCase()}</span>
+  <span
+    x-data="swipeLogo"
+    class="block aspect-[675.611/501.047] w-full [&_svg]:block [&_svg]:h-auto [&_svg]:w-full"
+    aria-hidden="true"
+  ></span>
 </a>

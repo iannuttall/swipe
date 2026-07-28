@@ -8,6 +8,7 @@ import {
   titleRow,
 } from './issue-chrome.js'
 import { issueFooter } from './issue-footer.js'
+import { disclosureSection, itemSection, reachOutSection } from './issue-items.js'
 import type { IssueSection } from './issue-parser.js'
 import { parseIssueSections } from './issue-parser.js'
 import {
@@ -80,6 +81,12 @@ export function renderIssueSection(section: IssueSection, withHeading = true): R
       return classifiedsSection(section, withHeading)
     case 'quote':
       return quoteSection(section, withHeading)
+    case 'item':
+      return itemSection(section)
+    case 'reach-out':
+      return reachOutSection(section, withHeading)
+    case 'disclosure':
+      return disclosureSection(section)
     default:
       return textSection(section, withHeading)
   }

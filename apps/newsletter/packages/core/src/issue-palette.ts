@@ -1,20 +1,20 @@
-// Swipe brand palette. One accent, one ink, one grey, one tint. The email is
-// mostly type on white; colour is for the accent and the footer band.
+// The centre blue carries links and controls. Pink and cyan stay decorative
+// so low-contrast logo accents never become body text.
 export const issueColors = {
   paper: '#FFFFFF',
   ink: '#0F1115',
   grey: '#5A5A5A',
-  // Brand pink, matching --primary on swipe.md. Used for surfaces.
-  accent: '#FF4FA3',
-  // Deeper pink for text on white, where #FF4FA3 falls under 4.5:1.
-  accentInk: '#C4185F',
+  accent: '#4548E9',
+  accentInk: '#4548E9',
+  accentLeft: '#FD30F8',
+  accentRight: '#43D8F7',
   highlight: '#F4F4F5',
   line: '#E5E7EB',
-  button: '#0F1115',
+  button: '#4548E9',
   buttonText: '#FFFFFF',
-  heroDefault: '#FF4FA3',
+  heroDefault: '#4548E9',
   // Inline text highlight (==text== in markdown).
-  textHighlight: '#FFE3F0',
+  textHighlight: '#E9FAFD',
 } as const
 
 export interface IssueSectionColors {

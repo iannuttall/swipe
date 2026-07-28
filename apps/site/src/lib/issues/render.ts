@@ -1,9 +1,12 @@
 import { createMarkdownProcessor } from "@astrojs/markdown-remark";
 import { rehypeCodeCopy } from "@/lib/markdown-code.mjs";
 import {
+  parseIssueItem,
+  parseIssueItems,
   parseIssueSections,
   parseLinkItem,
   resolveIssueConditionals,
+  type IssueItem,
   type IssueLinkItem,
   type IssueSection,
 } from "./parser";
@@ -16,10 +19,17 @@ const defaultTitles: Record<string, string> = {
   sponsor: "Sponsor",
   links: "Links",
   classifieds: "Classifieds",
+  "reach-out": "Reach out",
 };
 
 export interface IssueLinkItemView extends IssueLinkItem {
   descriptionHtml: string;
+}
+
+export interface IssueItemView extends IssueItem {
+  descriptionHtml: string;
+  likeHtml: string;
+  dislikeHtml: string;
 }
 
 export interface IssueSectionView {
@@ -29,6 +39,8 @@ export interface IssueSectionView {
   bodyHtml: string;
   items: IssueLinkItemView[];
   itemsHtml: string[];
+  item: IssueItemView | undefined;
+  contents: IssueItem[];
 }
 
 // Mirror of the email's Dense Discovery palette in @email/core
@@ -49,7 +61,7 @@ export const issueSectionPalette: Record<string, { square: string; tint: string 
   olive: { square: "#8B8B4B", tint: "#F4F4EB" },
 };
 
-export const heroDefaultColor = "#E999BE";
+export const heroDefaultColor = "#4548E9";
 
 export function sectionColors(value: string | undefined): { square: string; tint: string } {
   const fallback = issueSectionPalette.gray!;
@@ -80,7 +92,24 @@ async function markdownToHtml(markdown: string): Promise<string> {
   const highlighted = markdown
     .replaceAll("{{unsubscribeUrl}}", "#")
     .replace(/==([^=\n][^=\n]*)==/g, "<mark>$1</mark>");
-  return (await processor.render(highlighted)).code;
+  return protectEmailLinks((await processor.render(highlighted)).code);
+}
+
+function protectEmailLinks(html: string): string {
+  return html.replace(
+    /href="mailto:ian@swipe\.md(?:\?([^"]*))?"/giu,
+    (_match, query = "") => {
+      const subject = new URLSearchParams(query).get("subject") ?? "";
+      return `href="#" data-protected-email data-email-subject="${escapeAttribute(subject)}"`;
+    },
+  );
+}
+
+function escapeAttribute(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("<", "&lt;");
 }
 
 export async function renderIssueSections(
@@ -91,8 +120,51 @@ export async function renderIssueSections(
   const sections = parseIssueSections(resolved).filter(
     (section) => !skippedTypes.has(section.type),
   );
+  const items = parseIssueItems(sections);
+  const authoredViews = await Promise.all(sections.map(toView));
+  const views: IssueSectionView[] = [];
+  let addedContents = false;
+  let activeItemGroup: "established" | "new" | undefined;
 
-  return Promise.all(sections.map(toView));
+  for (const view of authoredViews) {
+    if (view.type === "item" && view.item) {
+      if (!addedContents) {
+        views.push(syntheticView("contents", "In this issue", items));
+        addedContents = true;
+      }
+      if (!view.item.sponsor) {
+        const group = view.item.newRelease ? "new" : "established";
+        if (group !== activeItemGroup) {
+          views.push(
+            syntheticView(
+              "item-group",
+              group === "new" ? "New and early" : "Useful tools",
+            ),
+          );
+          activeItemGroup = group;
+        }
+      }
+    }
+    views.push(view);
+  }
+  return views;
+}
+
+function syntheticView(
+  type: string,
+  title: string,
+  contents: IssueItem[] = [],
+): IssueSectionView {
+  return {
+    type,
+    attrs: {},
+    title,
+    bodyHtml: "",
+    items: [],
+    itemsHtml: [],
+    item: undefined,
+    contents,
+  };
 }
 
 async function toView(section: IssueSection): Promise<IssueSectionView> {
@@ -103,6 +175,8 @@ async function toView(section: IssueSection): Promise<IssueSectionView> {
     bodyHtml: "",
     items: [],
     itemsHtml: [],
+    item: undefined,
+    contents: [],
   };
 
   if (section.type === "links") {
@@ -117,6 +191,24 @@ async function toView(section: IssueSection): Promise<IssueSectionView> {
 
   if (section.type === "classifieds") {
     view.itemsHtml = await Promise.all(section.items.map(markdownToHtml));
+    return view;
+  }
+
+  if (section.type === "item") {
+    const item = parseIssueItem(section);
+    view.title = undefined;
+    view.item = {
+      ...item,
+      descriptionHtml: await markdownToHtml(
+        `${item.description}${item.sponsor ? ` ${item.sponsorLabel}` : ""}`,
+      ),
+      likeHtml: await markdownToHtml(
+        `**${item.likeLabel}** ${item.whatWeLike}`,
+      ),
+      dislikeHtml: await markdownToHtml(
+        `**${item.dislikeLabel}** ${item.whatWeDontLike}`,
+      ),
+    };
     return view;
   }
 

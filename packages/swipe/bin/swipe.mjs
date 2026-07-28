@@ -119,9 +119,9 @@ function newsletterNodeArgs() {
   return existsSync(newsletterEnv) ? [`--env-file=${newsletterEnv}`] : [];
 }
 
-function emailCli(cliArgs) {
+function emailCli(cliArgs, options = {}) {
   buildNewsletterCliIfMissing();
-  run("node", [...newsletterNodeArgs(), newsletterCli, ...cliArgs]);
+  run("node", [...newsletterNodeArgs(), newsletterCli, ...cliArgs], options);
 }
 
 function getOption(argv, name, fallback) {
@@ -486,19 +486,28 @@ async function issue(argv) {
       .filter(Boolean).length;
     console.log(`~${Math.max(1, Math.ceil(words / 220))} min read (${words} words)`);
     console.log(`Web preview: pnpm swipe site dev -> http://localhost:4321/issues/${slug}`);
-    emailCli([
-      "template",
-      "render",
-      "--subject",
-      parsed.frontmatter.subject,
-      "--body-file",
-      bodyFile,
-      "--status",
-      status,
-      "--out-dir",
-      "apps/newsletter/rendered",
-      "--json",
-    ]);
+    emailCli(
+      [
+        "template",
+        "render",
+        "--subject",
+        parsed.frontmatter.subject,
+        "--name",
+        slug,
+        "--body-file",
+        bodyFile,
+        "--status",
+        status,
+        "--out-dir",
+        "apps/newsletter/rendered",
+        "--json",
+      ],
+      {
+        env: {
+          SWIPE_EMAIL_ASSET_BASE_URL: "http://localhost:4321",
+        },
+      },
+    );
     return;
   }
 

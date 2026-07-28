@@ -216,7 +216,7 @@ export const defaultEmailMarkdownStyles = {
     fontWeight: 400,
     lineHeight: '27px',
   },
-  blockquote: {
+  blockQuote: {
     margin: '0 0 24px',
     paddingLeft: '16px',
     borderLeft: `3px solid ${barebonesColors.strokeStrong}`,

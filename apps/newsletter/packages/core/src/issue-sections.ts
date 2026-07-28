@@ -16,30 +16,13 @@ import {
 } from './issue-styles.js'
 
 const defaultClassifiedsButton = 'Book yours ↗︎'
-const defaultClassifiedsButtonUrl = 'https://swipe.md/advertise'
+const defaultClassifiedsButtonUrl = 'mailto:ian@swipe.md?subject=Sponsor%20Swipe'
 
 export function issueSpacer(key?: string) {
   return h(
     Section,
     { key },
     h(Text, { className: 'issue-spacer', style: issueStyles.spacer }, ' '),
-  )
-}
-
-// Section separator: the same dither line the site uses under page headers,
-// as a PNG because Gmail drops SVG. Rendered at its natural 60x2 from a 4x
-// source so it stays crisp on retina.
-export function issueSectionDivider(key?: string) {
-  return h(
-    Section,
-    { key, style: issueStyles.dividerSection },
-    h(Img, {
-      src: 'https://swipe.md/email/dither-line.png',
-      alt: '',
-      width: 60,
-      height: 2,
-      style: { display: 'block', border: '0' },
-    }),
   )
 }
 
@@ -93,13 +76,20 @@ export function mdBlockWithCode(
 
 // Section headings are plain type. The marker column that used to sit before
 // them read as decoration once the palette lost its per-section colours.
-export function sectionHeading(title: string) {
+export function sectionHeading(title: string, marker?: string) {
   return h(
     Section,
     null,
     h(
       Row,
       null,
+      marker
+        ? h(
+            Column,
+            { style: issueStyles.headingMarkerCell, width: 18 },
+            h(Text, { style: issueStyles.headingMarker }, marker),
+          )
+        : null,
       h(
         Column,
         { style: issueStyles.headingCell },
@@ -191,7 +181,7 @@ export function linksSection(section: IssueSection, withHeading = true) {
   return h(
     Fragment,
     null,
-    withHeading ? sectionHeading(section.attrs.title ?? 'Links') : null,
+    withHeading ? sectionHeading(section.attrs.title ?? 'Links', '＋') : null,
     h(Section, null, ...rows),
   )
 }
@@ -199,7 +189,9 @@ export function linksSection(section: IssueSection, withHeading = true) {
 export function boxSection(section: IssueSection, withHeading = true) {
   const colors = resolveSectionColors(section.attrs.color)
   const heading =
-    withHeading && section.attrs.title ? sectionHeading(section.attrs.title) : null
+    withHeading && section.attrs.title
+      ? sectionHeading(section.attrs.title, section.type === 'sponsor' ? '✦' : undefined)
+      : null
   const background = colors.tint
   const content = mdBlockWithCode(section.body)
   let body: ReactNode
@@ -299,7 +291,7 @@ export function classifiedsSection(section: IssueSection, withHeading = true) {
   return h(
     Fragment,
     null,
-    withHeading ? sectionHeading(section.attrs.title ?? 'Classifieds') : null,
+    withHeading ? sectionHeading(section.attrs.title ?? 'Classifieds', '◆') : null,
     h(
       Section,
       null,

@@ -1,0 +1,22 @@
+---
+interface Props {
+  href: string;
+}
+
+const { href } = Astro.props;
+---
+
+<div class="mx-auto w-full max-w-2xl text-center">
+  <a
+    href={href}
+    class="group grid grid-cols-[1rem_1fr_1rem] items-center rounded-lg border border-border bg-background-raised px-5 py-4 font-mono text-base text-foreground no-underline transition-colors hover:border-primary hover:text-primary"
+  >
+    <span class="text-primary" aria-hidden="true">›</span>
+    <span>View in Markdown for your agent</span>
+    <span class="text-primary" aria-hidden="true">↗</span>
+  </a>
+  <p class="mt-3 text-sm leading-6 text-foreground-soft">
+    Plain <code class="rounded bg-foreground/5 px-1.5 py-0.5 font-mono text-foreground">.md</code>
+    you can paste straight into Claude, ChatGPT, or any agent.
+  </p>
+</div>

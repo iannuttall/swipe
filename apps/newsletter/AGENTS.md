@@ -187,8 +187,36 @@ render tests. For multi-item blocks like `<Links>` and `<Classifieds>`, start
 each item with a normal Markdown heading. Classifieds button attrs are `button`
 and `button-url`. The legacy `:::` dialect stays supported for published issues
 but must not be used for new drafts.
-Section headings are plain type. There are no marker glyphs before them and no
-`marker` attribute; a heading earns attention through weight and spacing.
+
+New Swipe picks use one first-class `<Item>` block per pick. `id` and `title`
+are required. Use `url` for the destination. The item body starts with a
+three-to-four-word description, then contains one required `<Like>` block and
+one required `<Dislike>` block. Established products use `＋`. Set `new="true"`
+for a newly surfaced product and the marker becomes `β`; this is an editorial
+signal, not a claim that the product is technically in beta. Set
+`sponsor="true"` for a paid placement and the marker becomes `✦`. Defaults are
+`What we like:`, `What we don't like:`, and `[sponsor]`. Use `chip`,
+`like-label`, `dislike-label`, and `sponsor-label` only when an issue needs
+different wording. Contents summaries default to the short description and
+archive anchors are generated from item IDs.
+
+Author items in display order. A sponsor goes first, followed by three
+established products and five new or early products. The template inserts
+`Useful tools` and `New and early` headings from the item flags. Sponsor
+responses use `mailto:ian@swipe.md?subject=Sponsor%20Swipe` until the placement
+has enough data to justify a landing page.
+
+Use `<ReachOut>` for the closing action list and `<Disclosure>` for the final
+editorial note. When a draft has a stable name, the template adds the direct
+`/issues/<slug>.md` agent link before the disclosure.
+
+Section markers are fixed: sponsors use `✦`, links use `＋`, and classifieds
+use `◆`. Keep them black and close to the heading.
+
+Run `pnpm email:logo` from `apps/newsletter` after changing the logo source.
+It creates the light and dark static PNGs used in the email header and footer.
+`pnpm swipe issue preview` points those assets at `http://localhost:4321`;
+test and send renders keep the production `https://swipe.md` asset base.
 
 There is no poll block. Polls cannot be answered inside an email without a
 round trip, and the archive could only ever show them as dead options.
@@ -196,10 +224,11 @@ round trip, and the archive could only ever show them as dead options.
 Available templates:
 
 - `default`: Swipe shell. Body text renders at 18px; it accepts component
-  blocks (`<Links>`, `<Sponsor>`, `<Box>`, `<Classifieds>`, `<Quote>`)
-  for mixed campaigns. Use `<Header name="Issue 001" />` to override the
-  top-right label. `<Conditional if="status:cold">` is the only recipient
-  condition; it is hidden from the public archive.
+  blocks (`<Item>`, `<ReachOut>`, `<Disclosure>`, `<Links>`, `<Sponsor>`,
+  `<Box>`, `<Classifieds>`, `<Quote>`) for mixed campaigns. Use
+  `<Header name="Issue 001" />` to override the top-right label.
+  `<Conditional if="status:cold">` is the only recipient condition; it is
+  hidden from the public archive.
 
 Before real sends, render the email locally:
 

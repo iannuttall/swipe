@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import {
+  parseIssueItem,
+  parseIssueItems,
   parseIssueSections,
   parseLinkItem,
   resolveIssueConditionals,
@@ -89,6 +91,74 @@ describe('parseIssueSections', () => {
     assert.equal(sections[0]?.attrs.name, 'Issue 002')
     assert.equal(sections[1]?.items.length, 2)
     assert.equal(parseLinkItem(sections[1]?.items[1] ?? '').title, 'Second')
+  })
+
+  it('parses first-class items and applies stable defaults', () => {
+    const sections = parseIssueSections(
+      [
+        '<Item id="agent-grade" title="AgentGrade" url="https://www.agentgrade.dev/report" summary="grades an agent setup" sponsor="true">',
+        'A focused description with **useful detail**.',
+        '',
+        '<Like>',
+        'Run the same task against two agent setups and compare the result.',
+        '</Like>',
+        '',
+        '<Dislike>',
+        'Useful when the test task resembles your real work.',
+        '</Dislike>',
+        '</Item>',
+      ].join('\n'),
+    )
+    const section = sections[0]
+    assert.ok(section)
+    const item = parseIssueItem(section)
+
+    assert.equal(sections[0]?.type, 'item')
+    assert.equal(item.id, 'agent-grade')
+    assert.equal(item.chip, '✦')
+    assert.equal(item.sponsorLabel, '[sponsor]')
+    assert.equal(item.likeLabel, 'What we like:')
+    assert.equal(item.dislikeLabel, "What we don't like:")
+    assert.equal(item.sponsor, true)
+    assert.match(item.whatWeLike, /same task/)
+    assert.match(item.whatWeDontLike, /real work/)
+  })
+
+  it('uses beta as the marker for newly surfaced products', () => {
+    const [section] = parseIssueSections(
+      [
+        '<Item id="new-tool" title="New Tool" new="true">',
+        'Useful new thing.',
+        '<Like>',
+        'Good.',
+        '</Like>',
+        '<Dislike>',
+        'Early.',
+        '</Dislike>',
+        '</Item>',
+      ].join('\n'),
+    )
+    assert.ok(section)
+    assert.equal(parseIssueItem(section).chip, 'β')
+  })
+
+  it('rejects duplicate item anchors', () => {
+    const body = (title: string) =>
+      [
+        `<Item id="same-item" title="${title}">`,
+        'Description.',
+        '<Like>',
+        'Action.',
+        '</Like>',
+        '<Dislike>',
+        'Tradeoff.',
+        '</Dislike>',
+        '</Item>',
+      ].join('\n')
+    assert.throws(
+      () => parseIssueItems(parseIssueSections(`${body('One')}\n\n${body('Two')}`)),
+      /Duplicate item id/,
+    )
   })
 })
 

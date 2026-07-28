@@ -75,10 +75,19 @@ describe('renderDraft', () => {
     assert.match(rendered.html, /Sponsor Title/)
     assert.match(rendered.html, /Issue 001/)
     assert.match(rendered.html, /Worth a Click/)
-    // Section headings are plain type; the ▲ ✦ ＋ ◆ markers are gone.
-    assert.doesNotMatch(rendered.html, /[▲✦＋◆]/)
+    assert.match(rendered.html, /✦[\s\S]*Sponsor Title/)
+    assert.match(rendered.html, /＋[\s\S]*Worth a Click/)
+    assert.match(rendered.html, /◆[\s\S]*Classifieds/)
     assert.match(rendered.html, /Classifieds/)
-    assert.match(rendered.html, /Advertise in Swipe[\s\S]*Unsubscribe/)
+    assert.match(rendered.html, /https:\/\/swipe\.md\/email\/swipe-email-logo@2x\.png/)
+    assert.match(
+      rendered.html,
+      /https:\/\/swipe\.md\/email\/swipe-email-logo-dark@2x\.png/,
+    )
+    assert.doesNotMatch(rendered.html, /swipe-email-logo\.gif/)
+    assert.match(rendered.html, /20-22[\s\S]*Unsubscribe/)
+    assert.doesNotMatch(rendered.html, /Sent by/)
+    assert.doesNotMatch(rendered.html, /Advertise in Swipe/)
     assert.doesNotMatch(rendered.html, /Browse older issues/)
     assert.match(rendered.html, /Book yours ↗︎/)
     assert.match(rendered.html, /\[if mso\]/)
@@ -110,6 +119,59 @@ describe('renderDraft', () => {
     assert.doesNotMatch(cold.html, /<Box/)
     assert.doesNotMatch(warm.html, /Still reading\?/)
     assert.doesNotMatch(warm.text, /Click any link/)
+  })
+
+  it('renders item contents, anchors, labels, and the Markdown route', async () => {
+    const rendered = await renderDraftEmail({
+      subject: 'Item issue',
+      name: 'item-issue',
+      bodyMarkdown: [
+        '<Header name="Issue 003" />',
+        '',
+        '<Item id="agent-grade" title="AgentGrade" url="https://agentgrade.dev" new="true">',
+        'A focused description.',
+        '',
+        '<Like>',
+        'Compare the same task across two setups.',
+        '</Like>',
+        '',
+        '<Dislike>',
+        'Useful when the task resembles your real work.',
+        '</Dislike>',
+        '</Item>',
+        '',
+        '<ReachOut>',
+        '- Found a useful tool? [Send it over.](mailto:ian@swipe.md)',
+        '</ReachOut>',
+        '',
+        '<Disclosure>',
+        'Sponsors are labelled and never reviewed for pay.',
+        '</Disclosure>',
+      ].join('\n'),
+    })
+
+    assert.match(rendered.html, /In this issue/)
+    assert.match(rendered.html, /href="#agent-grade"/)
+    assert.match(rendered.html, /id="agent-grade"/)
+    assert.match(rendered.html, /AgentGrade/)
+    assert.match(rendered.html, /β/)
+    assert.match(rendered.html, /New and early/)
+    assert.match(rendered.html, /What we like:/)
+    assert.match(rendered.html, /What we don&#39;t like:/)
+    assert.match(rendered.html, /Reach out/)
+    assert.match(rendered.html, /item-issue\.md/)
+    assert.match(rendered.html, /you can paste straight into/)
+    assert.ok(
+      rendered.html.indexOf('In this issue') <
+        rendered.html.indexOf('hr-center-ink@2x.png'),
+    )
+    assert.ok(
+      rendered.html.indexOf('hr-center-ink@2x.png') <
+        rendered.html.indexOf('New and early'),
+    )
+    assert.match(rendered.text, /AgentGrade/)
+    assert.match(rendered.text, /What we like:/)
+    assert.doesNotMatch(rendered.text, /<Item|<Like|<Dislike/)
   })
 
   it('lists available templates', () => {

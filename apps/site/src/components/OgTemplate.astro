@@ -1,0 +1,83 @@
+---
+import DitherEdge from "@/components/DitherEdge.astro";
+import DitherHrCenter from "@/components/DitherHrCenter.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+const hasGradientLead = description?.startsWith("The ");
+const descriptionRest =
+  hasGradientLead && description ? description.slice(4) : description;
+---
+
+<div
+  class="flex h-[630px] w-[1200px] flex-col overflow-hidden bg-white font-body text-[#0f1115]"
+  style="color-scheme: light;"
+>
+  <article class="flex h-[598px] shrink-0 flex-col bg-[#0f1115] px-[104px] pt-[96px] pb-10 text-white">
+    <header class="flex items-center justify-between">
+      <div class="flex items-center gap-5">
+        <img src="/favicon.png" alt="" width="64" height="64" class="block size-16" />
+        <span class="font-heading text-[42px] leading-none font-semibold tracking-[-0.04em]">Swipe</span>
+      </div>
+      <span class="font-mono text-[20px] text-[#aeb4c0]">Swipe.md</span>
+    </header>
+
+    <DitherHrCenter class="mt-9 text-white/80" />
+
+    <div class="flex min-h-0 flex-1 flex-col justify-center py-8">
+      <h1
+        class="og-title m-0 max-w-[990px] overflow-hidden font-heading text-[72px] leading-[1.02] font-semibold tracking-[-0.045em] text-pretty"
+      >
+        {title}
+      </h1>
+      {
+        description ? (
+          <p
+            class="og-description mt-6 mb-0 max-w-[1000px] overflow-hidden text-[36px] leading-[1.22] text-[#c8ccd4]"
+          >
+            {
+              hasGradientLead ? (
+                <>
+                  <span
+                    class="font-mono font-semibold"
+                    style={{
+                      backgroundImage: "linear-gradient(to right, var(--rainbow-original-light))",
+                      backgroundClip: "text",
+                      WebkitBackgroundClip: "text",
+                      color: "transparent",
+                    }}
+                  >
+                    The
+                  </span>{" "}
+                  {descriptionRest}
+                </>
+              ) : (
+                description
+              )
+            }
+          </p>
+        ) : null
+      }
+    </div>
+
+  </article>
+  <DitherEdge direction="down" height={32} class="shrink-0 text-[#0f1115]" />
+</div>
+
+<style>
+  .og-title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .og-description {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+</style>

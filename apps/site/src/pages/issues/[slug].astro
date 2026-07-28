@@ -3,7 +3,6 @@ export const prerender = true;
 
 import type { CollectionEntry } from "astro:content";
 import CodeCopy from "@/components/content/CodeCopy.astro";
-import NewsletterSignup from "@/components/content/NewsletterSignup.astro";
 import PageHeader from "@/components/content/PageHeader.astro";
 import IssueSections from "@/components/issues/IssueSections.astro";
 import Layout from "@/layouts/Layout.astro";
@@ -48,6 +47,11 @@ const schema = {
     url: new URL("/", Astro.site).toString(),
   },
 };
+const issueFontStyle = {
+  "--font-body": "'Inter', 'Inter Fallback', Helvetica, Arial, sans-serif",
+  "--font-heading": "'Inter', 'Inter Fallback', Helvetica, Arial, sans-serif",
+  fontFamily: "'Inter', 'Inter Fallback', Helvetica, Arial, sans-serif",
+};
 ---
 
 <Layout
@@ -56,8 +60,12 @@ const schema = {
   canonicalPath={path}
   ogType="article"
   structuredData={schema}
+  preloadInter
 >
-  <article>
+  <article
+    class="mx-auto w-full max-w-[40rem]"
+    style={issueFontStyle}
+  >
     <PageHeader
       title={issue.data.subject}
       description={issue.data.preheader}
@@ -70,11 +78,7 @@ const schema = {
     }
 
     <div class="mt-10">
-      <NewsletterSignup source={`swipe.md/issues/${issue.id}`} />
-    </div>
-
-    <div class="mt-12">
-      <IssueSections body={issue.body ?? ""} />
+      <IssueSections body={issue.body ?? ""} markdownPath={`${path}.md`} />
     </div>
     <CodeCopy />
   </article>

@@ -1,4 +1,4 @@
-import { type ComponentProps, Fragment, createElement as h, type ReactNode } from 'react'
+import { type ComponentProps, createElement as h } from 'react'
 import {
   Body,
   Column,
@@ -6,38 +6,24 @@ import {
   Font,
   Head,
   Html,
+  Img,
   Link,
   Preview,
   Row,
   Section,
   Text,
 } from 'react-email'
+import { defaultBlocks } from './default-template-blocks.js'
+import { emailAssetUrl } from './email-assets.js'
 import { issueFooter } from './issue-footer.js'
 import { type IssueSection, parseIssueSections } from './issue-parser.js'
-import {
-  issueSectionDivider,
-  issueSpacer,
-  mdBlockWithCode,
-  sectionHeading,
-} from './issue-sections.js'
 import { issueResponsiveCss } from './issue-styles.js'
-import { renderIssueSection } from './issue-template.js'
-import {
-  barebonesColors,
-  defaultEmailMarkdownStyles,
-  defaultEmailStyles,
-  fontFallback,
-  interFonts,
-} from './react-email-styles.js'
+import { defaultEmailStyles, fontFallback, interFonts } from './react-email-styles.js'
 import type { DraftInput } from './types.js'
 
 type TrackedLinkProps = ComponentProps<typeof Link> & {
   'data-track'?: 'false'
 }
-
-// Issue building blocks that can be dropped into the default shell. Chrome types
-// (hero/header/footer) stay owned by each template's own shell.
-const defaultModularTypes = new Set(['links', 'sponsor', 'box', 'classifieds', 'quote'])
 
 // Default text sits 40px from the shell edge on desktop. React Email puts
 // Section padding on a generated inner <td>, so responsive gutter classes must
@@ -51,14 +37,6 @@ const defaultResponsiveCss = `${issueResponsiveCss}
   pre, pre *, code, code * {
     font-family: Menlo, Consolas, monospace !important;
   }
-  .default-footer .issue-footer-blurb {
-    padding-left: 40px !important;
-    padding-right: 10px !important;
-  }
-  .default-footer .issue-footer-links {
-    padding-left: 10px !important;
-    padding-right: 40px !important;
-  }
   @media only screen and (max-width: 599px) {
     .default-header-cell,
     .default-content-cell,
@@ -71,8 +49,7 @@ const defaultResponsiveCss = `${issueResponsiveCss}
       padding-right: 0 !important;
     }
     .default-module-cell .issue-cell,
-    .default-footer .issue-footer-blurb,
-    .default-footer .issue-footer-links {
+    .default-footer .issue-footer-cell {
       padding-left: 16px !important;
       padding-right: 16px !important;
     }
@@ -98,11 +75,7 @@ export function DefaultEmail(draft: DraftInput) {
   const sections = parsed.filter(
     (section) => !['hero', 'header', 'footer'].includes(section.type),
   )
-  const blocks: ReactNode[] = []
-  sections.forEach((section, index) => {
-    if (index > 0) blocks.push(issueSectionDivider(`default-divider-${index}`))
-    blocks.push(h(Fragment, { key: index }, defaultBlock(section)))
-  })
+  const blocks = defaultBlocks(sections, draft.name)
 
   return h(
     Html,
@@ -135,73 +108,7 @@ export function DefaultEmail(draft: DraftInput) {
   )
 }
 
-// Colored surfaces sit their box edge on the 40px text gutter; sections
-// without a surface use the 20px wrapper so their copy (with its own 20px
-// cells) lands on that same gutter.
-const defaultColoredTypes = new Set(['sponsor', 'box'])
-
-const defaultSectionTitles: Record<string, string> = {
-  sponsor: 'Sponsor',
-  links: 'Links',
-  classifieds: 'Classifieds',
-}
-
-function defaultBlock(section: IssueSection) {
-  if (section.type === 'text' && section.attrs.title) {
-    return h(
-      Fragment,
-      null,
-      defaultCell(
-        'default-content-cell',
-        defaultEmailStyles.textWrap,
-        sectionHeading(section.attrs.title),
-      ),
-      defaultCell(
-        'default-content-cell',
-        defaultEmailStyles.textWrap,
-        mdBlockWithCode(
-          section.body,
-          defaultEmailMarkdownStyles,
-          defaultEmailStyles.content,
-        ),
-      ),
-    )
-  }
-
-  if (defaultModularTypes.has(section.type)) {
-    // The heading renders on the default text grid so every square sits
-    // exactly on the 40px gutter, regardless of the body wrapper below.
-    const title = section.attrs.title ?? defaultSectionTitles[section.type]
-    const heading = title
-      ? defaultCell(
-          'default-content-cell',
-          defaultEmailStyles.textWrap,
-          sectionHeading(title),
-        )
-      : null
-    const body = defaultColoredTypes.has(section.type)
-      ? defaultCell(
-          'default-surface-cell',
-          defaultEmailStyles.coloredWrap,
-          renderIssueSection(section, false),
-        )
-      : defaultCell(
-          'default-module-cell',
-          defaultEmailStyles.modularWrap,
-          renderIssueSection(section, false),
-        )
-    return h(Fragment, null, heading, body)
-  }
-  return defaultCell(
-    'default-content-cell',
-    defaultEmailStyles.textWrap,
-    mdBlockWithCode(section.body, defaultEmailMarkdownStyles, defaultEmailStyles.content),
-  )
-}
-
 function defaultFooterBand(footer: IssueSection | undefined) {
-  // Undefined so the footer uses its own brand band; the old bg3 grey is what
-  // made the white footer type invisible.
   return issueFooter(footer, undefined, undefined, 'default-footer')
 }
 
@@ -245,7 +152,22 @@ function headerRow(header: IssueSection | undefined, minutes?: number) {
           href: 'https://swipe.md',
           style: defaultEmailStyles.logoLink,
         }),
-        'Swipe',
+        h(Img, {
+          className: 'swipe-logo-light',
+          src: emailAssetUrl('email/swipe-email-logo@2x.png'),
+          alt: 'Swipe',
+          width: 137,
+          height: 42,
+          style: defaultEmailStyles.logo,
+        }),
+        h(Img, {
+          className: 'swipe-logo-dark',
+          src: emailAssetUrl('email/swipe-email-logo-dark@2x.png'),
+          alt: 'Swipe',
+          width: 137,
+          height: 42,
+          style: { ...defaultEmailStyles.logo, display: 'none' },
+        }),
       ),
     ),
     h(
@@ -254,14 +176,6 @@ function headerRow(header: IssueSection | undefined, minutes?: number) {
       h(Text, { style: defaultEmailStyles.company }, label),
     ),
   )
-}
-
-function defaultCell(
-  className: string,
-  style: ComponentProps<typeof Column>['style'],
-  ...children: ReactNode[]
-) {
-  return h(Section, null, h(Row, null, h(Column, { className, style }, ...children)))
 }
 
 function fontFaces() {

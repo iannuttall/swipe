@@ -10,6 +10,14 @@
   ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
 
+/fonts/*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/favicon*
+  ! Cache-Control
+  Cache-Control: public, max-age=86400, s-maxage=2592000, stale-while-revalidate=604800
+
 /llms.txt
   Access-Control-Allow-Origin: *
   Cache-Control: public, max-age=300, must-revalidate

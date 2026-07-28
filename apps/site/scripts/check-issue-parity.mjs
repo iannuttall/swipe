@@ -7,23 +7,21 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 const siteDir = process.cwd();
-const siteCopy = resolve(siteDir, "src/lib/issues/parser.ts");
-const canonical = resolve(
-  siteDir,
-  "../../apps/newsletter/packages/core/src/issue-parser.ts",
-);
+const pairs = [
+  ["src/lib/issues/parser.ts", "../../apps/newsletter/packages/core/src/issue-parser.ts"],
+  [
+    "src/lib/issues/issue-item-parser.ts",
+    "../../apps/newsletter/packages/core/src/issue-item-parser.ts",
+  ],
+];
 
-const a = readFileSync(siteCopy, "utf8");
-const b = readFileSync(canonical, "utf8");
-
-if (a !== b) {
-  console.error(
-    "Issue parser drift: apps/site/src/lib/issues/parser.ts no longer matches",
-  );
-  console.error("apps/newsletter/packages/core/src/issue-parser.ts.");
-  console.error(
-    "Update whichever side changed by copying the canonical file verbatim.",
-  );
+for (const [sitePath, canonicalPath] of pairs) {
+  const siteCopy = resolve(siteDir, sitePath);
+  const canonical = resolve(siteDir, canonicalPath);
+  if (readFileSync(siteCopy, "utf8") === readFileSync(canonical, "utf8")) continue;
+  console.error(`Issue parser drift: apps/site/${sitePath} no longer matches`);
+  console.error(canonicalPath.replace("../../", ""));
+  console.error("Update whichever side changed by copying the canonical file verbatim.");
   process.exit(1);
 }
 

@@ -1,0 +1,59 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+// Exact 2px-cell mask from dither-hr-center.svg. Keeping the mask compact and
+// building one path avoids shipping hundreds of individual <rect> elements.
+const mask =
+  "AIiIiKiqqqqqqqqqqqqqqu7u7v7///////////////////////////7u7u7qqqqqqqqqqqqqqqiIiIiAAAAAAAAAAABAREREVVVVVVVVVVVVVVXV3d3d///////9/d3d1dVVVVVVVVVVVVVUVEREQEAAAAAAAAAAAAAgIiIioqqqqqqqqqqqqqq6u7u7+//////////////////////7+7u7uqqqqqqqqqqqqqqioiIiIAAA";
+const bytes = Uint8Array.from(atob(mask), (character) =>
+  character.charCodeAt(0),
+);
+const columns = 480;
+const rows = 3;
+const cellSize = 2;
+
+function hasCell(index: number) {
+  return (bytes[Math.floor(index / 8)] & (1 << (7 - (index % 8)))) !== 0;
+}
+
+let path = "";
+for (let row = 0; row < rows; row += 1) {
+  let column = 0;
+  while (column < columns) {
+    if (!hasCell(row * columns + column)) {
+      column += 1;
+      continue;
+    }
+
+    const start = column;
+    while (
+      column < columns &&
+      hasCell(row * columns + column)
+    ) {
+      column += 1;
+    }
+
+    const x = start * cellSize;
+    const y = row * cellSize;
+    const width = (column - start) * cellSize;
+    path += `M${x} ${y}h${width}v${cellSize}H${x}z`;
+  }
+}
+---
+
+<svg
+  class:list={["block h-auto w-full", className]}
+  width="960"
+  height="6"
+  viewBox="0 0 960 6"
+  shape-rendering="crispEdges"
+  fill="currentColor"
+  aria-hidden="true"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path d={path} />
+</svg>

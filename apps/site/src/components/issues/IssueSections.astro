@@ -1,35 +1,138 @@
 ---
+import DitherHrCenter from "@/components/DitherHrCenter.astro";
 import { renderIssueSections, sectionColors, tintStyle, heroDefaultColor } from "@/lib/issues/render";
+import MarkdownAgentLink from "./MarkdownAgentLink.astro";
 
 interface Props {
   body: string;
+  markdownPath: string;
 }
 
-const { body } = Astro.props;
+const { body, markdownPath } = Astro.props;
 const sections = await renderIssueSections(body);
+const hasDisclosure = sections.some((section) => section.type === "disclosure");
+const introIndex = sections.findIndex(
+  (section) => section.type === "text" && !section.title,
+);
 
 const defaultClassifiedsButton = "Book yours ↗︎";
-const defaultClassifiedsButtonUrl = "https://swipe.md/advertise";
+const defaultClassifiedsButtonUrl =
+  "mailto:ian@swipe.md?subject=Sponsor%20Swipe";
 const tintedTypes = new Set(["box", "sponsor"]);
+const sectionMarkers: Record<string, string> = {
+  sponsor: "✦",
+  links: "＋",
+  classifieds: "◆",
+};
 
 function heroStyle(color: string | undefined) {
   const background = color && /^#/.test(color) ? color : sectionColors(color).tint;
   const resolved = color ? background : heroDefaultColor;
   return `background-color: light-dark(${resolved}, color-mix(in oklab, ${resolved} 30%, var(--background-raised)))`;
 }
+
+function publicLinkAttrs(url: string | undefined) {
+  if (!url?.toLowerCase().startsWith("mailto:ian@swipe.md")) {
+    return { href: url };
+  }
+
+  const query = url.split("?", 2)[1] ?? "";
+  return {
+    href: "#",
+    "data-protected-email": "",
+    "data-email-subject": new URLSearchParams(query).get("subject") ?? "",
+  };
+}
 ---
 
-<div class="flex flex-col gap-10">
+<div
+  x-data="protectedEmailLinks"
+  x-on:click="openEmail($event)"
+  class="flex flex-col gap-9"
+>
   {
-    sections.map((section) => (
-      <section>
+    sections.map((section, index) => (
+      <>
+        {section.type === "disclosure" ? (
+          <MarkdownAgentLink href={markdownPath} />
+        ) : null}
+      <section
+        id={section.item?.id}
+        data-agent-markdown={section.type === "reach-out" ? "exclude" : undefined}
+        class:list={[
+          section.type === "item" ? "scroll-mt-8" : undefined,
+          index === introIndex ? "issue-intro" : undefined,
+        ]}
+      >
         {section.title ? (
-          <h2 class="mb-5 font-heading text-[1.4375rem] leading-[1.6875rem] font-semibold tracking-tight text-foreground">
-            {section.title}
+          <h2 class="mb-5 flex items-baseline gap-1.5 font-heading text-[1.4375rem] leading-[1.6875rem] font-semibold tracking-tight text-foreground">
+            {sectionMarkers[section.type] ? (
+              <span class="font-mono text-sm" aria-hidden="true">
+                {sectionMarkers[section.type]}
+              </span>
+            ) : null}
+            <span>{section.title}</span>
           </h2>
         ) : null}
 
-        {section.type === "links" ? (
+        {section.type === "contents" ? (
+          <ol class="m-0 flex list-none flex-col gap-3 p-0">
+            {section.contents.map((item) => (
+              <li class="grid grid-cols-[1rem_1fr] gap-1.5">
+                <span class="font-mono text-sm font-semibold text-foreground">
+                  {item.chip}
+                </span>
+                <p class="m-0 text-base leading-6">
+                  <a
+                    href={`#${item.id}`}
+                    class="font-semibold text-primary underline decoration-dotted underline-offset-4 hover:decoration-solid"
+                  >
+                    {item.title}
+                  </a>
+                  {item.summary ? (
+                    <span class="font-mono text-sm text-foreground-soft">
+                      , {item.summary}{item.sponsor ? ` ${item.sponsorLabel}` : ""}
+                    </span>
+                  ) : null}
+                </p>
+              </li>
+            ))}
+          </ol>
+        ) : section.type === "item" && section.item ? (
+          <div class="grid grid-cols-[1rem_1fr] gap-1.5">
+            <span class="pt-1 font-mono text-sm font-semibold text-foreground">
+              {section.item.chip}
+            </span>
+            <div class="min-w-0">
+              <div class="mb-0.5">
+                <h2 class="m-0 font-heading text-xl leading-7 font-semibold tracking-tight text-foreground">
+                  {section.item.url ? (
+                    <a
+                      {...publicLinkAttrs(section.item.url)}
+                      class="text-primary underline decoration-dotted underline-offset-4"
+                    >
+                      {section.item.title}
+                    </a>
+                  ) : (
+                    section.item.title
+                  )}
+                </h2>
+              </div>
+              <div
+                class="content-prose issue-item-description mb-4"
+                set:html={section.item.descriptionHtml}
+              />
+              <div
+                class="content-prose issue-item-action"
+                set:html={section.item.likeHtml}
+              />
+              <div
+                class="content-prose issue-item-action"
+                set:html={section.item.dislikeHtml}
+              />
+            </div>
+          </div>
+        ) : section.type === "item-group" ? null : section.type === "links" ? (
           <ul class="m-0 flex list-none flex-col gap-8 p-0">
             {section.items.map((item) => (
               <li class="grid gap-1 sm:grid-cols-[13rem_1fr] sm:gap-6">
@@ -77,12 +180,24 @@ function heroStyle(color: string | undefined) {
                 <p class="issue-tagline m-0">{section.attrs.note}</p>
               ) : null}
               <a
-                href={section.attrs["button-url"] ?? defaultClassifiedsButtonUrl}
-                class="inline-block rounded-[10px] bg-foreground px-4 py-2 text-base font-medium text-background no-underline hover:opacity-90"
+                {...publicLinkAttrs(
+                  section.attrs["button-url"] ?? defaultClassifiedsButtonUrl
+                )}
+                class="inline-block rounded-[10px] bg-button px-4 py-2 text-base font-medium text-button-fg no-underline hover:opacity-90"
               >
                 {section.attrs.button ?? defaultClassifiedsButton}
               </a>
             </div>
+          </div>
+        ) : section.type === "disclosure" ? (
+          <div class="grid grid-cols-[1rem_1fr] gap-1.5">
+            <span class="font-mono text-sm font-semibold text-foreground">
+              {section.attrs.chip ?? "✦"}
+            </span>
+            <div
+              class="content-prose text-sm italic text-foreground"
+              set:html={section.bodyHtml}
+            />
           </div>
         ) : section.type === "quote" ? (
           <blockquote class="m-0 border-l-2 border-border-strong pl-5">
@@ -110,8 +225,13 @@ function heroStyle(color: string | undefined) {
           <div class="content-prose" set:html={section.bodyHtml} />
         )}
       </section>
+      {section.type === "contents" ? (
+        <DitherHrCenter class="text-dither" />
+      ) : null}
+      </>
     ))
   }
+  {!hasDisclosure ? <MarkdownAgentLink href={markdownPath} /> : null}
 </div>
 
 <style>
@@ -121,5 +241,23 @@ function heroStyle(color: string | undefined) {
     color: var(--foreground-soft);
     font-size: 0.9375rem;
     line-height: 1.5;
+  }
+
+  .issue-item-description :global(:last-child),
+  .issue-item-action :global(:last-child),
+  blockquote :global(:last-child),
+  section > div :global(:last-child) {
+    margin-bottom: 0;
+  }
+
+  .issue-item-description {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .issue-intro :global(p) {
+    font-size: 18px;
+    line-height: 27px;
   }
 </style>

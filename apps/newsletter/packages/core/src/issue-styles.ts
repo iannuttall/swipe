@@ -133,7 +133,7 @@ export const issueStyles = {
     height: '25px',
   }),
   dividerSection: {
-    padding: '28px 40px',
+    padding: '22px 40px',
     lineHeight: '0',
     fontSize: '0',
     textAlign: 'left' as const,
@@ -142,6 +142,16 @@ export const issueStyles = {
     padding: '15px 0',
     verticalAlign: 'middle',
   },
+  headingMarkerCell: {
+    padding: '15px 5px 15px 0',
+    verticalAlign: 'middle',
+  },
+  headingMarker: issueText({
+    fontFamily: 'Menlo, Consolas, monospace',
+    fontSize: '14px',
+    fontWeight: 600,
+    lineHeight: '20px',
+  }),
   headingText: issueText({
     fontSize: '23px',
     fontWeight: 700,
@@ -281,10 +291,9 @@ export const issueMsoHeadHtml =
   '<!--[if mso]><style>table,td,p,h1,h2,h3,span,a,div{font-family:Helvetica,Arial,sans-serif !important;}</style><![endif]-->'
 
 export const issueResponsiveCss = `
-  /* Apple Mail auto-links postal addresses in blue; the address lives on the
-     pink footer band, so the override has to be white, not grey. */
+  /* Apple Mail auto-links postal addresses in blue. Keep the plain footer ink. */
   a[x-apple-data-detectors], .issue-address, .issue-address a {
-    color: #FFFFFF !important;
+    color: #14171E !important;
     text-decoration: none !important;
   }
   /* Dotted by default, solid on hover — the inverse of what this used to do,
@@ -295,6 +304,28 @@ export const issueResponsiveCss = `
   }
   a:hover {
     text-decoration-style: solid !important;
+  }
+  .issue-dither-dark,
+  .swipe-logo-dark {
+    display: none !important;
+  }
+  [data-ogsc] .issue-dither-light,
+  [data-ogsc] .swipe-logo-light {
+    display: none !important;
+  }
+  [data-ogsc] .issue-dither-dark,
+  [data-ogsc] .swipe-logo-dark {
+    display: block !important;
+  }
+  @media (prefers-color-scheme: dark) {
+    .issue-dither-light,
+    .swipe-logo-light {
+      display: none !important;
+    }
+    .issue-dither-dark,
+    .swipe-logo-dark {
+      display: block !important;
+    }
   }
   @media only screen and (max-width: 599px) {
     .issue-stack {

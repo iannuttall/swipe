@@ -20,6 +20,7 @@
     "newsletter:build": "pnpm --filter email build",
     "newsletter:clean": "pnpm --filter email clean",
     "newsletter:email:preview": "pnpm --filter email email:preview",
+    "newsletter:email:logo": "pnpm --filter email email:logo",
     "newsletter:lint": "pnpm --filter email lint",
     "newsletter:lint:fix": "pnpm --filter email lint:fix",
     "newsletter:test": "pnpm --filter email test",

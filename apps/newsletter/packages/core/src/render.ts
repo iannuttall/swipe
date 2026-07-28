@@ -1,6 +1,11 @@
 import { marked } from 'marked'
 import sanitizeHtml from 'sanitize-html'
-import { type IssueConditionContext, resolveIssueConditionals } from './issue-parser.js'
+import {
+  type IssueConditionContext,
+  parseIssueItem,
+  parseIssueSections,
+  resolveIssueConditionals,
+} from './issue-parser.js'
 import {
   emailTemplateDefinitions,
   isKnownEmailTemplate,
@@ -111,7 +116,27 @@ function renderDefaultEmail(input: DraftInput, contentHtml: string): RenderedEma
 }
 
 export function markdownToText(markdown: string): string {
-  return markdown
+  const normalized = parseIssueSections(markdown)
+    .map((section) => {
+      if (section.type === 'item') {
+        const item = parseIssueItem(section)
+        return [
+          item.title,
+          item.sponsor ? item.sponsorLabel : '',
+          item.description,
+          `${item.likeLabel} ${item.whatWeLike}`,
+          `${item.dislikeLabel} ${item.whatWeDontLike}`,
+        ]
+          .filter(Boolean)
+          .join('\n\n')
+      }
+      const title = section.attrs.title
+      return [title, section.body].filter(Boolean).join('\n\n')
+    })
+    .filter(Boolean)
+    .join('\n\n')
+
+  return normalized
     .replace(/```[\s\S]*?```/g, '')
     .replace(/`([^`]+)`/g, '$1')
     .replace(/!\[[^\]]*]\([^)]*\)/g, '')

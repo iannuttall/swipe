@@ -39,9 +39,13 @@
   --bg: #ffffff;
   --fg: #0f1115;
   --muted: #6b7280;
-  --accent: #ff4fa3;
-  --primary: #ff4fa3;
-  --primary-fg: #0f1115;
+  --accent: #fd30f8;
+  --accent-left: #fd30f8;
+  --accent-right: #43d8f7;
+  --primary: #4548e9;
+  --primary-fg: #ffffff;
+  --button: #4548e9;
+  --button-fg: #ffffff;
   --card: #ffffff;
   --dither: #0f1115;
   --border: #e5e7eb;
@@ -50,12 +54,14 @@
   --foreground-soft: #6b7280;
   --card-inv-bg: #0f1115;
   --card-inv-fg: #ffffff;
-  --primary-inv: #ff4fa3;
+  --primary-inv: #4548e9;
   --primary-inv-fg: #ffffff;
   --rainbow-original-light: #f08c8c, #f0a868, #e8c85a, #6dbf7b, #6aaed6, #9b8ec4, #c77dbb;
   --rainbow-original-dark: #b03a3a, #c05717, #a88b20, #2e7d42, #2362a2, #5c3da8, #8e3882;
   --rainbow-pink-light: #ff9dcc, #ff70b4, #ff4fa3, #ff82be, #ffb0d7;
   --rainbow-pink-dark: #c92d77, #e52f86, #ff4fa3, #d92778, #b51f68;
+  --rainbow-logo-light: #fd30f8, #8d3af1, #4548e9, #438fe9, #43d8f7;
+  --rainbow-logo-dark: #d928d3, #7432ca, #4548e9, #3677c7, #37b4cf;
   --rainbow-light: var(--rainbow-original-light);
   --rainbow-dark: var(--rainbow-original-dark);
   --rainbow-auto: var(--rainbow-dark);
@@ -94,14 +100,23 @@ html[data-gradient='pink'] {
   --rainbow-dark: var(--rainbow-pink-dark);
 }
 
+html[data-gradient='logo'] {
+  --rainbow-light: var(--rainbow-logo-light);
+  --rainbow-dark: var(--rainbow-logo-dark);
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #191c1e;
     --fg: #ece8e1;
     --muted: #a3a3a3;
-    --accent: #ff4fa3;
-    --primary: #ff4fa3;
+    --accent: #fd30f8;
+    --accent-left: #fd30f8;
+    --accent-right: #43d8f7;
+    --primary: #8b8dff;
     --primary-fg: #0f1115;
+    --button: #8b8dff;
+    --button-fg: #0f1115;
     --card: #1f2225;
     --dither: #a3a3a3;
     --border: #5a5d60;
@@ -194,13 +209,15 @@ html[data-gradient='pink'] {
 }
 
 .subscribe-button {
-  background-color: var(--primary);
-  background-image: none;
+  background-color: #ff4fa3;
+  background-image: linear-gradient(135deg, #ff8cc5 0%, #ff4fa3 48%, #d92778 100%);
+  background-position: 25% 30%;
+  background-size: 180% 180%;
 }
 
 .subscribe-button:hover {
-  background-color: var(--primary);
-  background-image: linear-gradient(135deg, #ff8cc5 0%, #ff4fa3 48%, #d92778 100%);
+  background-color: #ff4fa3;
+  background-image: linear-gradient(135deg, #ffb0d7 0%, #ff70b4 46%, #c92d77 100%);
   background-size: 180% 180%;
   animation: pink-button-drift 2.8s ease-in-out infinite alternate;
 }
@@ -236,6 +253,8 @@ html[data-gradient='pink'] {
   --color-accent: var(--accent);
   --color-primary: var(--primary);
   --color-primary-fg: var(--primary-fg);
+  --color-button: var(--button);
+  --color-button-fg: var(--button-fg);
   --color-card: var(--card);
   --color-dither: var(--dither);
   --color-border: var(--border);

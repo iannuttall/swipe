@@ -49,6 +49,7 @@ async function draftInput(parsed: ParsedArgs): Promise<DraftInput> {
   return {
     subject,
     bodyMarkdown,
+    ...(getStringFlag(parsed, 'name') ? { name: mustString(parsed, 'name') } : {}),
     ...(getStringFlag(parsed, 'preview')
       ? { preview: mustString(parsed, 'preview') }
       : {}),

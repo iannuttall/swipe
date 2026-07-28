@@ -11,7 +11,13 @@ export * from './db/migrate.js'
 export * from './delivery-planner.js'
 export * from './email-address.js'
 export * from './factory.js'
-export { parseIssueSections, parseLinkItem } from './issue-parser.js'
+export {
+  type IssueItem,
+  parseIssueItem,
+  parseIssueItems,
+  parseIssueSections,
+  parseLinkItem,
+} from './issue-parser.js'
 export * from './link-metadata.js'
 export * from './platform.js'
 export * from './platform-contracts.js'

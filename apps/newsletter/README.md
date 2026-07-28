@@ -229,8 +229,9 @@ Use `--json` for scripts and agents.
 
 Markdown is the authoring format. The default template is the normal Swipe
 React Email shell. Reusable layout uses small component-style blocks such as
-`<Links>`, `<Sponsor>`, `<Box>`, `<Classifieds>`, `<Quote>`, and `<Poll>`.
-These are parsed as data, not executed as arbitrary MDX.
+`<Item>`, `<ReachOut>`, `<Disclosure>`, `<Links>`, `<Sponsor>`, `<Box>`,
+`<Classifieds>`, and `<Quote>`. These are parsed as data, not executed as
+arbitrary MDX.
 
 Use `<Header name="Issue 001" />` to override the small top-right label.
 
@@ -255,7 +256,7 @@ Air quality monitor
 Configure alerts for nearby sensors.
 </Links>
 
-<Classifieds title="Classifieds" button="Book yours ↗︎" button-url="https://swipe.md/advertise">
+<Classifieds title="Classifieds" button="Book yours ↗︎" button-url="mailto:ian@swipe.md?subject=Sponsor%20Swipe">
 ## MicroSponsor
 [MicroSponsor](https://example.com) is a tiny classified placement for builders.
 
@@ -263,6 +264,34 @@ Configure alerts for nearby sensors.
 [Toolmaker Jobs](https://example.com) lists small teams hiring practical software people.
 </Classifieds>
 ```
+
+New issue picks use one first-class item block:
+
+```md
+<Item id="agent-grade" title="AgentGrade" url="https://agentgrade.dev" new="true">
+Agent setup grading.
+
+<Like>
+Run the same task against two agent setups and compare the result.
+</Like>
+
+<Dislike>
+The result only matters when the test resembles your real work.
+</Dislike>
+</Item>
+```
+
+`id` and `title` are required. Keep the opening description to three or four
+words. `<Like>` and `<Dislike>` are required. Established products use `＋`;
+`new="true"` uses `β`, and `sponsor="true"` uses `✦` plus the paid label. Item
+IDs become stable archive anchors. Finish the issue with `<ReachOut>` and
+`<Disclosure>` when needed; the direct agent Markdown link is inserted before
+the disclosure.
+
+Put the sponsor first, then three established products, then five new or early
+products. The template generates `Useful tools` and `New and early` headings.
+Use `mailto:ian@swipe.md?subject=Sponsor%20Swipe` for sponsor responses until a
+dedicated landing page has enough supporting data.
 
 Recipient-only content uses one explicit condition:
 
@@ -280,9 +309,8 @@ status is snapshotted when the broadcast is planned. Conditional content is
 omitted from the public issue archive. Local previews and test sends default to
 the cold variant; pass `--status warm` to verify the normal version.
 
-Section headings use text markers, so email clients cannot squash icon cells on
-mobile. Defaults are `▲` for normal text sections, `✦` for sponsor, `＋` for
-links, and `◆` for classifieds. Override with `marker="..."` on any section.
+Section headings are plain type. Item blocks use a `＋` chip by default; change
+it with the `chip` attribute only when the content calls for it.
 
 Render the selected template before real sends:
 

@@ -4,8 +4,9 @@ import { issueColors, issueText } from './issue-styles.js'
 const markdownBase = {
   p: issueText({ marginBottom: '15px' }),
   link: {
-    color: issueColors.ink,
+    color: issueColors.accentInk,
     textDecoration: 'underline',
+    textDecorationStyle: 'dotted' as const,
     textUnderlineOffset: '2px',
     backgroundColor: 'transparent',
   },

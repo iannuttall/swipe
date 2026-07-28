@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import { normalizeCodeLanguage, splitIssueBody } from './issue-code.js'
+import { issueColors } from './issue-palette.js'
 import { renderDraftEmail } from './render.js'
 
 describe('splitIssueBody', () => {
@@ -44,7 +45,11 @@ describe('fenced code in issues', () => {
       bodyMarkdown: ['Intro.', '', '```bash', 'pnpm swipe check site', '```'].join('\n'),
     })
 
-    assert.match(rendered.html, /<pre[^>]*Menlo[^>]*#F2F2F2/)
+    // Asserted against the token so a palette change does not silently drift.
+    assert.match(
+      rendered.html,
+      new RegExp(`<pre[^>]*Menlo[^>]*${issueColors.highlight}`, 'i'),
+    )
     assert.doesNotMatch(rendered.html, /SFMono-Regular/)
     // CodeBlock inserts zero-width characters between words to preserve
     // whitespace in email clients, so match tokens individually.

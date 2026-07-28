@@ -26,7 +26,6 @@ export const issueSectionTypes = [
   'box',
   'classifieds',
   'quote',
-  'poll',
   'footer',
 ] as const
 

@@ -15,10 +15,10 @@ import {
 import { issueFooter } from './issue-footer.js'
 import { type IssueSection, parseIssueSections } from './issue-parser.js'
 import {
-  headingMarker,
+  issueSectionDivider,
   issueSpacer,
   mdBlockWithCode,
-  squareHeading,
+  sectionHeading,
 } from './issue-sections.js'
 import { issueResponsiveCss } from './issue-styles.js'
 import { renderIssueSection } from './issue-template.js'
@@ -37,14 +37,7 @@ type TrackedLinkProps = ComponentProps<typeof Link> & {
 
 // Issue building blocks that can be dropped into the default shell. Chrome types
 // (hero/header/footer) stay owned by each template's own shell.
-const defaultModularTypes = new Set([
-  'links',
-  'sponsor',
-  'box',
-  'classifieds',
-  'quote',
-  'poll',
-])
+const defaultModularTypes = new Set(['links', 'sponsor', 'box', 'classifieds', 'quote'])
 
 // Default text sits 40px from the shell edge on desktop. React Email puts
 // Section padding on a generated inner <td>, so responsive gutter classes must
@@ -107,7 +100,7 @@ export function DefaultEmail(draft: DraftInput) {
   )
   const blocks: ReactNode[] = []
   sections.forEach((section, index) => {
-    if (index > 0) blocks.push(issueSpacer(`default-spacer-${index}`))
+    if (index > 0) blocks.push(issueSectionDivider(`default-divider-${index}`))
     blocks.push(h(Fragment, { key: index }, defaultBlock(section)))
   })
 
@@ -145,13 +138,12 @@ export function DefaultEmail(draft: DraftInput) {
 // Colored surfaces sit their box edge on the 40px text gutter; sections
 // without a surface use the 20px wrapper so their copy (with its own 20px
 // cells) lands on that same gutter.
-const defaultColoredTypes = new Set(['sponsor', 'box', 'poll'])
+const defaultColoredTypes = new Set(['sponsor', 'box'])
 
 const defaultSectionTitles: Record<string, string> = {
   sponsor: 'Sponsor',
   links: 'Links',
   classifieds: 'Classifieds',
-  poll: 'Poll',
 }
 
 function defaultBlock(section: IssueSection) {
@@ -162,7 +154,7 @@ function defaultBlock(section: IssueSection) {
       defaultCell(
         'default-content-cell',
         defaultEmailStyles.textWrap,
-        squareHeading(section.attrs.title, headingMarker(section)),
+        sectionHeading(section.attrs.title),
       ),
       defaultCell(
         'default-content-cell',
@@ -184,7 +176,7 @@ function defaultBlock(section: IssueSection) {
       ? defaultCell(
           'default-content-cell',
           defaultEmailStyles.textWrap,
-          squareHeading(title, headingMarker(section)),
+          sectionHeading(title),
         )
       : null
     const body = defaultColoredTypes.has(section.type)
@@ -208,7 +200,9 @@ function defaultBlock(section: IssueSection) {
 }
 
 function defaultFooterBand(footer: IssueSection | undefined) {
-  return issueFooter(footer, undefined, barebonesColors.bg3, 'default-footer')
+  // Undefined so the footer uses its own brand band; the old bg3 grey is what
+  // made the white footer type invisible.
+  return issueFooter(footer, undefined, undefined, 'default-footer')
 }
 
 function defaultHeader(header: IssueSection | undefined, minutes?: number) {

@@ -10,7 +10,6 @@ import {
 import { issueFooter } from './issue-footer.js'
 import type { IssueSection } from './issue-parser.js'
 import { parseIssueSections } from './issue-parser.js'
-import { pollSection } from './issue-poll.js'
 import {
   boxSection,
   classifiedsSection,
@@ -81,8 +80,6 @@ export function renderIssueSection(section: IssueSection, withHeading = true): R
       return classifiedsSection(section, withHeading)
     case 'quote':
       return quoteSection(section, withHeading)
-    case 'poll':
-      return pollSection(section, withHeading)
     default:
       return textSection(section, withHeading)
   }

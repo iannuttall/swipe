@@ -55,14 +55,6 @@ The simplest authoring format is the one you can remember six days later.
 — Test issue
 </Quote>
 
-<Poll title="Poll" question="Which authoring format would you rather use?" color="yellow">
-## [Component blocks](https://ian.is)
-
-## [Old directive fences](https://ian.is)
-
-## [Plain Markdown only](https://ian.is)
-</Poll>
-
 <Conditional if="status:cold">
 <Box title="Cold subscriber conditional" color="red">
 This block is included in the cold test email. It is removed from warm/new emails and from the public Astro issue archive.

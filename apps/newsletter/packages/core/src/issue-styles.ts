@@ -132,6 +132,12 @@ export const issueStyles = {
     lineHeight: '25px',
     height: '25px',
   }),
+  dividerSection: {
+    padding: '28px 40px',
+    lineHeight: '0',
+    fontSize: '0',
+    textAlign: 'left' as const,
+  },
   headingCell: {
     padding: '15px 0',
     verticalAlign: 'middle',
@@ -141,13 +147,6 @@ export const issueStyles = {
     fontWeight: 700,
     lineHeight: '27px',
     margin: 0,
-  }),
-  headingMarker: issueText({
-    display: 'inline-block',
-    fontSize: '21px',
-    lineHeight: '1',
-    marginRight: '10px',
-    verticalAlign: 'middle',
   }),
   narrowLeftCell: {
     padding: '15px 10px 5px 20px',
@@ -174,7 +173,7 @@ export const issueStyles = {
   },
   linkTitle: issueText({ fontWeight: 600, marginBottom: '5px' }),
   linkTitleAnchor: {
-    color: issueColors.ink,
+    color: issueColors.accentInk,
     textDecoration: 'underline',
     textUnderlineOffset: '2px',
   },
@@ -193,7 +192,7 @@ export const issueStyles = {
   },
   classifiedNote: issueText({ color: issueColors.grey, marginBottom: '15px' }),
   classifiedLink: {
-    color: issueColors.ink,
+    color: issueColors.accentInk,
     fontWeight: 600,
     textDecoration: 'underline',
     textUnderlineOffset: '2px',
@@ -217,43 +216,8 @@ export const issueStyles = {
     lineHeight: '31px',
     color: issueColors.grey,
   }),
-  pollQuestion: issueText({ fontSize: '21px', lineHeight: '31px', marginBottom: '15px' }),
-  pollResultsLink: {
-    color: issueColors.grey,
-    textDecoration: 'underline',
-    textUnderlineOffset: '2px',
-  },
-  pollResultsText: issueText({
-    fontSize: '14px',
-    lineHeight: '19px',
-    color: issueColors.grey,
-    marginBottom: '15px',
-  }),
-  pollLetterCell: {
-    width: '34px',
-    padding: '7px 0',
-    textAlign: 'center' as const,
-    verticalAlign: 'middle',
-  },
-  pollLetterText: issueText({
-    fontWeight: 700,
-    color: '#FFFFFF',
-    textAlign: 'center' as const,
-  }),
-  pollOptionCell: {
-    backgroundColor: '#FFFFFF',
-    padding: '7px 12px',
-    verticalAlign: 'middle',
-  },
-  pollOptionLink: {
-    color: issueColors.ink,
-    textDecoration: 'underline',
-    textUnderlineOffset: '2px',
-  },
-  pollOptionText: issueText({}),
-  pollRowGap: issueText({ fontSize: '1px', lineHeight: '5px', height: '5px' }),
   footerBand: {
-    backgroundColor: issueColors.highlight,
+    backgroundColor: issueColors.accent,
   },
   footerCenterCell: {
     padding: '20px 20px 0',
@@ -264,43 +228,50 @@ export const issueStyles = {
     fontSize: '21px',
     fontWeight: 600,
     lineHeight: '23px',
+    color: '#FFFFFF',
     marginBottom: '15px',
     textAlign: 'center' as const,
   }),
   shareBox: issueText({
     margin: '0 0 15px',
     padding: '13px 5px 15px',
-    backgroundColor: '#FFFFFF',
-    border: '2px dashed #C7C7C7',
+    backgroundColor: 'transparent',
+    border: '2px solid #FFFFFF',
+    color: '#FFFFFF',
     fontWeight: 600,
     textAlign: 'center' as const,
   }),
   shareVia: issueText({
     fontSize: '14px',
     lineHeight: '19px',
+    color: '#FFFFFF',
     marginBottom: '15px',
     textAlign: 'center' as const,
   }),
   shareLink: {
-    color: issueColors.ink,
+    color: '#FFFFFF',
     textDecoration: 'underline',
     textUnderlineOffset: '2px',
   },
-  footerText: issueText({ marginBottom: '15px', textAlign: 'left' as const }),
+  footerText: issueText({
+    color: '#FFFFFF',
+    marginBottom: '15px',
+    textAlign: 'left' as const,
+  }),
   footerSmall: issueText({
     fontSize: '16px',
     lineHeight: '23px',
-    color: issueColors.grey,
+    color: '#FFFFFF',
     marginBottom: '15px',
     textAlign: 'left' as const,
   }),
   footerLink: {
-    color: issueColors.ink,
+    color: '#FFFFFF',
     textDecoration: 'underline',
     textUnderlineOffset: '2px',
   },
   footerMutedLink: {
-    color: issueColors.grey,
+    color: '#FFFFFF',
     textDecoration: 'underline',
     textUnderlineOffset: '2px',
   },
@@ -310,13 +281,20 @@ export const issueMsoHeadHtml =
   '<!--[if mso]><style>table,td,p,h1,h2,h3,span,a,div{font-family:Helvetica,Arial,sans-serif !important;}</style><![endif]-->'
 
 export const issueResponsiveCss = `
+  /* Apple Mail auto-links postal addresses in blue; the address lives on the
+     pink footer band, so the override has to be white, not grey. */
   a[x-apple-data-detectors], .issue-address, .issue-address a {
-    color: ${issueColors.grey} !important;
+    color: #FFFFFF !important;
     text-decoration: none !important;
   }
-  a:hover {
+  /* Dotted by default, solid on hover — the inverse of what this used to do,
+     and the same treatment as prose links on swipe.md. */
+  a {
     text-decoration-style: dotted !important;
-    text-underline-offset: 2px !important;
+    text-underline-offset: 3px !important;
+  }
+  a:hover {
+    text-decoration-style: solid !important;
   }
   @media only screen and (max-width: 599px) {
     .issue-stack {

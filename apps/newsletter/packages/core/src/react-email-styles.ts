@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react'
+import { issueColors } from './issue-palette.js'
 
 export const fontFamily = 'Inter, Helvetica, Arial, sans-serif'
 
@@ -41,7 +42,7 @@ export const defaultEmailStyles = {
   body: {
     margin: 0,
     padding: 0,
-    backgroundColor: barebonesColors.bg2,
+    backgroundColor: barebonesColors.bg,
     color: barebonesColors.fg,
     fontFamily,
     textAlign: 'center',
@@ -49,7 +50,7 @@ export const defaultEmailStyles = {
   frame: {
     maxWidth: '640px',
     width: '100%',
-    margin: '32px auto 0',
+    margin: '0 auto',
     backgroundColor: barebonesColors.bg,
   },
   shell: {
@@ -79,6 +80,10 @@ export const defaultEmailStyles = {
   },
   logoLink: {
     display: 'inline-block',
+    // Without an explicit colour a bare <a> inherits the client's default link
+    // blue, which made the wordmark render blue in every inbox.
+    color: issueColors.ink,
+    fontWeight: 600,
     textDecoration: 'none',
   },
   logo: {
@@ -196,9 +201,10 @@ export const defaultEmailMarkdownStyles = {
     lineHeight: '27px',
   },
   link: {
-    color: barebonesColors.fg,
+    color: issueColors.accentInk,
     textDecoration: 'underline',
-    textUnderlineOffset: '2px',
+    textDecorationStyle: 'dotted' as const,
+    textUnderlineOffset: '3px',
     backgroundColor: 'transparent',
   },
   ul: { margin: '0 0 24px', paddingLeft: '22px', listStyleType: 'square' },

@@ -8,14 +8,6 @@ import {
   type IssueSection,
 } from "./parser";
 
-// Web mirror of the email markers in @email/core issue-sections.ts.
-const sectionMarkers: Record<string, string> = {
-  sponsor: "✦",
-  links: "＋",
-  classifieds: "◆",
-  poll: "?",
-};
-
 // Email-only chrome; the site layout provides its own.
 const skippedTypes = new Set(["header", "footer"]);
 
@@ -24,7 +16,6 @@ const defaultTitles: Record<string, string> = {
   sponsor: "Sponsor",
   links: "Links",
   classifieds: "Classifieds",
-  poll: "Poll",
 };
 
 export interface IssueLinkItemView extends IssueLinkItem {
@@ -34,7 +25,6 @@ export interface IssueLinkItemView extends IssueLinkItem {
 export interface IssueSectionView {
   type: string;
   attrs: Record<string, string>;
-  marker: string;
   title: string | undefined;
   bodyHtml: string;
   items: IssueLinkItemView[];
@@ -109,7 +99,6 @@ async function toView(section: IssueSection): Promise<IssueSectionView> {
   const view: IssueSectionView = {
     type: section.type,
     attrs: section.attrs,
-    marker: section.attrs.marker ?? sectionMarkers[section.type] ?? "▲",
     title: section.attrs.title ?? defaultTitles[section.type],
     bodyHtml: "",
     items: [],
@@ -126,7 +115,7 @@ async function toView(section: IssueSection): Promise<IssueSectionView> {
     return view;
   }
 
-  if (section.type === "classifieds" || section.type === "poll") {
+  if (section.type === "classifieds") {
     view.itemsHtml = await Promise.all(section.items.map(markdownToHtml));
     return view;
   }

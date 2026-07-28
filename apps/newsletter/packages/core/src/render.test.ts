@@ -71,15 +71,12 @@ describe('renderDraft', () => {
     })
 
     assert.match(rendered.html, /Plain intro text/)
-    assert.match(rendered.html, /▲/)
     assert.match(rendered.html, /What to expect/)
-    assert.match(rendered.html, /✦/)
     assert.match(rendered.html, /Sponsor Title/)
-    assert.match(rendered.html, /#F1F1F1/)
     assert.match(rendered.html, /Issue 001/)
-    assert.match(rendered.html, /＋/)
     assert.match(rendered.html, /Worth a Click/)
-    assert.match(rendered.html, /◆/)
+    // Section headings are plain type; the ▲ ✦ ＋ ◆ markers are gone.
+    assert.doesNotMatch(rendered.html, /[▲✦＋◆]/)
     assert.match(rendered.html, /Classifieds/)
     assert.match(rendered.html, /Advertise in Swipe[\s\S]*Unsubscribe/)
     assert.doesNotMatch(rendered.html, /Browse older issues/)

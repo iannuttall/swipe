@@ -10,7 +10,6 @@ const sections = await renderIssueSections(body);
 
 const defaultClassifiedsButton = "Book yours ↗︎";
 const defaultClassifiedsButtonUrl = "https://swipe.md/advertise";
-const letters = "ABCDEFGHIJ";
 const tintedTypes = new Set(["box", "sponsor"]);
 
 function heroStyle(color: string | undefined) {
@@ -25,10 +24,7 @@ function heroStyle(color: string | undefined) {
     sections.map((section) => (
       <section>
         {section.title ? (
-          <h2 class="mb-5 flex items-center gap-2.5 text-[1.4375rem] leading-[1.6875rem] font-bold text-foreground">
-            <span aria-hidden="true" class="text-[1.3125rem] leading-none">
-              {section.marker}
-            </span>
+          <h2 class="mb-5 font-heading text-[1.4375rem] leading-[1.6875rem] font-semibold tracking-tight text-foreground">
             {section.title}
           </h2>
         ) : null}
@@ -92,31 +88,6 @@ function heroStyle(color: string | undefined) {
           <blockquote class="m-0 border-l-2 border-border-strong pl-5">
             <div class="content-prose text-foreground-muted" set:html={section.bodyHtml} />
           </blockquote>
-        ) : section.type === "poll" ? (
-          <div class="rounded-lg p-6" style={tintStyle(section.attrs.color ?? "yellow")}>
-            {section.attrs.question ? (
-              <p class="m-0 mb-4 text-xl leading-snug font-medium text-foreground">
-                {section.attrs.question}
-              </p>
-            ) : null}
-            <ul class="m-0 flex list-none flex-col gap-2 p-0">
-              {section.itemsHtml.map((itemHtml, index) => (
-                <li class="flex items-center gap-3">
-                  <span
-                    aria-hidden="true"
-                    class="flex size-8 shrink-0 items-center justify-center rounded-sm text-sm font-semibold text-white"
-                    style={`background-color: ${sectionColors(section.attrs.color ?? "yellow").square}`}
-                  >
-                    {letters[index] ?? "•"}
-                  </span>
-                  <div class="content-prose issue-poll-option" set:html={itemHtml} />
-                </li>
-              ))}
-            </ul>
-            <p class="issue-tagline mt-4">
-              Polls run inside the email. Subscribe to vote on the next one.
-            </p>
-          </div>
         ) : section.type === "hero" ? (
           <div class="rounded-lg p-6" style={heroStyle(section.attrs.color)}>
             {section.bodyHtml ? (

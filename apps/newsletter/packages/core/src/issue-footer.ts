@@ -1,91 +1,76 @@
 import { Fragment, createElement as h, type ReactNode } from 'react'
-import { Column, Link, Row, Section, Text } from 'react-email'
+import { Column, Img, Link, Row, Section, Text } from 'react-email'
 import { fullBleed, issueSiteUrl } from './issue-chrome.js'
 import { issueInlineMarkdownStyles } from './issue-markdown-styles.js'
 import type { IssueSection } from './issue-parser.js'
 import { issueSpacer, mdBlock } from './issue-sections.js'
 import { issueColors, issueLayout, issueStyles } from './issue-styles.js'
 
-const defaultBlurb = `**Swipe** helps you learn AI by stealing useful skills, prompts, tools, and workflows. Thanks for reading all the way to the end.
+// Matches the signup pitch on swipe.md so the email and the site say the same
+// thing in the same words.
+const defaultBlurb = `**Swipe** is the newsletter to learn AI by stealing the cool ideas, skills, and tools you didn't know you needed.
 
-If someone forwarded this to you, you can [subscribe here](${issueSiteUrl}).`
+If someone forwarded this to you, [subscribe here](${issueSiteUrl}).`
 
-const defaultShareText = 'Really enjoying Swipe. Check out this issue:'
-
-// Dense Discovery-style mega footer: a full-width grey band holding a
-// centered share box plus a blurb/links two-column block.
+// One plain column: blurb, then the small print. The share box and the
+// blurb/links split are gone; a footer does not need to be a layout.
 export function issueFooter(
   footer: IssueSection | undefined,
-  shareUrl?: string,
+  _shareUrl?: string,
   background?: string,
   className?: string,
 ) {
   const attrs = footer?.attrs ?? {}
-  const url = attrs['share-url'] ?? shareUrl
-  return fullBleed(
-    background ?? issueColors.highlight,
-    className,
-    issueSpacer('footer-top'),
-    url ? shareBlock(url, attrs['share-text'] ?? defaultShareText) : null,
-    h(
-      Section,
-      null,
+  return h(
+    Fragment,
+    null,
+    ditherEdge(),
+    fullBleed(
+      background ?? issueColors.accent,
+      className,
+      issueSpacer('footer-top'),
       h(
-        Row,
+        Section,
         null,
         h(
-          Column,
-          {
-            className: 'issue-stack issue-cell issue-footer-blurb',
-            style: issueStyles.wideLeftCell,
-            width: issueLayout.wideCol,
-          },
-          blurb(footer),
-        ),
-        h(
-          Column,
-          {
-            className: 'issue-stack issue-cell issue-footer-links',
-            style: issueStyles.narrowRightCell,
-            width: issueLayout.narrowCol,
-          },
-          footerLinks(attrs),
+          Row,
+          null,
+          h(
+            Column,
+            {
+              className: 'issue-cell issue-footer-blurb',
+              style: issueStyles.wideLeftCell,
+            },
+            blurb(footer),
+            footerLinks(attrs),
+          ),
         ),
       ),
+      issueSpacer('footer-bottom'),
     ),
-    issueSpacer('footer-bottom'),
   )
 }
 
-function shareBlock(url: string, shareText: string) {
-  const display = url.replace(/^https?:\/\//, '')
-  const tweet = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`${shareText} ${url}`)}`
-  const mail = `mailto:?subject=${encodeURIComponent('Newsletter recommendation')}&body=${encodeURIComponent(`${shareText} ${url}`)}`
+// The page breaking apart into the footer, matching swipe.md. A PNG rather
+// than the site's SVG because Gmail drops SVG entirely, and pre-tinted because
+// email has no currentColor to inherit.
+function ditherEdge() {
   return h(
     Section,
-    null,
-    h(
-      Row,
-      null,
-      h(
-        Column,
-        { className: 'issue-cell', style: issueStyles.footerCenterCell },
-        h(Text, { style: issueStyles.shareHeading }, 'Enjoyed this issue? Share it:'),
-        h(
-          Text,
-          { style: issueStyles.shareBox },
-          h(Link, { href: url, style: issueStyles.shareLink }, display),
-        ),
-        h(
-          Text,
-          { style: issueStyles.shareVia },
-          'Share via: ',
-          h(Link, { href: tweet, style: issueStyles.shareLink }, 'X'),
-          ' / ',
-          h(Link, { href: mail, style: issueStyles.shareLink }, 'Email'),
-        ),
-      ),
-    ),
+    { style: { lineHeight: '0', fontSize: '0' } },
+    h(Img, {
+      src: `${issueSiteUrl}/email/dither-edge.png`,
+      alt: '',
+      width: issueLayout.width,
+      height: 32,
+      style: {
+        display: 'block',
+        width: '100%',
+        maxWidth: '100%',
+        height: '32px',
+        border: '0',
+      },
+    }),
   )
 }
 
@@ -128,11 +113,13 @@ function footerLinks(attrs: Record<string, string>) {
     h(
       Text,
       { style: issueStyles.footerSmall },
+      'Had enough? ',
       h(
         Link,
         { href: '{{unsubscribeUrl}}', style: issueStyles.footerMutedLink },
         'Unsubscribe',
       ),
+      '.',
     ),
   )
 }

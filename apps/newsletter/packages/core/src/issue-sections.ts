@@ -17,18 +17,29 @@ import {
 
 const defaultClassifiedsButton = 'Book yours ↗︎'
 const defaultClassifiedsButtonUrl = 'https://swipe.md/advertise'
-const sectionMarkers: Record<string, string> = {
-  sponsor: '✦',
-  links: '＋',
-  classifieds: '◆',
-  poll: '?',
-}
 
 export function issueSpacer(key?: string) {
   return h(
     Section,
     { key },
     h(Text, { className: 'issue-spacer', style: issueStyles.spacer }, ' '),
+  )
+}
+
+// Section separator: the same dither line the site uses under page headers,
+// as a PNG because Gmail drops SVG. Rendered at its natural 60x2 from a 4x
+// source so it stays crisp on retina.
+export function issueSectionDivider(key?: string) {
+  return h(
+    Section,
+    { key, style: issueStyles.dividerSection },
+    h(Img, {
+      src: 'https://swipe.md/email/dither-line.png',
+      alt: '',
+      width: 60,
+      height: 2,
+      style: { display: 'block', border: '0' },
+    }),
   )
 }
 
@@ -52,10 +63,6 @@ export function mdBlock(
     // biome-ignore lint/correctness/noChildrenProp: React Email Markdown types require this prop.
     children: withHardLineBreaks(withHighlights(markdown)),
   })
-}
-
-export function headingMarker(section: IssueSection): string {
-  return section.attrs.marker ?? sectionMarkers[section.type] ?? '▲'
 }
 
 // mdBlock plus fenced-code awareness: markdown renders through the Markdown
@@ -84,7 +91,9 @@ export function mdBlockWithCode(
   )
 }
 
-export function squareHeading(title: string, marker = '▲') {
+// Section headings are plain type. The marker column that used to sit before
+// them read as decoration once the palette lost its per-section colours.
+export function sectionHeading(title: string) {
   return h(
     Section,
     null,
@@ -94,12 +103,7 @@ export function squareHeading(title: string, marker = '▲') {
       h(
         Column,
         { style: issueStyles.headingCell },
-        h(
-          Text,
-          { style: issueStyles.headingText },
-          h('span', { style: issueStyles.headingMarker }, marker),
-          h('span', null, title),
-        ),
+        h(Text, { style: issueStyles.headingText }, title),
       ),
     ),
   )
@@ -142,9 +146,7 @@ export function textSection(section: IssueSection, withHeading = true) {
   return h(
     Fragment,
     null,
-    withHeading && section.attrs.title
-      ? squareHeading(section.attrs.title, headingMarker(section))
-      : null,
+    withHeading && section.attrs.title ? sectionHeading(section.attrs.title) : null,
     h(
       Section,
       null,
@@ -189,9 +191,7 @@ export function linksSection(section: IssueSection, withHeading = true) {
   return h(
     Fragment,
     null,
-    withHeading
-      ? squareHeading(section.attrs.title ?? 'Links', headingMarker(section))
-      : null,
+    withHeading ? sectionHeading(section.attrs.title ?? 'Links') : null,
     h(Section, null, ...rows),
   )
 }
@@ -199,9 +199,7 @@ export function linksSection(section: IssueSection, withHeading = true) {
 export function boxSection(section: IssueSection, withHeading = true) {
   const colors = resolveSectionColors(section.attrs.color)
   const heading =
-    withHeading && section.attrs.title
-      ? squareHeading(section.attrs.title, headingMarker(section))
-      : null
+    withHeading && section.attrs.title ? sectionHeading(section.attrs.title) : null
   const background = colors.tint
   const content = mdBlockWithCode(section.body)
   let body: ReactNode
@@ -288,28 +286,33 @@ export function classifiedsSection(section: IssueSection, withHeading = true) {
     : null
   const buttonLabel = section.attrs.button ?? defaultClassifiedsButton
   const buttonUrl = section.attrs['button-url'] ?? defaultClassifiedsButtonUrl
-  const button =
+  // A plain sentence rather than a pill button in its own column. The two-column
+  // split made a short list feel like a layout.
+  const cta =
     buttonLabel && buttonUrl
       ? h(
           Text,
-          { style: { margin: '0 0 15px', padding: 0 } },
-          h(Link, { href: buttonUrl, style: issueStyles.button }, buttonLabel),
+          { style: issueStyles.classifiedNote },
+          h(Link, { href: buttonUrl, style: issueStyles.classifiedLink }, buttonLabel),
         )
       : null
   return h(
     Fragment,
     null,
-    withHeading
-      ? squareHeading(section.attrs.title ?? 'Classifieds', headingMarker(section))
-      : null,
+    withHeading ? sectionHeading(section.attrs.title ?? 'Classifieds') : null,
     h(
       Section,
       null,
-      stackedColumns(
-        h(Fragment, null, ...entries),
-        h(Fragment, null, note, button),
-        [issueLayout.wideCol, issueLayout.narrowCol],
-        [issueStyles.wideLeftCell, issueStyles.narrowRightCell],
+      h(
+        Row,
+        null,
+        h(
+          Column,
+          { className: 'issue-cell', style: issueStyles.fullCell },
+          ...entries,
+          note,
+          cta,
+        ),
       ),
     ),
   )
@@ -330,9 +333,7 @@ export function quoteSection(section: IssueSection, withHeading = true) {
   return h(
     Fragment,
     null,
-    withHeading && section.attrs.title
-      ? squareHeading(section.attrs.title, headingMarker(section))
-      : null,
+    withHeading && section.attrs.title ? sectionHeading(section.attrs.title) : null,
     h(
       Section,
       null,

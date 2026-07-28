@@ -187,14 +187,16 @@ render tests. For multi-item blocks like `<Links>` and `<Classifieds>`, start
 each item with a normal Markdown heading. Classifieds button attrs are `button`
 and `button-url`. The legacy `:::` dialect stays supported for published issues
 but must not be used for new drafts.
-Section headings use inline text markers, not separate square/icon columns:
-`▲` default, `✦` sponsor, `＋` links, `◆` classifieds. Override per section
-with `marker="..."` if a campaign needs a different symbol.
+Section headings are plain type. There are no marker glyphs before them and no
+`marker` attribute; a heading earns attention through weight and spacing.
+
+There is no poll block. Polls cannot be answered inside an email without a
+round trip, and the archive could only ever show them as dead options.
 
 Available templates:
 
 - `default`: Swipe shell. Body text renders at 18px; it accepts component
-  blocks (`<Links>`, `<Sponsor>`, `<Box>`, `<Classifieds>`, `<Quote>`, `<Poll>`)
+  blocks (`<Links>`, `<Sponsor>`, `<Box>`, `<Classifieds>`, `<Quote>`)
   for mixed campaigns. Use `<Header name="Issue 001" />` to override the
   top-right label. `<Conditional if="status:cold">` is the only recipient
   condition; it is hidden from the public archive.

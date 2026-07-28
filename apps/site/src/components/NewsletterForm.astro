@@ -44,36 +44,38 @@ const inputId = `newsletter-${source.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}
   <form
     x-show="status !== 'success'"
     x-on:submit.prevent="submit"
-    class="flex flex-col gap-2 sm:flex-row sm:items-end"
+    class="space-y-2"
   >
-    <label for={inputId} class="sr-only">Email address</label>
-    <Input
-      id={inputId}
-      name="email"
-      type="email"
-      size={compact ? "default" : "hero"}
-      x-model="email"
-      x-bind:aria-invalid="status === 'error' ? 'true' : 'false'"
-      placeholder="sam@openai.com"
-      autocomplete="email"
-      required
-    />
-    <Button
-      type="submit"
-      variant="primary"
-      size={compact ? "default" : "hero"}
-      x-bind:disabled="status === 'loading'"
-      class:list={[!compact && "subscribe-button text-white"]}
-    >
-      <span x-text={`status === 'loading' ? 'Sending...' : ${JSON.stringify(buttonText)}`}>
-        {buttonText}
-      </span>
-    </Button>
+    <div class="flex flex-col gap-2 sm:flex-row sm:items-end">
+      <label for={inputId} class="sr-only">Email address</label>
+      <Input
+        id={inputId}
+        name="email"
+        type="email"
+        size={compact ? "default" : "hero"}
+        x-model="email"
+        x-bind:aria-invalid="status === 'error' ? 'true' : 'false'"
+        placeholder="sam@openai.com"
+        autocomplete="email"
+        required
+      />
+      <Button
+        type="submit"
+        variant="primary"
+        size={compact ? "default" : "hero"}
+        x-bind:disabled="status === 'loading'"
+        class:list={[!compact && "subscribe-button text-white"]}
+      >
+        <span x-text={`status === 'loading' ? 'Sending...' : ${JSON.stringify(buttonText)}`}>
+          {buttonText}
+        </span>
+      </Button>
+    </div>
     <p
       x-cloak
       x-show="status === 'error'"
       x-text="message"
-      class="text-sm sm:basis-full"
+      class="text-sm"
       role="alert"
     >
     </p>

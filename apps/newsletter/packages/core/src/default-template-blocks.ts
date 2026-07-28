@@ -12,6 +12,7 @@ const modularTypes = new Set([
   'sponsor',
   'box',
   'classifieds',
+  'cta',
   'quote',
   'item',
   'reach-out',

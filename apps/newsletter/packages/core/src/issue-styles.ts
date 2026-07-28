@@ -219,6 +219,19 @@ export const issueStyles = {
     textAlign: 'center' as const,
     textDecoration: 'none',
   },
+  signupButton: {
+    backgroundColor: '#FF4FA3',
+    backgroundImage: 'linear-gradient(135deg, #FF8CC5 0%, #FF4FA3 48%, #D92778 100%)',
+    borderRadius: '0',
+    color: '#FFFFFF',
+    display: 'inline-block',
+    fontSize: '16px',
+    fontWeight: 600,
+    lineHeight: '23px',
+    padding: '13px 20px 14px',
+    textAlign: 'center' as const,
+    textDecoration: 'none',
+  },
   // DD 396 quotes: plain large grey text, no background.
   quoteText: issueText({
     fontSize: '21px',

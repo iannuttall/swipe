@@ -31,6 +31,7 @@ export const issueSectionTypes = [
   'sponsor',
   'box',
   'classifieds',
+  'cta',
   'quote',
   'item',
   'reach-out',

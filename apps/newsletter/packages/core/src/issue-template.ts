@@ -7,6 +7,7 @@ import {
   simpleHeader,
   titleRow,
 } from './issue-chrome.js'
+import { ctaSection } from './issue-cta.js'
 import { issueFooter } from './issue-footer.js'
 import { disclosureSection, itemSection, reachOutSection } from './issue-items.js'
 import type { IssueSection } from './issue-parser.js'
@@ -79,6 +80,8 @@ export function renderIssueSection(section: IssueSection, withHeading = true): R
       return boxSection(section, withHeading)
     case 'classifieds':
       return classifiedsSection(section, withHeading)
+    case 'cta':
+      return ctaSection(section)
     case 'quote':
       return quoteSection(section, withHeading)
     case 'item':

@@ -58,6 +58,19 @@ describe('subscriber confirmations', () => {
     )
     assert.equal((await platform.previewAudience()).total, 0)
     assert.equal(provider.sent.length, 1)
+    assert.match(
+      provider.sent[0]?.html ?? '',
+      /Click to confirm your email &amp; get the best AI skills and workflows\./,
+    )
+    assert.match(
+      provider.sent[0]?.html ?? '',
+      /https:\/\/swipe\.md\/email\/swipe-email-logo-on-white@2x\.png/,
+    )
+    assert.match(
+      provider.sent[0]?.html ?? '',
+      /linear-gradient\(135deg, #FF8CC5 0%, #FF4FA3 48%, #D92778 100%\)/,
+    )
+    assert.doesNotMatch(provider.sent[0]?.html ?? '', /{{unsubscribeUrl}}/)
 
     const token = confirmationToken(provider.sent[0]?.html ?? '')
     const request = await store.confirmations.findByTokenHash(

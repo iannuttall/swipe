@@ -60,7 +60,7 @@ export async function subscribeWithConfirmation(
   })
   const confirmationUrl = requestUrl(request, deps.config)
   await deps.provider.send(
-    doubleOptInEmail({
+    await doubleOptInEmail({
       config: deps.config,
       email: contact.email,
       confirmationUrl,

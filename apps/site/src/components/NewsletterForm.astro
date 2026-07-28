@@ -20,9 +20,26 @@ const inputId = `newsletter-${source.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}
   x-data={`newsletterSignup(${JSON.stringify({ source })})`}
   class="[--primary:#ff4fa3]"
 >
-  <p x-cloak x-show="status === 'success'" class="text-sm" role="status">
-    you're in - check your inbox.
-  </p>
+  <div
+    x-cloak
+    x-show="status === 'success'"
+    class="flex items-center gap-4 border-l-4 border-[#ff4fa3] bg-white/6 px-4 py-3 sm:px-5 sm:py-4"
+    role="status"
+    aria-live="polite"
+  >
+    <span
+      class="grid size-10 shrink-0 place-items-center bg-[linear-gradient(135deg,#ff4fa3_0%,#d92fd0_100%)] text-xl font-bold text-white"
+      aria-hidden="true"
+    >
+      ✓
+    </span>
+    <div>
+      <p class="text-lg font-bold text-white sm:text-xl">You're in.</p>
+      <p class="mt-0.5 text-sm text-white/70 sm:text-base">
+        Check your inbox to confirm.
+      </p>
+    </div>
+  </div>
 
   <form
     x-show="status !== 'success'"

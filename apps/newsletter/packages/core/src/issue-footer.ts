@@ -1,15 +1,16 @@
-import { createElement as h } from 'react'
+import { Fragment, createElement as h } from 'react'
 import { Column, Img, Link, Row, Section, Text } from 'react-email'
 import { emailAssetUrl } from './email-assets.js'
 import type { IssueSection } from './issue-parser.js'
 import { barebonesColors, fontFamily } from './react-email-styles.js'
 
 export function issueFooter(
-  _footer: IssueSection | undefined,
+  footer: IssueSection | undefined,
   _shareUrl?: string,
   _background?: string,
   className?: string,
 ) {
+  const showUnsubscribe = footer?.attrs.unsubscribe !== 'false'
   return h(
     Section,
     { className, style: footerStyles.section },
@@ -27,20 +28,28 @@ export function issueFooter(
           height: 32,
           style: footerStyles.logo,
         }),
-        h(
-          Text,
-          { style: footerStyles.copy },
-          "Don't want these emails any more? No worries. Here's a slightly greyed out, 13 pixel unsubscribe link for you.",
-        ),
+        showUnsubscribe
+          ? h(
+              Text,
+              { style: footerStyles.copy },
+              "Don't want these emails any more? No worries. Here's a slightly greyed out, 13 pixel unsubscribe link for you.",
+            )
+          : null,
         h(
           Text,
           { className: 'issue-footer-meta', style: footerStyles.meta },
-          h(
-            Link,
-            { href: '{{unsubscribeUrl}}', style: footerStyles.link },
-            'Unsubscribe',
-          ),
-          ' | ',
+          showUnsubscribe
+            ? h(
+                Fragment,
+                null,
+                h(
+                  Link,
+                  { href: '{{unsubscribeUrl}}', style: footerStyles.link },
+                  'Unsubscribe',
+                ),
+                ' | ',
+              )
+            : null,
           h(
             Link,
             {

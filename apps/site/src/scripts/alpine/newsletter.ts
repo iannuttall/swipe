@@ -1,4 +1,5 @@
 import type { AlpineRuntime } from "./types";
+import { burstConfetti } from "./confetti";
 
 type NewsletterConfig = {
   source?: string;
@@ -45,6 +46,7 @@ export function registerNewsletter(Alpine: AlpineRuntime) {
 
         this.status = "success";
         this.email = "";
+        burstConfetti();
       } catch {
         this.status = "error";
         this.message = "Could not subscribe right now. Try again.";

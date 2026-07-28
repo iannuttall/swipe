@@ -70,7 +70,7 @@ export async function personalizeConfirmationDraft(input: {
       bodyMarkdown: input.draft.bodyMarkdown.replaceAll(confirmationUrlPlaceholder, url),
     },
     excludedTrackingPrefixes: [
-      `${input.config.confirmation.baseUrl.replace(/\/$/, '')}/confirm/`,
+      `${input.config.confirmation.baseUrl.replace(/\/$/, '')}/confirm?token=`,
     ],
   }
 }
@@ -85,7 +85,7 @@ export function previewConfirmationDraft(
     ...draft,
     bodyMarkdown: draft.bodyMarkdown.replaceAll(
       confirmationUrlPlaceholder,
-      `${config.confirmation.baseUrl.replace(/\/$/, '')}/confirm/test-link`,
+      `${config.confirmation.baseUrl.replace(/\/$/, '')}/confirm?token=test-link`,
     ),
   }
 }

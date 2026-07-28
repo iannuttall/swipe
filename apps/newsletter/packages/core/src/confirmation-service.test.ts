@@ -22,9 +22,9 @@ function makePlatform(input: { doubleOptIn?: boolean; nowBaseUrl?: string } = {}
 }
 
 function confirmationToken(html: string): string {
-  const token = html.match(/https:\/\/swipe\.md\/confirm\/([^"]+)/)?.[1]
+  const token = html.match(/https:\/\/swipe\.md\/confirm\?token=([^"]+)/)?.[1]
   assert.ok(token)
-  return token
+  return decodeURIComponent(token)
 }
 
 describe('subscriber confirmations', () => {
@@ -56,7 +56,7 @@ describe('subscriber confirmations', () => {
       token,
       ip: '203.0.113.5',
       userAgent: 'Mozilla/5.0 Test Browser',
-      sourceUrl: `https://swipe.md/confirm/${token}`,
+      sourceUrl: `https://swipe.md/confirm?token=${encodeURIComponent(token)}`,
     })
     assert.deepEqual(result, {
       confirmed: true,
@@ -187,10 +187,10 @@ describe('subscriber confirmations', () => {
     await platform.sendDue(new Date(), 10)
 
     const sentHtml = provider.sent[0]?.html ?? ''
-    assert.match(sentHtml, /href="https:\/\/swipe\.md\/confirm\//)
+    assert.match(sentHtml, /href="https:\/\/swipe\.md\/confirm\?token=/)
     assert.equal(
       Array.from(store.links.values()).some((link) =>
-        link.originalUrl.startsWith('https://swipe.md/confirm/'),
+        link.originalUrl.startsWith('https://swipe.md/confirm?token='),
       ),
       false,
     )

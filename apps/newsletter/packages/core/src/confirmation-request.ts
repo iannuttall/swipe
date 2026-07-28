@@ -79,7 +79,7 @@ export function requestUrl(
   if (confirmationTokenHash(token) !== request.tokenHash) {
     throw new Error('Confirmation secret does not match the stored request')
   }
-  return `${config.confirmation.baseUrl.replace(/\/$/, '')}/confirm/${token}`
+  return `${config.confirmation.baseUrl.replace(/\/$/, '')}/confirm?token=${encodeURIComponent(token)}`
 }
 
 export function assertConfirmationBatchKey(batchKey: string): void {

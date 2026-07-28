@@ -16,13 +16,15 @@ is stored in Postgres.
 The email link opens:
 
 ```text
-https://swipe.md/confirm/<token>
+https://swipe.md/confirm?token=<token>
 ```
 
 Opening the page does not change the subscription. The page runs a managed
 Turnstile check. After Turnstile succeeds, Alpine posts the token to the
 same-origin Swipe Worker. The Worker validates Turnstile and calls the protected
-newsletter API.
+newsletter API. The confirmation page is a static asset. Alpine fetches the
+public Turnstile site key from `GET /api/confirm`; the Turnstile secret remains
+inside the Worker.
 
 Turnstile uses `appearance: interaction-only`. Most readers see the confirmation
 complete automatically. Suspicious traffic receives an interactive challenge.
@@ -186,7 +188,7 @@ email canary create \
 
 Check the first real message in a mailbox you control:
 
-- the link uses `https://swipe.md/confirm/`;
+- the link uses `https://swipe.md/confirm?token=`;
 - opening it completes confirmation after Turnstile succeeds;
 - reloading the page reports a successful existing confirmation;
 - the link is not rewritten through `/t/click/`;
@@ -272,6 +274,23 @@ EMAIL_DOUBLE_OPT_IN=false
 ```
 
 ## Troubleshooting
+
+### The confirmation link opens the 404 page
+
+Check the email link uses this format:
+
+```text
+https://swipe.md/confirm?token=<token>
+```
+
+Do not use `/confirm/<token>`. Cloudflare handles browser navigation as a static
+asset request before the Worker and returns the static 404 page for that path.
+
+Run `pnpm build` and confirm the output lists:
+
+```text
+/confirm/index.html
+```
 
 ### The confirmation page says it is not configured
 

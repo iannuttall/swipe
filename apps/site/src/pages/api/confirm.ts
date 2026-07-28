@@ -32,6 +32,14 @@ function isTrustedRequest(request: Request): boolean {
   }
 }
 
+export function GET() {
+  const siteKey = env.TURNSTILE_SITE_KEY;
+  if (!siteKey) {
+    return json({ error: "Confirmation is not configured yet." }, 503);
+  }
+  return json({ siteKey }, 200);
+}
+
 export async function POST({ request }: APIContext) {
   if (!isTrustedRequest(request)) return json({ error: "Not found" }, 404);
 

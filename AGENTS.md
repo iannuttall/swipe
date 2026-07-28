@@ -76,7 +76,8 @@ Use `pnpm`, not npm.
 - Public newsletter APIs belong on `swipe.md`. Do not create a public
   `list.swipe.md` surface.
 - `apps/site/src/pages/api/subscribe.ts` proxies signups to the newsletter VPS.
-- `apps/site/src/pages/confirm/[token].astro` runs the managed Turnstile check.
+- `apps/site/src/pages/confirm/index.astro` is the static Turnstile
+  confirmation shell.
 - `apps/site/src/pages/api/confirm.ts` validates Turnstile before calling the
   protected newsletter confirmation API.
 - `apps/site/src/pages/api/webhooks/[secret]/ses.ts` proxies the public SES SNS

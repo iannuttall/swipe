@@ -196,8 +196,7 @@ export class MemoryConfirmationStore implements ConfirmationStore {
       ...(input.batchKey ? { batchKey: input.batchKey } : {}),
       total: requests.length,
       pending: requests.filter(
-        (request) =>
-          request.status === 'pending' && request.expiresAt.getTime() > now,
+        (request) => request.status === 'pending' && request.expiresAt.getTime() > now,
       ).length,
       confirmed: countStatus(requests, 'confirmed'),
       expired: requests.filter(

@@ -43,6 +43,9 @@ pnpm site:deploy:dry-run
   during migration. Do not create a public `list.swipe.md` surface.
 - Keep the homepage prerendered. Use Alpine for its form and background-card
   behavior. Do not add a client framework or route `/` through the Worker.
+- Keep `/confirm` prerendered. Alpine reads its signed token from `?token=` and
+  posts it to `/api/confirm`; do not route confirmation page loads through the
+  Worker.
 - Use a Cloudflare Redirect Rule for `www.swipe.md` to `swipe.md`.
 - Keep `nodejs_compat` enabled because Astro server output uses `process`.
 - Do not deploy or attach Cloudflare routes unless the user asks.

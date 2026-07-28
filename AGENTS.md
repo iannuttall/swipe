@@ -60,14 +60,17 @@ Use `pnpm`, not npm.
 - The existing `ian.is` install sends the final Ian's List transition email.
   The message uses Swipe confirmation links, but the familiar Ian's List
   sender remains in place for that announcement.
-- The newsletter production workflow still targets the existing service domain
-  during migration. Change its public hostname only as a deliberate DNS and
-  email-deliverability cutover.
+- The Swipe newsletter production workflow targets `origin.swipe.md`. Keep it
+  behind Cloudflare and treat DNS and email deliverability as deliberate
+  cutovers.
 - Automatic newsletter deploys require the GitHub repository variable
   `NEWSLETTER_DEPLOY_ENABLED=true`. Keep it false during the initial repo
   handoff. A trusted manual workflow dispatch remains an explicit deploy.
 - The workflow syncs only the root workspace files needed for the build plus
-  `apps/newsletter/**` to `/opt/apps/email`.
+  `apps/newsletter/**` to `/opt/apps/swipe`.
+- The preserved Ian's List stack lives at `/opt/apps/ian`. It is a separate
+  Compose project and database used only for Ian's personal list and its final
+  transition email.
 - Normal deploys start `postgres`, `app`, and `web`. The sender `worker` stays
   behind the explicit `sender` profile.
 
@@ -89,8 +92,8 @@ Use `pnpm`, not npm.
   signature. Do not weaken those checks because Cloudflare accepted the request.
 - Never print the complete webhook URL. Redact the secret segment in logs,
   screenshots, docs, issues, and command output.
-- `NEWSLETTER_API_URL` may continue pointing at `https://list.ian.is` as the
-  private origin during migration.
+- `NEWSLETTER_API_URL` points at `https://origin.swipe.md` after the private
+  origin cutover. Do not point Swipe confirmations at the Ian API.
 - Keep `docs/email-setup.md`, `docs/email-operations.md`, and
   `docs/subscriber-confirmation.md` current when email or confirmation behavior
   changes.

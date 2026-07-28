@@ -1,3 +1,4 @@
+import crypto from 'node:crypto'
 import type { AppConfig } from './config.js'
 import { requireSecret } from './config.js'
 import {
@@ -7,8 +8,16 @@ import {
   usableOrNewRequest,
 } from './confirmation-request.js'
 import { doubleOptInEmail } from './confirmation-template.js'
-import { confirmationTokenHash, verifyConfirmationToken } from './confirmation-token.js'
-import type { ConfirmationPurpose, ConfirmationReport } from './confirmation-types.js'
+import {
+  confirmationTokenHash,
+  verifyConfirmationToken,
+  verifySwipeInviteToken,
+} from './confirmation-token.js'
+import type {
+  ConfirmationPurpose,
+  ConfirmationReport,
+  ConfirmationRequestRecord,
+} from './confirmation-types.js'
 import { subscribeContact } from './contact-consent.js'
 import type { EmailProvider } from './providers.js'
 import type { EmailStore } from './store.js'
@@ -111,7 +120,7 @@ export async function confirmSubscription(
   const secret = requireSecret(deps.config.confirmation.secret, 'CONFIRMATION_SECRET')
   const payload = verifyConfirmationToken(input.token, secret)
   if (!payload) {
-    return { confirmed: false, alreadyConfirmed: false, status: 'invalid' }
+    return confirmSwipeInvitation(deps, input)
   }
   const request = await deps.store.confirmations.findByTokenHash(
     confirmationTokenHash(input.token),
@@ -125,6 +134,107 @@ export async function confirmSubscription(
   ) {
     return { confirmed: false, alreadyConfirmed: false, status: 'invalid' }
   }
+  return confirmStoredRequest(deps.store, input, request, secret)
+}
+
+async function confirmSwipeInvitation(
+  deps: { store: EmailStore; config: AppConfig },
+  input: {
+    token: string
+    ip?: string
+    userAgent?: string
+    sourceUrl?: string
+    now?: Date
+  },
+): Promise<{
+  confirmed: boolean
+  alreadyConfirmed: boolean
+  status: 'confirmed' | 'expired' | 'invalid'
+  purpose?: ConfirmationPurpose
+}> {
+  const secret = deps.config.swipeInvite.secret
+  if (!secret) return { confirmed: false, alreadyConfirmed: false, status: 'invalid' }
+  const payload = verifySwipeInviteToken(input.token, secret)
+  if (!payload) return { confirmed: false, alreadyConfirmed: false, status: 'invalid' }
+
+  const now = input.now ?? new Date()
+  const expiresAt = new Date(payload.expiresAt)
+  if (expiresAt.getTime() <= now.getTime()) {
+    return {
+      confirmed: false,
+      alreadyConfirmed: false,
+      status: 'expired',
+      purpose: 'swipe_invite',
+    }
+  }
+
+  const tokenHash = confirmationTokenHash(input.token)
+  const existing = await deps.store.confirmations.findByTokenHash(tokenHash)
+  if (existing) {
+    if (
+      existing.purpose !== 'swipe_invite' ||
+      existing.batchKey !== payload.batchKey ||
+      existing.expiresAt.toISOString() !== payload.expiresAt
+    ) {
+      return { confirmed: false, alreadyConfirmed: false, status: 'invalid' }
+    }
+    return confirmStoredRequest(deps.store, input, existing, secret, true)
+  }
+
+  const activeSuppressions = await deps.store.listActiveSuppressionsForEmail(
+    payload.email,
+  )
+  if (activeSuppressions.some((suppression) => suppression.reason !== 'unsubscribe')) {
+    return { confirmed: false, alreadyConfirmed: false, status: 'invalid' }
+  }
+  const source = `swipe-invite:${payload.batchKey}`
+  const contact = await deps.store.confirmations.upsertPendingContact({
+    email: payload.email,
+    source,
+  })
+  await deps.store.confirmations.createRequests([
+    {
+      id: crypto.randomUUID(),
+      contactId: contact.id,
+      purpose: 'swipe_invite',
+      batchKey: payload.batchKey,
+      tokenHash,
+      source,
+      requestedAt: now,
+      expiresAt,
+      metadata: { consent: 'explicit_click' },
+    },
+  ])
+  const request = await deps.store.confirmations.findByTokenHash(tokenHash)
+  if (
+    !request ||
+    request.contactId !== contact.id ||
+    request.purpose !== 'swipe_invite' ||
+    request.batchKey !== payload.batchKey
+  ) {
+    return { confirmed: false, alreadyConfirmed: false, status: 'invalid' }
+  }
+  return confirmStoredRequest(deps.store, input, request, secret, true)
+}
+
+async function confirmStoredRequest(
+  store: EmailStore,
+  input: {
+    token: string
+    ip?: string
+    userAgent?: string
+    sourceUrl?: string
+    now?: Date
+  },
+  request: ConfirmationRequestRecord,
+  auditSecret: string,
+  reactivate = false,
+): Promise<{
+  confirmed: boolean
+  alreadyConfirmed: boolean
+  status: 'confirmed' | 'expired' | 'invalid'
+  purpose?: ConfirmationPurpose
+}> {
   if (request.status === 'confirmed') {
     return {
       confirmed: true,
@@ -135,7 +245,7 @@ export async function confirmSubscription(
   }
   const now = input.now ?? new Date()
   if (request.status !== 'pending' || request.expiresAt.getTime() <= now.getTime()) {
-    await deps.store.confirmations.expireRequest(request.id)
+    await store.confirmations.expireRequest(request.id)
     return {
       confirmed: false,
       alreadyConfirmed: false,
@@ -143,16 +253,19 @@ export async function confirmSubscription(
       purpose: request.purpose,
     }
   }
-  const confirmed = await deps.store.confirmations.confirmRequest({
+  const confirmed = await store.confirmations.confirmRequest({
     id: request.id,
     confirmedAt: now,
-    ...(input.ip ? { confirmedIpHash: ipHash(input.ip, secret) } : {}),
+    ...(input.ip ? { confirmedIpHash: ipHash(input.ip, auditSecret) } : {}),
     ...(input.userAgent ? { confirmedUserAgent: input.userAgent.slice(0, 500) } : {}),
     ...(input.sourceUrl
       ? { confirmedSourceUrl: sanitizeConfirmationSourceUrl(input.sourceUrl) }
       : {}),
   })
   const success = confirmed?.status === 'confirmed'
+  if (success && reactivate) {
+    await store.reactivateContact({ contactId: request.contactId })
+  }
   return {
     confirmed: success,
     alreadyConfirmed: false,

@@ -1,12 +1,14 @@
 import type { AppConfig } from './config.js'
-import { requestUrl, usableOrNewRequest } from './confirmation-request.js'
-import type { DraftRecord, EmailStore, MessageRecord } from './store.js'
+import { requireSecret } from './config.js'
+import { assertConfirmationBatchKey } from './confirmation-request.js'
+import { createSwipeInviteToken } from './confirmation-token.js'
+import type { DraftRecord, MessageRecord } from './store.js'
 import type { DraftInput } from './types.js'
 
 export const confirmationUrlPlaceholder = '{{confirmationUrl}}'
 
 export interface ConfirmationDraftSettings {
-  purpose: 'swipe_migration'
+  purpose: 'swipe_invite'
   batchKey: string
   expiresAt: Date
 }
@@ -17,8 +19,8 @@ export function confirmationDraftSettings(
   const raw = draft.metadata?.confirmation
   if (!raw || typeof raw !== 'object') return undefined
   const value = raw as Record<string, unknown>
-  if (value.purpose !== 'swipe_migration') {
-    throw new Error('Draft confirmation purpose must be swipe_migration')
+  if (value.purpose !== 'swipe_invite') {
+    throw new Error('Draft confirmation purpose must be swipe_invite')
   }
   if (typeof value.batchKey !== 'string' || !value.batchKey.trim()) {
     throw new Error('Draft confirmation batchKey is required')
@@ -30,11 +32,11 @@ export function confirmationDraftSettings(
   if (Number.isNaN(expiresAt.getTime())) {
     throw new Error('Draft confirmation expiresAt must be an ISO date')
   }
+  assertConfirmationBatchKey(value.batchKey)
   return { purpose: value.purpose, batchKey: value.batchKey, expiresAt }
 }
 
 export async function personalizeConfirmationDraft(input: {
-  store: EmailStore
   config: AppConfig
   draft: DraftRecord
   message: MessageRecord
@@ -52,26 +54,22 @@ export async function personalizeConfirmationDraft(input: {
   if (settings.expiresAt.getTime() <= Date.now()) {
     throw new Error('Confirmation campaign has expired')
   }
-  const request = await usableOrNewRequest({
-    store: input.store,
-    config: input.config,
-    contactId: input.message.contactId,
-    purpose: settings.purpose,
-    batchKey: settings.batchKey,
-    source: `broadcast:${input.message.broadcastId}`,
-    requestedAt: new Date(),
-    expiresAt: settings.expiresAt,
-    metadata: { broadcastId: input.message.broadcastId },
-  })
-  const url = requestUrl(request, input.config)
+  const token = createSwipeInviteToken(
+    {
+      email: input.message.toEmail,
+      batchKey: settings.batchKey,
+      expiresAt: settings.expiresAt,
+    },
+    requireSecret(input.config.swipeInvite.secret, 'SWIPE_INVITE_SECRET'),
+  )
+  const baseUrl = input.config.swipeInvite.baseUrl.replace(/\/$/, '')
+  const url = `${baseUrl}/confirm?token=${encodeURIComponent(token)}`
   return {
     draft: {
       ...input.draft,
       bodyMarkdown: input.draft.bodyMarkdown.replaceAll(confirmationUrlPlaceholder, url),
     },
-    excludedTrackingPrefixes: [
-      `${input.config.confirmation.baseUrl.replace(/\/$/, '')}/confirm?token=`,
-    ],
+    excludedTrackingPrefixes: [`${baseUrl}/confirm?token=`],
   }
 }
 
@@ -85,7 +83,7 @@ export function previewConfirmationDraft(
     ...draft,
     bodyMarkdown: draft.bodyMarkdown.replaceAll(
       confirmationUrlPlaceholder,
-      `${config.confirmation.baseUrl.replace(/\/$/, '')}/confirm?token=test-link`,
+      `${config.swipeInvite.baseUrl.replace(/\/$/, '')}/confirm?token=test-link`,
     ),
   }
 }

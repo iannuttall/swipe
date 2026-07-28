@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { createConfirmationToken } from '@email/core'
+import { createConfirmationToken, createSwipeInviteToken } from '@email/core'
 import { authorized, makeTestApp } from './index.test-helper.js'
 
 describe('confirmation routes', () => {
@@ -56,5 +56,31 @@ describe('confirmation routes', () => {
       },
     )
     assert.deepEqual(result, { matched: 1, unsubscribed: 0 })
+  })
+
+  it('creates no contact for an invitation until its confirmed POST', async () => {
+    const { app, store } = makeTestApp()
+    const token = createSwipeInviteToken(
+      {
+        email: 'invited@example.com',
+        batchKey: 'ians-list-to-swipe-2026',
+        expiresAt: new Date('2099-08-03T00:00:00.000Z'),
+      },
+      'test-secret',
+    )
+    assert.equal(await store.findContactByEmail('invited@example.com'), undefined)
+
+    const confirmed = await authorized(app, '/api/confirmations/confirm', {
+      token,
+      ip: '203.0.113.10',
+      sourceUrl: 'https://swipe.md/confirm',
+    })
+
+    assert.equal(confirmed.status, 'confirmed')
+    assert.equal(confirmed.purpose, 'swipe_invite')
+    assert.equal(
+      (await store.findContactByEmail('invited@example.com'))?.status,
+      'active',
+    )
   })
 })

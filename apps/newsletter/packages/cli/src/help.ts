@@ -29,7 +29,7 @@ Commands:
 
   Confirmations:
   email confirmation prepare --yes --batch-key KEY --expires-at ISO [--source SOURCE] [--json]
-  email confirmation report [--purpose double_opt_in|swipe_migration] [--batch-key KEY] [--json]
+  email confirmation report [--purpose double_opt_in|swipe_invite|swipe_migration] [--batch-key KEY] [--json]
   email confirmation unsubscribe-unconfirmed --batch-key KEY --expired-before ISO [--yes] [--source SOURCE] [--json]
       Runs as a dry run unless --yes is present.
 

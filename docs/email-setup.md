@@ -33,7 +33,7 @@ The current Swipe values are:
 | AWS region | `us-east-1` |
 | SNS topic name | `swipe-ses-feedback` |
 | Public webhook host | `swipe.md` |
-| Private newsletter origin | `https://list.ian.is` |
+| Private newsletter origin | `https://origin.swipe.md` |
 | Inbound Worker | `mailroom` |
 
 The visible From address and the custom MAIL FROM domain are separate. Readers
@@ -294,9 +294,9 @@ EMAIL_FROM_NAME=Ian Nuttall
 Restart the API and sender containers after changing the credential:
 
 ```sh
-vps ssh email -- docker compose \
-  --env-file /opt/apps/email/.env.production \
-  -f /opt/apps/email/apps/newsletter/docker-compose.prod.yml \
+vps ssh swipe -- docker compose \
+  --env-file /opt/apps/swipe/.env.production \
+  -f /opt/apps/swipe/apps/newsletter/docker-compose.prod.yml \
   --profile sender up -d app worker
 ```
 
@@ -350,7 +350,7 @@ Set the Worker secret from `apps/site`:
 pnpm exec wrangler secret put NEWSLETTER_WEBHOOK_SECRET
 ```
 
-Set the VPS value in `/opt/apps/email/.env.production`, then restart the API
+Set the VPS value in `/opt/apps/swipe/.env.production`, then restart the API
 container.
 
 Never print or store the complete public webhook URL. Its shape is:

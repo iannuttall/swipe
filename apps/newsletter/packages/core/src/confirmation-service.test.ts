@@ -16,6 +16,7 @@ function makePlatform(input: { doubleOptIn?: boolean; nowBaseUrl?: string } = {}
     EMAIL_CONFIRMATION_BASE_URL: input.nowBaseUrl ?? 'https://swipe.md',
     EMAIL_DOUBLE_OPT_IN: String(input.doubleOptIn ?? true),
     CONFIRMATION_SECRET: 'confirmation-secret',
+    SWIPE_INVITE_SECRET: 'shared-swipe-invite-secret',
   })
   const platform = new CoreEmailPlatform({ store, provider, config })
   return { platform, provider, store }
@@ -160,40 +161,81 @@ describe('subscriber confirmations', () => {
     )
   })
 
-  it('personalizes migration links without storing them as tracked URLs', async () => {
-    const { platform, provider, store } = makePlatform({ doubleOptIn: false })
-    await platform.subscribe({ email: 'reader@example.com' })
+  it('creates a Swipe contact only after an encrypted Ian invitation is confirmed', async () => {
+    const ian = makePlatform({ doubleOptIn: false })
+    await ian.platform.subscribe({ email: 'reader@example.com' })
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1_000)
-    await platform.prepareMigrationConfirmations({
-      batchKey: 'swipe-migration-2026',
-      expiresAt,
-    })
-    const draft = await platform.createDraft({
+    const draft = await ian.platform.createDraft({
       subject: 'Swipe is moving',
       bodyMarkdown: '[Keep sending me Swipe]({{confirmationUrl}})',
       metadata: {
         confirmation: {
-          purpose: 'swipe_migration',
-          batchKey: 'swipe-migration-2026',
+          purpose: 'swipe_invite',
+          batchKey: 'ians-list-to-swipe-2026',
           expiresAt: expiresAt.toISOString(),
         },
       },
     })
-    await platform.createBroadcast({
+    await ian.platform.createBroadcast({
       draftId: draft.id,
       scheduledAt: new Date(0),
     })
 
-    await platform.sendDue(new Date(), 10)
+    await ian.platform.sendDue(new Date(), 10)
 
-    const sentHtml = provider.sent[0]?.html ?? ''
+    const sentHtml = ian.provider.sent[0]?.html ?? ''
     assert.match(sentHtml, /href="https:\/\/swipe\.md\/confirm\?token=/)
     assert.equal(
-      Array.from(store.links.values()).some((link) =>
+      Array.from(ian.store.links.values()).some((link) =>
         link.originalUrl.startsWith('https://swipe.md/confirm?token='),
       ),
       false,
     )
+    assert.equal(ian.store.confirmations.requests.size, 0)
+
+    const token = confirmationToken(sentHtml)
+    assert.equal(
+      token.includes(Buffer.from('reader@example.com').toString('base64url')),
+      false,
+    )
+
+    const swipe = makePlatform()
+    assert.equal(await swipe.store.findContactByEmail('reader@example.com'), undefined)
+    const confirmed = await swipe.platform.confirmSubscription({
+      token,
+      ip: '203.0.113.20',
+      sourceUrl: 'https://swipe.md/confirm',
+    })
+    assert.deepEqual(confirmed, {
+      confirmed: true,
+      alreadyConfirmed: false,
+      status: 'confirmed',
+      purpose: 'swipe_invite',
+    })
+    assert.equal(
+      (await swipe.store.findContactByEmail('reader@example.com'))?.status,
+      'active',
+    )
+    assert.deepEqual(
+      await swipe.platform.getConfirmationReport({
+        purpose: 'swipe_invite',
+        batchKey: 'ians-list-to-swipe-2026',
+      }),
+      {
+        purpose: 'swipe_invite',
+        batchKey: 'ians-list-to-swipe-2026',
+        total: 1,
+        pending: 0,
+        confirmed: 1,
+        expired: 0,
+        cancelled: 0,
+        activeUnconfirmed: 0,
+      },
+    )
+
+    const repeated = await swipe.platform.confirmSubscription({ token })
+    assert.equal(repeated.confirmed, true)
+    assert.equal(repeated.alreadyConfirmed, true)
   })
 })
 

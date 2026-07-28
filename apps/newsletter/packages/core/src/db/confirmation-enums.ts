@@ -9,6 +9,7 @@ export const contactStatusEnum = pgEnum('contact_status', [
 
 export const confirmationPurposeEnum = pgEnum('confirmation_purpose', [
   'double_opt_in',
+  'swipe_invite',
   'swipe_migration',
 ])
 

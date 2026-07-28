@@ -22,7 +22,6 @@ export async function sendQueuedMessage(
   const storedDraft = await deps.store.getDraft(broadcast.draftId)
   if (!storedDraft) throw new Error(`Draft not found: ${broadcast.draftId}`)
   const personalized = await personalizeConfirmationDraft({
-    store: deps.store,
     config: deps.config,
     draft: storedDraft,
     message,

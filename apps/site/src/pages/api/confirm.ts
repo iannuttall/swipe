@@ -5,7 +5,7 @@ import { verifyTurnstile } from "@/lib/turnstile";
 
 export const prerender = false;
 
-const DEFAULT_API_URL = "https://list.ian.is";
+const DEFAULT_API_URL = "https://origin.swipe.md";
 const TURNSTILE_ACTION = "confirm_subscription";
 
 function json(data: unknown, status: number) {

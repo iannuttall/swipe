@@ -135,7 +135,10 @@ export class MemoryConfirmationStore implements ConfirmationStore {
     }
 
     const contact = await this.contactById(request.contactId)
-    if (contact && request.purpose === 'double_opt_in') {
+    if (
+      contact &&
+      (request.purpose === 'double_opt_in' || request.purpose === 'swipe_invite')
+    ) {
       contact.status = 'active'
       contact.subscribedAt = input.confirmedAt
       delete contact.unsubscribedAt
@@ -156,7 +159,10 @@ export class MemoryConfirmationStore implements ConfirmationStore {
         ...(request.batchKey ? { batchKey: request.batchKey } : {}),
       },
     })
-    if (contact && request.purpose === 'double_opt_in') {
+    if (
+      contact &&
+      (request.purpose === 'double_opt_in' || request.purpose === 'swipe_invite')
+    ) {
       this.events.push({
         id: crypto.randomUUID(),
         type: 'contact.subscribed',

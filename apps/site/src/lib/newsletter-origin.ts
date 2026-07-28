@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
 
-const DEFAULT_API_URL = "https://list.ian.is";
+const DEFAULT_API_URL = "https://origin.swipe.md";
 const TOKEN_RE = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
 
 export function isNewsletterToken(value: string | undefined): value is string {

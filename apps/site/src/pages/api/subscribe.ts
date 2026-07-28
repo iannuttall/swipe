@@ -3,7 +3,7 @@ import type { APIContext } from "astro";
 
 export const prerender = false;
 
-const DEFAULT_API_URL = "https://list.ian.is";
+const DEFAULT_API_URL = "https://origin.swipe.md";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function json(data: unknown, status: number) {

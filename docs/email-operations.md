@@ -66,9 +66,9 @@ Use a unique subject on every test.
 Create a draft and send only to the test recipient:
 
 ```sh
-vps ssh email -- docker compose \
-  --env-file /opt/apps/email/.env.production \
-  -f /opt/apps/email/apps/newsletter/docker-compose.prod.yml \
+vps ssh swipe -- docker compose \
+  --env-file /opt/apps/swipe/.env.production \
+  -f /opt/apps/swipe/apps/newsletter/docker-compose.prod.yml \
   exec -T app \
   node dist/index.js broadcast test \
   --yes \

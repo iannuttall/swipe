@@ -178,7 +178,7 @@ export class PostgresConfirmationStore implements ConfirmationStore {
         return existing ? mapRequest(existing) : undefined
       }
 
-      if (row.purpose === 'double_opt_in') {
+      if (row.purpose === 'double_opt_in' || row.purpose === 'swipe_invite') {
         await transaction
           .update(contacts)
           .set({
@@ -207,7 +207,7 @@ export class PostgresConfirmationStore implements ConfirmationStore {
           },
         })
         .onConflictDoNothing()
-      if (row.purpose === 'double_opt_in') {
+      if (row.purpose === 'double_opt_in' || row.purpose === 'swipe_invite') {
         await transaction
           .insert(events)
           .values({

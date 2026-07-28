@@ -64,8 +64,14 @@ export async function runConfirmationCommand(
 
 function purposeFlag(parsed: ParsedArgs): ConfirmationPurpose {
   const value = getStringFlag(parsed, 'purpose') ?? 'swipe_migration'
-  if (value !== 'double_opt_in' && value !== 'swipe_migration') {
-    throw new Error('Invalid --purpose; expected double_opt_in or swipe_migration')
+  if (
+    value !== 'double_opt_in' &&
+    value !== 'swipe_invite' &&
+    value !== 'swipe_migration'
+  ) {
+    throw new Error(
+      'Invalid --purpose; expected double_opt_in, swipe_invite, or swipe_migration',
+    )
   }
   return value
 }

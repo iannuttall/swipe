@@ -17,7 +17,7 @@ const prepareSchema = z.object({
 })
 
 const reportSchema = z.object({
-  purpose: z.enum(['double_opt_in', 'swipe_migration']),
+  purpose: z.enum(['double_opt_in', 'swipe_invite', 'swipe_migration']),
   batchKey: z.string().min(3).max(80).optional(),
 })
 

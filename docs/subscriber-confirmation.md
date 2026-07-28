@@ -1,17 +1,21 @@
 # Set up subscriber confirmation
 
-This guide covers:
+Ian's List and Swipe are separate newsletters.
 
-- confirmation of the Ian's List to Swipe move;
-- double opt-in for new Swipe signups;
-- Cloudflare Turnstile protection against email link scanners;
-- confirmation reports;
-- removal of migration contacts who do not confirm.
+- Ian's List runs from `/opt/apps/ian`.
+- Swipe runs from `/opt/apps/swipe`.
+- Each app has its own Postgres database, contacts, API token, and email secrets.
+- A reader stays on Ian's List unless Ian removes them from that list.
+- A reader joins Swipe only after confirming on `swipe.md`.
 
-## How confirmation works
+Never import the Ian's List audience into the Swipe database. A person can be
+on either list, both lists, or neither list.
 
-The newsletter service signs a one-time confirmation token. Only the token hash
-is stored in Postgres.
+## How the Ian invitation works
+
+The final Ian's List email contains a different encrypted invitation for each
+reader. The invitation includes the destination email address, batch key, and
+expiry time. None of those values can be read or changed from the URL.
 
 The email link opens:
 
@@ -19,315 +23,194 @@ The email link opens:
 https://swipe.md/confirm?token=<token>
 ```
 
-Opening the page does not change the subscription. The page runs a managed
-Turnstile check. After Turnstile succeeds, Alpine posts the token to the
-same-origin Swipe Worker. The Worker validates Turnstile and calls the protected
-newsletter API. The confirmation page is a static asset. Alpine fetches the
-public Turnstile site key from `GET /api/confirm`; the Turnstile secret remains
-inside the Worker.
+Opening that page does not subscribe anyone. The page runs a managed Turnstile
+check, then posts the token to the same-origin Swipe Worker. The Worker validates
+Turnstile and calls the protected Swipe newsletter API.
 
-Turnstile uses `appearance: interaction-only`. Most readers see the confirmation
-complete automatically. Suspicious traffic receives an interactive challenge.
+Swipe decrypts and validates the invitation after that POST. It creates and
+activates the contact in one confirmation flow. An expired or modified token
+creates no contact.
 
-## 1. Create the Turnstile widget
+The Ian database stores no Swipe migration requests. Swipe stores only accepted
+invitations.
 
-Open [Cloudflare Turnstile](https://dash.cloudflare.com/?to=/:account/turnstile).
+## Configure Turnstile
 
-1. Select `Add widget`.
-2. Name the widget `swipe-confirmation`.
-3. Add `swipe.md` as an allowed hostname.
-4. Choose `Managed` widget mode.
-5. Create the widget.
-6. Copy the site key and secret key.
+Create a managed Turnstile widget named `swipe-confirmation`. Allow `swipe.md`
+as its hostname.
 
-Do not commit either value. The site key is safe to expose in page HTML, but it
-still belongs in deployment configuration so it can differ between
-environments.
-
-Set both values on the deployed Swipe Worker:
+Set both values on the Swipe Worker:
 
 ```sh
 pnpm -C apps/site exec wrangler secret put TURNSTILE_SITE_KEY
 pnpm -C apps/site exec wrangler secret put TURNSTILE_SECRET_KEY
 ```
 
-For local Worker testing, copy `apps/site/.dev.vars.example` to an ignored
-`.dev.vars` file. The example contains Cloudflare's always-pass Turnstile test
-keys:
+The example development values are Cloudflare's always-pass test keys:
 
 ```text
 TURNSTILE_SITE_KEY=1x00000000000000000000AA
 TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
 ```
 
-Never use the test keys in production.
+Never use those test keys in production.
 
-## 2. Configure the newsletter service
+## Share one invitation secret
 
-Generate a signing secret:
+Generate one secret:
 
 ```sh
-openssl rand -base64 48
+openssl rand -hex 48
 ```
 
-Add these values to the VPS production environment:
+Set the same `SWIPE_INVITE_SECRET` value in:
 
 ```text
-CONFIRMATION_SECRET=<generated-secret>
-EMAIL_CONFIRMATION_BASE_URL=https://swipe.md
-EMAIL_CONFIRMATION_TTL_HOURS=72
-EMAIL_DOUBLE_OPT_IN=true
+/opt/apps/ian/.env.production
+/opt/apps/swipe/.env.production
 ```
 
-Keep `CONFIRMATION_SECRET` stable. Changing it invalidates every unexpired
-confirmation link.
+This is the only application secret the two stacks share. Keep their
+`CONFIRMATION_SECRET`, `API_TOKEN`, `TRACKING_SECRET`, `UNSUBSCRIBE_SECRET`, and
+database credentials different.
 
-Restart the newsletter API and sender after the values are present:
+Set this in both environments too:
+
+```text
+SWIPE_INVITE_BASE_URL=https://swipe.md
+```
+
+Changing `SWIPE_INVITE_SECRET` invalidates every invitation that has not been
+accepted yet. Keep it stable until the transition window has closed.
+
+## Point the site at the Swipe stack
+
+The Swipe Worker needs the Swipe origin and API token:
+
+```text
+NEWSLETTER_API_URL=https://origin.swipe.md
+NEWSLETTER_API_TOKEN=<Swipe API token>
+```
+
+Do not point the confirmation route at the Ian API. The public route stays on
+`swipe.md`; `origin.swipe.md` is the Cloudflare-restricted private origin.
+
+## Deploy the invitation migration
+
+Migration `0013_swipe_invites.sql` adds the `swipe_invite` confirmation purpose.
+The normal Swipe deploy applies it before starting the API.
+
+Check the Swipe stack:
 
 ```sh
-vps ssh email -- docker compose \
-  --env-file /opt/apps/email/.env.production \
-  -f /opt/apps/email/apps/newsletter/docker-compose.prod.yml \
-  --profile sender up -d app worker
+vps status swipe
 ```
 
-## 3. Run the database migration
+The normal services are `postgres`, `app`, and `web`. The `worker` service stays
+off until a real Swipe broadcast has been approved.
 
-Deploy the newsletter code before preparing a confirmation batch. The deploy
-must run:
-
-```sh
-email db migrate --json
-```
-
-Migration `0012_contact_confirmations.sql` adds:
-
-- the `pending` contact status;
-- confirmation request and status types;
-- the `confirmation_requests` table;
-- indexes for tokens, batches, reports, and expiry.
-
-Do not prepare a batch until the migration and new API are both running.
-
-## 4. Prepare the Swipe migration batch
-
-Choose one batch key and one expiry time. Use the same values in every command
-and in the draft metadata.
-
-Example:
-
-```sh
-email confirmation prepare \
-  --yes \
-  --batch-key ians-list-to-swipe-2026-07-28 \
-  --expires-at 2026-08-11T12:00:00.000Z \
-  --source ians-list-transition \
-  --json
-```
-
-This creates one request for every active contact. It does not include contacts
-that are already unsubscribed or suppressed. Existing active contacts remain
-active until the cleanup command is explicitly run later.
-
-The command is idempotent for the same batch key. Run it again if the process is
-interrupted.
-
-Check the result:
-
-```sh
-email confirmation report \
-  --purpose swipe_migration \
-  --batch-key ians-list-to-swipe-2026-07-28 \
-  --json
-```
-
-`total` should match the intended active audience before the email is sent.
-
-## 5. Add the link to the transition email
+## Add the button to the final Ian email
 
 Use the placeholder in the email Markdown:
 
 ```md
-[Yes, keep sending me Swipe]({{confirmationUrl}})
+[Yes, subscribe me to Swipe]({{confirmationUrl}})
 ```
 
-Create a metadata file:
+Use this draft metadata:
 
 ```json
 {
   "confirmation": {
-    "purpose": "swipe_migration",
+    "purpose": "swipe_invite",
     "batchKey": "ians-list-to-swipe-2026-07-28",
     "expiresAt": "2026-08-11T12:00:00.000Z"
   }
 }
 ```
 
-Create the draft with both files:
+The Ian sender replaces the placeholder with an encrypted token for the
+message recipient. It does not write anything to the Swipe database.
 
-```sh
-email draft create \
-  --subject "Ian's List is becoming Swipe" \
-  --body-file transition.md \
-  --metadata-file transition-metadata.json \
-  --json
-```
+Test sends use a safe `test-link` preview. A planned message receives the real
+recipient invitation. Confirmation URLs are excluded from click rewriting.
 
-The normal test-send command renders a safe `test-link` preview. It does not
-confirm a subscriber. A real planned message receives the one-time token for
-its contact.
+Before the real send check a message in a mailbox you control:
 
-Use a canary before promoting the whole audience:
+- The From name and address are still the familiar Ian's List sender.
+- The button points to `https://swipe.md/confirm?token=`.
+- Opening the URL alone does not create a Swipe contact.
+- Completing Turnstile creates one active Swipe contact.
+- Reloading the confirmation page reports that the invitation was already
+  accepted.
+- The normal Ian's List unsubscribe link still works.
 
-```sh
-email canary create \
-  --draft-id <draft-id> \
-  --steps 50,500,2000,all \
-  --json
-```
+## Check accepted invitations
 
-Check the first real message in a mailbox you control:
-
-- the link uses `https://swipe.md/confirm?token=`;
-- opening it completes confirmation after Turnstile succeeds;
-- reloading the page reports a successful existing confirmation;
-- the link is not rewritten through `/t/click/`;
-- the unsubscribe footer still works.
-
-## 6. Monitor confirmations
-
-Run:
+Run the report against the Swipe stack:
 
 ```sh
 email confirmation report \
-  --purpose swipe_migration \
+  --purpose swipe_invite \
   --batch-key ians-list-to-swipe-2026-07-28 \
   --json
 ```
 
-The report contains:
+`confirmed` is the number of readers who explicitly joined Swipe. No row exists
+for a reader who did not click and confirm.
 
-- `total`;
-- `pending`;
-- `confirmed`;
-- `expired`;
-- `cancelled`;
-- `activeUnconfirmed`.
+There is no migration cleanup command for Swipe. Nonconfirmers were never added.
+Pruning Ian's List is a separate operation against `/opt/apps/ian` and must not
+depend on the Swipe report.
 
-Run the report during the response window and once more after the expiry time.
-
-## 7. Remove non-confirmers after the deadline
-
-Always run the cleanup without `--yes` first:
-
-```sh
-email confirmation unsubscribe-unconfirmed \
-  --batch-key ians-list-to-swipe-2026-07-28 \
-  --expired-before 2026-08-11T12:00:00.000Z \
-  --json
-```
-
-The result includes `dryRun: true`, `matched`, and `unsubscribed: 0`.
-
-Check that:
-
-- the batch key is exact;
-- the deadline has passed;
-- the matched count is expected;
-- the confirmation report has been saved.
-
-Run the mutation only after those checks:
-
-```sh
-email confirmation unsubscribe-unconfirmed \
-  --batch-key ians-list-to-swipe-2026-07-28 \
-  --expired-before 2026-08-11T12:00:00.000Z \
-  --yes \
-  --source ians-list-transition-cleanup \
-  --json
-```
-
-The command only changes active contacts that have an expired, unconfirmed
-request in that exact migration batch. It does not touch confirmed contacts or
-contacts outside the batch.
-
-## Double opt-in for new signups
+## Double opt-in for new Swipe signups
 
 `EMAIL_DOUBLE_OPT_IN=true` is the production default.
 
-For a new address:
+The normal signup flow creates a pending Swipe contact and sends a confirmation
+email. The contact stays out of every audience until Turnstile and the signed
+confirmation POST succeed.
 
-1. `/api/subscribe` creates a pending contact.
-2. The address is excluded from newsletter audiences.
-3. The service sends a confirmation email.
-4. The reader opens the Swipe confirmation page.
-5. Turnstile succeeds and the page posts to the protected API.
-6. The contact becomes active.
+An active address does not receive another confirmation email. A hard-suppressed
+address cannot become pending.
 
-An already active address remains active and does not receive another
-confirmation email. A hard-suppressed address cannot become pending.
+## Fix a failed confirmation
 
-Set this only if double opt-in must be disabled:
+### The link opens a 404 page
 
-```text
-EMAIL_DOUBLE_OPT_IN=false
-```
-
-## Troubleshooting
-
-### The confirmation link opens the 404 page
-
-Check the email link uses this format:
+The email must use this format:
 
 ```text
 https://swipe.md/confirm?token=<token>
 ```
 
-Do not use `/confirm/<token>`. Cloudflare handles browser navigation as a static
-asset request before the Worker and returns the static 404 page for that path.
+Do not use `/confirm/<token>`.
 
-Run `pnpm build` and confirm the output lists:
+### The page says confirmation is not configured
 
-```text
-/confirm/index.html
-```
-
-### The confirmation page says it is not configured
-
-Check the deployed Worker has:
+Check the Swipe Worker has:
 
 ```text
 TURNSTILE_SITE_KEY
 TURNSTILE_SECRET_KEY
 NEWSLETTER_API_TOKEN
+NEWSLETTER_API_URL
 ```
 
-### Turnstile verification fails
+### Turnstile fails
+
+Check the widget allows `swipe.md`, both keys belong to the same widget, and the
+returned action is `confirm_subscription`.
+
+### The API rejects an Ian invitation
 
 Check:
 
-- the widget allows `swipe.md`;
-- the site and secret keys belong to the same widget;
-- the widget mode is `Managed`;
-- the action returned by Turnstile is `confirm_subscription`;
-- the page is running on the allowed hostname.
+- `SWIPE_INVITE_SECRET` is identical on both stacks.
+- `SWIPE_INVITE_BASE_URL` is `https://swipe.md`.
+- migration `0013_swipe_invites.sql` ran on Swipe.
+- the invitation has not expired.
+- `NEWSLETTER_API_URL` points to the Swipe API.
 
-### The newsletter API cannot confirm the token
-
-Check:
-
-- `CONFIRMATION_SECRET` has not changed;
-- `EMAIL_CONFIRMATION_BASE_URL` is `https://swipe.md`;
-- migration `0012_contact_confirmations.sql` has run;
-- the token has not expired;
-- the Worker `NEWSLETTER_API_URL` points to the running newsletter API.
-
-### A migration link goes through click tracking
-
-Check that the draft contains both:
-
-- `{{confirmationUrl}}` in the Markdown;
-- matching `metadata.confirmation` values.
-
-Confirmation URLs are excluded from click rewriting. Do not replace the
-placeholder with a hand-written URL.
+Do not replace `{{confirmationUrl}}` with a hand-written URL. The Ian sender
+must generate the encrypted recipient token.

@@ -19,20 +19,19 @@ concurrency:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-  APP_NAME: email
-  # Keep the proven runtime hostname until the Swipe DNS/deliverability cutover.
-  APP_DOMAIN: list.ian.is
+  APP_NAME: swipe
+  # Private origin only. Public newsletter APIs remain on swipe.md.
+  APP_DOMAIN: origin.swipe.md
   PUBLIC_BASE_URL: https://swipe.md
   APP_PORT: "3000"
   WEB_PORT: "3002"
-  DEPLOY_APP_DIR: /opt/apps/email
+  DEPLOY_APP_DIR: /opt/apps/swipe
   DEPLOY_CADDY_ROOT: /opt/caddy
 
 jobs:
   deploy:
-    # The initial public-repo push must not replace the live Ian's List service.
-    # Set NEWSLETTER_DEPLOY_ENABLED=true after the deliberate handoff. A trusted
-    # workflow_dispatch remains available for an explicit deployment.
+    # Keep automatic deploys off until the private Swipe origin is ready.
+    # A trusted workflow_dispatch remains available for an explicit deployment.
     if: github.event_name == 'workflow_dispatch' || vars.NEWSLETTER_DEPLOY_ENABLED == 'true'
     runs-on: ubuntu-latest
     permissions:
@@ -76,7 +75,7 @@ jobs:
         run: |
           IMAGE_REF="${APP_NAME}:gha-$(printf '%s' "$GITHUB_SHA" | cut -c1-12)"
           docker build --platform linux/amd64 --build-arg BASE_URL="${PUBLIC_BASE_URL}" -f apps/newsletter/Dockerfile -t "$IMAGE_REF" .
-          docker save "$IMAGE_REF" | gzip > email-image.tar.gz
+          docker save "$IMAGE_REF" | gzip > swipe-image.tar.gz
           printf 'IMAGE_REF=%s\n' "$IMAGE_REF" >> "$GITHUB_ENV"
 
       - name: Sync app source
@@ -141,7 +140,7 @@ jobs:
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-        run: scp email-image.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:/tmp/email-image.tar.gz"
+        run: scp swipe-image.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:/tmp/swipe-image.tar.gz"
 
       - name: Deploy on server
         if: steps.deployed.outputs.skip != 'true'
@@ -153,8 +152,8 @@ jobs:
             set -euo pipefail
             cd $DEPLOY_APP_DIR
             test -f .env.production
-            docker load -i /tmp/email-image.tar.gz
-            rm -f /tmp/email-image.tar.gz
+            docker load -i /tmp/swipe-image.tar.gz
+            rm -f /tmp/swipe-image.tar.gz
             if grep -q '^APP_IMAGE=' .env.production; then
               sed -i 's|^APP_IMAGE=.*|APP_IMAGE=${IMAGE_REF}|' .env.production
             else

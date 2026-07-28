@@ -39,8 +39,9 @@ pnpm site:deploy:dry-run
   as `text/plain` without a browser `Origin` header, so Astro otherwise rejects
   them before the secret and signature checks run.
 - Never log or display the complete webhook URL.
-- `NEWSLETTER_API_URL` may stay on `https://list.ian.is` as the private origin
-  during migration. Do not create a public `list.swipe.md` surface.
+- `NEWSLETTER_API_URL` points at `https://origin.swipe.md` after the private
+  origin cutover. Do not point Swipe confirmations at the Ian API or create a
+  public `list.swipe.md` surface.
 - Keep the homepage prerendered. Use Alpine for its form and background-card
   behavior. Do not add a client framework or route `/` through the Worker.
 - Keep `/confirm` prerendered. Alpine reads its signed token from `?token=` and

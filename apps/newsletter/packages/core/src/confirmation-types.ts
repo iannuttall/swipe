@@ -1,6 +1,6 @@
 import type { ContactInput } from './types.js'
 
-export type ConfirmationPurpose = 'double_opt_in' | 'swipe_migration'
+export type ConfirmationPurpose = 'double_opt_in' | 'swipe_invite' | 'swipe_migration'
 export type ConfirmationStatus = 'pending' | 'confirmed' | 'expired' | 'cancelled'
 
 export interface ConfirmationRequestRecord {

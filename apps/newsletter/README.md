@@ -203,9 +203,7 @@ email contact tag person@example.com --tag high-value --json
 email contact external-id person@example.com --provider stripe --external-id cus_123 --json
 email purchase record --email person@example.com --provider stripe --external-id pi_123 --idempotency-key stripe:pi_123 --product-key course --amount-cents 50000 --currency USD --json
 email audience preview --contact-tag high-value --json
-email confirmation prepare --yes --batch-key KEY --expires-at ISO --json
-email confirmation report --purpose swipe_migration --batch-key KEY --json
-email confirmation unsubscribe-unconfirmed --batch-key KEY --expired-before ISO --json
+email confirmation report --purpose swipe_invite --batch-key KEY --json
 email template list --json
 email template render --subject "Hello" --body-file draft.md --out-dir rendered --json
 email draft create --subject "Hello" --body-file draft.md --json
@@ -353,9 +351,10 @@ Protected routes:
 
 - `POST /api/subscribe`
 - `POST /api/confirmations/confirm`
-- `POST /api/confirmations/migration/prepare`
 - `GET /api/confirmations/report`
-- `POST /api/confirmations/migration/unsubscribe-unconfirmed`
+- `POST /api/confirmations/migration/prepare` for legacy same-database migrations
+- `POST /api/confirmations/migration/unsubscribe-unconfirmed` for legacy
+  same-database migrations
 - `GET /api/doctor`
 - `GET /api/ops/checklist`
 - `POST /api/ops/recover-stuck`

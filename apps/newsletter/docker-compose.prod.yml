@@ -1,8 +1,8 @@
-name: ${COMPOSE_PROJECT_NAME:-email}
+name: ${COMPOSE_PROJECT_NAME:-swipe}
 
 x-email-env: &email-env
   NODE_ENV: production
-  EMAIL_APP_NAME: ${EMAIL_APP_NAME:-Email}
+  EMAIL_APP_NAME: ${EMAIL_APP_NAME:-Swipe}
   DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
   BASE_URL: ${BASE_URL}
   EMAIL_API_INTERNAL_URL: ${EMAIL_API_INTERNAL_URL:-http://app:3000}
@@ -10,6 +10,8 @@ x-email-env: &email-env
   UNSUBSCRIBE_SECRET: ${UNSUBSCRIBE_SECRET}
   TRACKING_SECRET: ${TRACKING_SECRET}
   CONFIRMATION_SECRET: ${CONFIRMATION_SECRET}
+  SWIPE_INVITE_SECRET: ${SWIPE_INVITE_SECRET}
+  SWIPE_INVITE_BASE_URL: ${SWIPE_INVITE_BASE_URL:-https://swipe.md}
   EMAIL_CONFIRMATION_BASE_URL: ${EMAIL_CONFIRMATION_BASE_URL:-https://swipe.md}
   EMAIL_CONFIRMATION_TTL_HOURS: ${EMAIL_CONFIRMATION_TTL_HOURS:-72}
   EMAIL_DOUBLE_OPT_IN: ${EMAIL_DOUBLE_OPT_IN:-true}
@@ -47,7 +49,7 @@ services:
       args:
         BASE_URL: ${BASE_URL:-https://newsletter.example.com}
       target: runner
-    image: ${APP_IMAGE:-email:local}
+    image: ${APP_IMAGE:-swipe:local}
     restart: unless-stopped
     depends_on:
       postgres:
@@ -74,14 +76,14 @@ services:
       default:
       edge:
         aliases:
-          - ${APP_NAME:-email}
+          - ${APP_NAME:-swipe}
 
   web:
     build:
       context: ../..
       dockerfile: apps/newsletter/Dockerfile
       target: runner
-    image: ${APP_IMAGE:-email:local}
+    image: ${APP_IMAGE:-swipe:local}
     restart: unless-stopped
     depends_on:
       app:
@@ -90,8 +92,8 @@ services:
       NODE_ENV: production
       HOST: 0.0.0.0
       PORT: ${WEB_PORT:-3002}
-      APP_NAME: ${APP_NAME:-email}
-      EMAIL_APP_NAME: ${EMAIL_APP_NAME:-Email}
+      APP_NAME: ${APP_NAME:-swipe}
+      EMAIL_APP_NAME: ${EMAIL_APP_NAME:-Swipe}
       MAIN_SITE_NAME: ${MAIN_SITE_NAME:-}
       MAIN_SITE_URL: ${MAIN_SITE_URL:-}
       BASE_URL: ${BASE_URL}
@@ -115,14 +117,14 @@ services:
       default:
       edge:
         aliases:
-          - ${APP_NAME:-email}-web
+          - ${APP_NAME:-swipe}-web
 
   ops:
     build:
       context: ../..
       dockerfile: apps/newsletter/Dockerfile
       target: runner
-    image: ${APP_IMAGE:-email:local}
+    image: ${APP_IMAGE:-swipe:local}
     profiles: ["ops"]
     depends_on:
       postgres:
@@ -136,7 +138,7 @@ services:
       context: ../..
       dockerfile: apps/newsletter/Dockerfile
       target: runner
-    image: ${APP_IMAGE:-email:local}
+    image: ${APP_IMAGE:-swipe:local}
     profiles: ["sender"]
     depends_on:
       postgres:

@@ -21,7 +21,8 @@ import type {
 import { subscribeContact } from './contact-consent.js'
 import type { EmailProvider } from './providers.js'
 import type { EmailStore } from './store.js'
-import { ipHash } from './tracking.js'
+import { createTrackingToken, ipHash } from './tracking.js'
+import { welcomeEmail } from './welcome-template.js'
 
 export async function subscribeWithConfirmation(
   deps: { store: EmailStore; provider: EmailProvider; config: AppConfig },
@@ -103,7 +104,7 @@ export async function prepareMigrationConfirmations(
 }
 
 export async function confirmSubscription(
-  deps: { store: EmailStore; config: AppConfig },
+  deps: { store: EmailStore; provider: EmailProvider; config: AppConfig },
   input: {
     token: string
     ip?: string
@@ -134,11 +135,11 @@ export async function confirmSubscription(
   ) {
     return { confirmed: false, alreadyConfirmed: false, status: 'invalid' }
   }
-  return confirmStoredRequest(deps.store, input, request, secret)
+  return confirmStoredRequest(deps, input, request, secret)
 }
 
 async function confirmSwipeInvitation(
-  deps: { store: EmailStore; config: AppConfig },
+  deps: { store: EmailStore; provider: EmailProvider; config: AppConfig },
   input: {
     token: string
     ip?: string
@@ -178,7 +179,7 @@ async function confirmSwipeInvitation(
     ) {
       return { confirmed: false, alreadyConfirmed: false, status: 'invalid' }
     }
-    return confirmStoredRequest(deps.store, input, existing, secret, true)
+    return confirmStoredRequest(deps, input, existing, secret, true)
   }
 
   const activeSuppressions = await deps.store.listActiveSuppressionsForEmail(
@@ -214,11 +215,11 @@ async function confirmSwipeInvitation(
   ) {
     return { confirmed: false, alreadyConfirmed: false, status: 'invalid' }
   }
-  return confirmStoredRequest(deps.store, input, request, secret, true)
+  return confirmStoredRequest(deps, input, request, secret, true)
 }
 
 async function confirmStoredRequest(
-  store: EmailStore,
+  deps: { store: EmailStore; provider: EmailProvider; config: AppConfig },
   input: {
     token: string
     ip?: string
@@ -245,7 +246,7 @@ async function confirmStoredRequest(
   }
   const now = input.now ?? new Date()
   if (request.status !== 'pending' || request.expiresAt.getTime() <= now.getTime()) {
-    await store.confirmations.expireRequest(request.id)
+    await deps.store.confirmations.expireRequest(request.id)
     return {
       confirmed: false,
       alreadyConfirmed: false,
@@ -253,7 +254,7 @@ async function confirmStoredRequest(
       purpose: request.purpose,
     }
   }
-  const confirmed = await store.confirmations.confirmRequest({
+  const confirmed = await deps.store.confirmations.confirmRequest({
     id: request.id,
     confirmedAt: now,
     ...(input.ip ? { confirmedIpHash: ipHash(input.ip, auditSecret) } : {}),
@@ -262,15 +263,48 @@ async function confirmStoredRequest(
       ? { confirmedSourceUrl: sanitizeConfirmationSourceUrl(input.sourceUrl) }
       : {}),
   })
-  const success = confirmed?.status === 'confirmed'
+  const success = confirmed.request?.status === 'confirmed'
   if (success && reactivate) {
-    await store.reactivateContact({ contactId: request.contactId })
+    await deps.store.reactivateContact({ contactId: request.contactId })
+  }
+  if (
+    success &&
+    confirmed.newlyConfirmed &&
+    (request.purpose === 'double_opt_in' || request.purpose === 'swipe_invite')
+  ) {
+    await sendWelcomeAfterConfirmation(deps, request.contactId)
   }
   return {
     confirmed: success,
-    alreadyConfirmed: false,
+    alreadyConfirmed: success && !confirmed.newlyConfirmed,
     status: success ? 'confirmed' : 'invalid',
     purpose: request.purpose,
+  }
+}
+
+async function sendWelcomeAfterConfirmation(
+  deps: { store: EmailStore; provider: EmailProvider; config: AppConfig },
+  contactId: string,
+): Promise<void> {
+  try {
+    const contact = await deps.store.getContact(contactId)
+    if (contact?.status !== 'active') return
+
+    const unsubscribeToken = createTrackingToken(
+      { kind: 'unsubscribe', contactId },
+      requireSecret(deps.config.unsubscribeSecret, 'UNSUBSCRIBE_SECRET'),
+    )
+    const unsubscribeUrl = `${deps.config.baseUrl.replace(/\/$/, '')}/unsubscribe/${unsubscribeToken}`
+
+    await deps.provider.send(
+      await welcomeEmail({
+        config: deps.config,
+        email: contact.email,
+        unsubscribeUrl,
+      }),
+    )
+  } catch (error) {
+    console.error('Failed to send welcome email after confirmation', error)
   }
 }
 

@@ -116,13 +116,19 @@ export class MemoryConfirmationStore implements ConfirmationStore {
     confirmedIpHash?: string
     confirmedUserAgent?: string
     confirmedSourceUrl?: string
-  }): Promise<ConfirmationRequestRecord | undefined> {
+  }): Promise<{
+    request?: ConfirmationRequestRecord
+    newlyConfirmed: boolean
+  }> {
     const request = this.requests.get(input.id)
     if (
       request?.status !== 'pending' ||
       request.expiresAt.getTime() <= input.confirmedAt.getTime()
     ) {
-      return request
+      return {
+        ...(request ? { request } : {}),
+        newlyConfirmed: false,
+      }
     }
     request.status = 'confirmed'
     request.confirmedAt = input.confirmedAt
@@ -176,7 +182,7 @@ export class MemoryConfirmationStore implements ConfirmationStore {
         },
       })
     }
-    return request
+    return { request, newlyConfirmed: true }
   }
 
   async expireRequest(id: string): Promise<void> {

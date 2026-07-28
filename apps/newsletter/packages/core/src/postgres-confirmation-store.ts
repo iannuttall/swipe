@@ -145,7 +145,10 @@ export class PostgresConfirmationStore implements ConfirmationStore {
     confirmedIpHash?: string
     confirmedUserAgent?: string
     confirmedSourceUrl?: string
-  }): Promise<ConfirmationRequestRecord | undefined> {
+  }): Promise<{
+    request?: ConfirmationRequestRecord
+    newlyConfirmed: boolean
+  }> {
     return this.db.transaction(async (transaction) => {
       const [row] = await transaction
         .update(confirmationRequests)
@@ -175,7 +178,10 @@ export class PostgresConfirmationStore implements ConfirmationStore {
           .from(confirmationRequests)
           .where(eq(confirmationRequests.id, input.id))
           .limit(1)
-        return existing ? mapRequest(existing) : undefined
+        return {
+          ...(existing ? { request: mapRequest(existing) } : {}),
+          newlyConfirmed: false,
+        }
       }
 
       if (row.purpose === 'double_opt_in' || row.purpose === 'swipe_invite') {
@@ -223,7 +229,7 @@ export class PostgresConfirmationStore implements ConfirmationStore {
           })
           .onConflictDoNothing()
       }
-      return mapRequest(row)
+      return { request: mapRequest(row), newlyConfirmed: true }
     })
   }
 

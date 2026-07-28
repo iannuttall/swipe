@@ -3,16 +3,28 @@ import { describe, it } from 'node:test'
 import { loadConfig } from './config.js'
 import { confirmationTokenHash, createConfirmationToken } from './confirmation-token.js'
 import { CoreEmailPlatform } from './platform.js'
-import { TestEmailProvider } from './providers.js'
+import {
+  type ProviderSendInput,
+  type ProviderSendResult,
+  TestEmailProvider,
+} from './providers.js'
 import { MemoryEmailStore } from './store.js'
 
-function makePlatform(input: { doubleOptIn?: boolean; nowBaseUrl?: string } = {}) {
+function makePlatform(
+  input: {
+    doubleOptIn?: boolean
+    nowBaseUrl?: string
+    provider?: TestEmailProvider
+  } = {},
+) {
   const store = new MemoryEmailStore()
-  const provider = new TestEmailProvider()
+  const provider = input.provider ?? new TestEmailProvider()
   const config = loadConfig({
     NODE_ENV: 'test',
     APP_NAME: 'Swipe',
+    BASE_URL: 'https://swipe.md',
     EMAIL_FROM_EMAIL: 'ian@swipe.md',
+    EMAIL_FROM_NAME: 'Swipe',
     EMAIL_CONFIRMATION_BASE_URL: input.nowBaseUrl ?? 'https://swipe.md',
     EMAIL_DOUBLE_OPT_IN: String(input.doubleOptIn ?? true),
     CONFIRMATION_SECRET: 'confirmation-secret',
@@ -74,10 +86,26 @@ describe('subscriber confirmations', () => {
       store.events.filter((event) => event.type === 'contact.subscribed').length,
       1,
     )
+    assert.equal(provider.sent.length, 2)
+    const welcome = provider.sent[1]
+    assert.equal(welcome?.subject, "You're on Swipe")
+    assert.equal(welcome?.fromName, 'Swipe')
+    assert.equal(welcome?.replyTo, 'ian@swipe.md')
+    assert.match(welcome?.html ?? '', /move it from Promotions to Primary/)
+    assert.match(welcome?.html ?? '', /ian@swipe\.md/)
+    assert.match(welcome?.html ?? '', /https:\/\/swipe\.md\/unsubscribe\//)
+    assert.ok(
+      welcome?.headers?.some(
+        (header) =>
+          header.name === 'List-Unsubscribe' &&
+          header.value.startsWith('<https://swipe.md/unsubscribe/'),
+      ),
+    )
 
     const repeated = await platform.confirmSubscription({ token })
     assert.equal(repeated.confirmed, true)
     assert.equal(repeated.alreadyConfirmed, true)
+    assert.equal(provider.sent.length, 2)
   })
 
   it('does not send another confirmation to an active contact', async () => {
@@ -216,6 +244,8 @@ describe('subscriber confirmations', () => {
       (await swipe.store.findContactByEmail('reader@example.com'))?.status,
       'active',
     )
+    assert.equal(swipe.provider.sent.length, 1)
+    assert.equal(swipe.provider.sent[0]?.subject, "You're on Swipe")
     assert.deepEqual(
       await swipe.platform.getConfirmationReport({
         purpose: 'swipe_invite',
@@ -236,8 +266,40 @@ describe('subscriber confirmations', () => {
     const repeated = await swipe.platform.confirmSubscription({ token })
     assert.equal(repeated.confirmed, true)
     assert.equal(repeated.alreadyConfirmed, true)
+    assert.equal(swipe.provider.sent.length, 1)
+  })
+
+  it('keeps the confirmed subscription when the welcome email fails', async () => {
+    const provider = new FailingWelcomeProvider()
+    const { platform, store } = makePlatform({ provider })
+    await platform.subscribe({ email: 'reader@example.com' })
+    const token = confirmationToken(provider.sent[0]?.html ?? '')
+    const originalConsoleError = console.error
+    console.error = () => undefined
+
+    try {
+      const result = await platform.confirmSubscription({ token })
+
+      assert.equal(result.confirmed, true)
+      assert.equal(
+        (await store.findContactByEmail('reader@example.com'))?.status,
+        'active',
+      )
+      assert.equal((await platform.previewAudience()).total, 1)
+      assert.equal(provider.sent.length, 2)
+    } finally {
+      console.error = originalConsoleError
+    }
   })
 })
+
+class FailingWelcomeProvider extends TestEmailProvider {
+  override async send(input: ProviderSendInput): Promise<ProviderSendResult> {
+    const result = await super.send(input)
+    if (this.sent.length === 2) throw new Error('Welcome send failed')
+    return result
+  }
+}
 
 function confirmationTokenForRequest(
   request: Parameters<typeof createConfirmationToken>[0],

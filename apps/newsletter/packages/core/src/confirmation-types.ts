@@ -62,7 +62,10 @@ export interface ConfirmationStore {
     confirmedIpHash?: string
     confirmedUserAgent?: string
     confirmedSourceUrl?: string
-  }): Promise<ConfirmationRequestRecord | undefined>
+  }): Promise<{
+    request?: ConfirmationRequestRecord
+    newlyConfirmed: boolean
+  }>
   expireRequest(id: string): Promise<void>
   report(input: {
     purpose: ConfirmationPurpose

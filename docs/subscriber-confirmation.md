@@ -34,6 +34,12 @@ creates no contact.
 The Ian database stores no Swipe migration requests. Swipe stores only accepted
 invitations.
 
+The first successful confirmation also sends the Swipe welcome email. It asks
+the reader to move Swipe to their primary inbox, add the sender to their
+contacts or safe sender list, and reply. Repeating the confirmation does not
+send another welcome. A temporary welcome-email failure does not roll back the
+reader's confirmed consent.
+
 ## Configure Turnstile
 
 Create a managed Turnstile widget named `swipe-confirmation`. Allow `swipe.md`
@@ -170,6 +176,9 @@ depend on the Swipe report.
 The normal signup flow creates a pending Swipe contact and sends a confirmation
 email. The contact stays out of every audience until Turnstile and the signed
 confirmation POST succeed.
+
+The first successful confirmation sends one welcome email. It includes a signed
+unsubscribe link and the standard one-click unsubscribe headers.
 
 An active address does not receive another confirmation email. A hard-suppressed
 address cannot become pending.

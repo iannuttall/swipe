@@ -16,7 +16,7 @@ const {
 const inputId = `newsletter-${source.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;
 ---
 
-<div x-data={`newsletterSignup(${JSON.stringify({ source })})`} x-cloak x-show="visible">
+<div x-data={`newsletterSignup(${JSON.stringify({ source })})`}>
   <p x-cloak x-show="status === 'success'" class="text-sm" role="status">
     you're in - check your inbox.
   </p>

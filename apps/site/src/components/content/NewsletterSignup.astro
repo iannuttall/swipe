@@ -24,13 +24,9 @@ const panelStyle = {
 };
 ---
 
-{/* The whole card is nothing but a pitch, so it comes out once subscribed. */}
 <section
   aria-labelledby={titleId}
   data-agent-markdown="exclude"
-  x-data="newsletterShell"
-  x-cloak
-  x-show="!subscribed"
   class="flex flex-col text-[color:var(--card-inv-bg)]"
 >
   <DitherEdge direction="up" />

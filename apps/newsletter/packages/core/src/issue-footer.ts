@@ -21,20 +21,12 @@ export function issueFooter(
         Column,
         { className: 'issue-footer-cell', style: footerStyles.cell },
         h(Img, {
-          className: 'swipe-logo-light',
-          src: emailAssetUrl('email/swipe-email-logo@2x.png'),
+          className: 'swipe-logo',
+          src: emailAssetUrl('email/swipe-email-logo-universal@2x.png'),
           alt: 'Swipe',
           width: 105,
           height: 32,
           style: footerStyles.logo,
-        }),
-        h(Img, {
-          className: 'swipe-logo-dark',
-          src: emailAssetUrl('email/swipe-email-logo-dark@2x.png'),
-          alt: 'Swipe',
-          width: 105,
-          height: 32,
-          style: { ...footerStyles.logo, display: 'none' },
         }),
         h(Text, { className: 'issue-address', style: footerStyles.address }, address()),
         h(

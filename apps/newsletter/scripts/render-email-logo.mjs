@@ -9,7 +9,10 @@ const sourcePath = resolve(
   'apps/newsletter/emails/static/swipe-email-logo-source.svg',
 )
 const lightOutput = resolve(root, 'apps/site/public/email/swipe-email-logo@2x.png')
-const darkOutput = resolve(root, 'apps/site/public/email/swipe-email-logo-dark@2x.png')
+const universalOutput = resolve(
+  root,
+  'apps/site/public/email/swipe-email-logo-universal@2x.png',
+)
 const magick = '/opt/homebrew/bin/magick'
 const fonttools = '/opt/homebrew/bin/fonttools'
 const fontUrl =
@@ -19,7 +22,8 @@ const workDir = mkdtempSync(join(tmpdir(), 'swipe-email-logo-'))
 const variableFont = join(workDir, 'BricolageGrotesque-variable.ttf')
 const staticFont = join(workDir, 'BricolageGrotesque-SemiBold.ttf')
 const lightSourcePath = join(workDir, 'swipe-email-logo-light.svg')
-const darkSourcePath = join(workDir, 'swipe-email-logo-dark.svg')
+const textMask = join(workDir, 'swipe-email-logo-text-mask.png')
+const textHalo = join(workDir, 'swipe-email-logo-text-halo.png')
 
 try {
   execFileSync('curl', ['-fsSL', fontUrl, '-o', variableFont])
@@ -34,17 +38,12 @@ try {
   ])
 
   const lightSource = readFileSync(sourcePath, 'utf8')
-  const darkSource = lightSource.replace(
-    '<text x="65" y="36.5" fill="#0F1115"',
-    '<text x="65" y="36.5" fill="#FFFFFF"',
-  )
   writeFileSync(lightSourcePath, lightSource)
-  writeFileSync(darkSourcePath, darkSource)
   renderLogo(lightSourcePath, lightOutput)
-  renderLogo(darkSourcePath, darkOutput)
+  addTextHalo(lightOutput, universalOutput)
 
   console.log(`Wrote ${lightOutput}`)
-  console.log(`Wrote ${darkOutput}`)
+  console.log(`Wrote ${universalOutput}`)
 } finally {
   rmSync(workDir, { recursive: true, force: true })
 }
@@ -60,6 +59,50 @@ function renderLogo(source, output) {
     source,
     '-resize',
     '340x104!',
+    '-strip',
+    output,
+  ])
+}
+
+function addTextHalo(source, output) {
+  execFileSync(magick, [
+    source,
+    '-crop',
+    '220x104+120+0',
+    '+repage',
+    '-alpha',
+    'extract',
+    '-morphology',
+    'Dilate',
+    'Diamond:2',
+    textMask,
+  ])
+  execFileSync(magick, [
+    '-size',
+    '220x104',
+    'xc:white',
+    textMask,
+    '-alpha',
+    'off',
+    '-compose',
+    'CopyOpacity',
+    '-composite',
+    textHalo,
+  ])
+  execFileSync(magick, [
+    '-size',
+    '340x104',
+    'xc:none',
+    textHalo,
+    '-geometry',
+    '+120+0',
+    '-compose',
+    'over',
+    '-composite',
+    source,
+    '-compose',
+    'over',
+    '-composite',
     '-strip',
     output,
   ])

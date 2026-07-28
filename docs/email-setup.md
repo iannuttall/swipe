@@ -288,7 +288,7 @@ Set the sender identity:
 
 ```text
 EMAIL_FROM_EMAIL=ian@swipe.md
-EMAIL_FROM_NAME=Ian Nuttall
+EMAIL_FROM_NAME=Ian at Swipe
 ```
 
 Restart the API and sender containers after changing the credential:

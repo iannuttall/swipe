@@ -55,7 +55,7 @@ EMAIL_CONFIRMATION_TTL_HOURS=72
 EMAIL_DOUBLE_OPT_IN=true
 EMAIL_PROVIDER=ses
 EMAIL_FROM_EMAIL=hello@swipe.md
-EMAIL_FROM_NAME="Swipe"
+EMAIL_FROM_NAME="Ian at Swipe"
 ```
 
 `APP_NAME` is the infrastructure/app id. `EMAIL_APP_NAME` is the public display

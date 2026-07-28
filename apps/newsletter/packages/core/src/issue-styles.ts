@@ -305,28 +305,6 @@ export const issueResponsiveCss = `
   a:hover {
     text-decoration-style: solid !important;
   }
-  .issue-dither-dark,
-  .swipe-logo-dark {
-    display: none !important;
-  }
-  [data-ogsc] .issue-dither-light,
-  [data-ogsc] .swipe-logo-light {
-    display: none !important;
-  }
-  [data-ogsc] .issue-dither-dark,
-  [data-ogsc] .swipe-logo-dark {
-    display: block !important;
-  }
-  @media (prefers-color-scheme: dark) {
-    .issue-dither-light,
-    .swipe-logo-light {
-      display: none !important;
-    }
-    .issue-dither-dark,
-    .swipe-logo-dark {
-      display: block !important;
-    }
-  }
   @media only screen and (max-width: 599px) {
     .issue-stack {
       display: block !important;

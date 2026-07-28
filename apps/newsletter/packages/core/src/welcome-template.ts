@@ -1,30 +1,46 @@
+import { readFileSync } from 'node:fs'
 import type { AppConfig } from './config.js'
 import { requireSecret } from './config.js'
 import type { ProviderSendInput } from './providers.js'
 import { renderDraftEmail } from './render.js'
 import type { DraftInput } from './types.js'
 
-export const welcomeEmailContent = {
-  subject: "You're on Swipe",
-  preview: 'One small favour before the first issue.',
-  template: 'default',
-  bodyMarkdown: `Hey, you're on Swipe.
+export const welcomeEmailContent = parseWelcomeEmailContent(
+  readFileSync(new URL('./welcome.md', import.meta.url), 'utf8'),
+)
 
-Every week we send useful AI skills, prompts, tools, and workflows worth stealing.
+export function parseWelcomeEmailContent(raw: string): DraftInput {
+  const match = raw.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/)
+  if (!match) throw new Error('welcome.md must start with frontmatter')
 
-<Text title="Help the next issue land in the right place">
-- If this message is in spam, mark it as not spam.
-- In Gmail, move it from Promotions to Primary and choose Yes when Gmail asks about future messages.
-- Add ian@swipe.md to your contacts or safe sender list.
-- Reply and say hi. You can also tell us what you want to use AI for.
-</Text>
+  const frontmatter = Object.fromEntries(
+    (match[1] ?? '')
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        const separator = line.indexOf(':')
+        if (separator === -1) throw new Error(`Invalid frontmatter line: ${line}`)
+        const key = line.slice(0, separator).trim()
+        const value = line
+          .slice(separator + 1)
+          .trim()
+          .replace(/^["']|["']$/g, '')
+        return [key, value]
+      }),
+  )
+  const subject = frontmatter.subject
+  const preview = frontmatter.preview
+  if (!subject) throw new Error('welcome.md is missing subject')
+  if (!preview) throw new Error('welcome.md is missing preview')
 
-That tells your email app you asked for Swipe and want future issues.
-
-See you in the next issue,
-
-Swipe`,
-} satisfies DraftInput
+  return {
+    subject,
+    preview,
+    template: frontmatter.template ?? 'default',
+    bodyMarkdown: (match[2] ?? '').trim(),
+  }
+}
 
 export async function welcomeEmail(input: {
   config: AppConfig
@@ -35,7 +51,7 @@ export async function welcomeEmail(input: {
   const fromName = input.config.email.fromName
   const rendered = await renderDraftEmail({
     ...welcomeEmailContent,
-    bodyMarkdown: welcomeEmailContent.bodyMarkdown.replace('ian@swipe.md', fromEmail),
+    bodyMarkdown: welcomeEmailContent.bodyMarkdown.replaceAll('{{fromEmail}}', fromEmail),
   })
 
   return {

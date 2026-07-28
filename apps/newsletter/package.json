@@ -10,6 +10,7 @@
   "scripts": {
     "build": "turbo --root-turbo-json turbo.json run build --filter='@email/*'",
     "clean": "turbo --root-turbo-json turbo.json run clean --filter='@email/*'",
+    "email:divider": "node scripts/render-email-divider.mjs",
     "email:preview": "node scripts/react-email-preview.mjs",
     "email:logo": "node scripts/render-email-logo.mjs",
     "lint": "node scripts/check-file-lines.mjs && biome check . && turbo --root-turbo-json turbo.json run lint --filter='@email/*'",

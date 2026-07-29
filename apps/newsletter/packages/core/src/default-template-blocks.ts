@@ -34,7 +34,11 @@ const sectionMarkers: Record<string, string> = {
   classifieds: '◆',
 }
 
-export function defaultBlocks(sections: IssueSection[], issueName?: string): ReactNode[] {
+export function defaultBlocks(
+  sections: IssueSection[],
+  issueName?: string,
+  withDividers = true,
+): ReactNode[] {
   const items = parseIssueItems(sections)
   const units: Array<{ kind: string; node: ReactNode }> = []
   let addedContents = false
@@ -82,7 +86,7 @@ export function defaultBlocks(sections: IssueSection[], issueName?: string): Rea
 
   const blocks: ReactNode[] = []
   units.forEach((unit, index) => {
-    if (index > 0 && needsDivider(units, index, items.length > 0)) {
+    if (withDividers && index > 0 && needsDivider(units, index, items.length > 0)) {
       blocks.push(issueSectionDivider(`default-divider-${index}`))
     }
     blocks.push(h(Fragment, { key: `default-${unit.kind}-${index}` }, unit.node))

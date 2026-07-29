@@ -66,10 +66,10 @@ describe('subscriber confirmations', () => {
       provider.sent[0]?.html ?? '',
       /https:\/\/swipe\.md\/email\/swipe-email-logo-on-white@2x\.png/,
     )
-    assert.match(
-      provider.sent[0]?.html ?? '',
-      /linear-gradient\(135deg, #FF8CC5 0%, #FF4FA3 48%, #D92778 100%\)/,
-    )
+    assert.match(provider.sent[0]?.html ?? '', /background-color:#4548E9/)
+    assert.doesNotMatch(provider.sent[0]?.html ?? '', /hr-center-on-white@2x\.png/)
+    assert.equal((provider.sent[0]?.html.match(/Confirm your email/g) ?? []).length, 1)
+    assert.doesNotMatch(provider.sent[0]?.html ?? '', /20-22/)
     assert.doesNotMatch(provider.sent[0]?.html ?? '', /{{unsubscribeUrl}}/)
 
     const token = confirmationToken(provider.sent[0]?.html ?? '')

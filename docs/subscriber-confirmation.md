@@ -177,6 +177,13 @@ The normal signup flow creates a pending Swipe contact and sends a confirmation
 email. The contact stays out of every audience until Turnstile and the signed
 confirmation POST succeed.
 
+Edit the confirmation subject, preview text, and body in
+`apps/newsletter/emails/confirmation.md`. Its `{{appName}}` and
+`{{confirmationUrl}}` placeholders are replaced when the message is sent. Run
+`pnpm newsletter:email:preview` to review the React Email render locally. The
+confirmation deliberately uses `<Footer show="false" />`; other emails retain
+the standard footer.
+
 The first successful confirmation sends one welcome email. It includes a signed
 unsubscribe link and the standard one-click unsubscribe headers.
 

@@ -75,7 +75,7 @@ export function DefaultEmail(draft: DraftInput) {
   const sections = parsed.filter(
     (section) => !['hero', 'header', 'footer'].includes(section.type),
   )
-  const blocks = defaultBlocks(sections, draft.name)
+  const blocks = defaultBlocks(sections, draft.name, header?.attrs.dividers !== 'off')
 
   return h(
     Html,
@@ -109,6 +109,7 @@ export function DefaultEmail(draft: DraftInput) {
 }
 
 function defaultFooterBand(footer: IssueSection | undefined) {
+  if (footer?.attrs.show === 'false') return null
   return issueFooter(footer, undefined, undefined, 'default-footer')
 }
 
@@ -130,13 +131,14 @@ function defaultHeader(header: IssueSection | undefined, minutes?: number) {
 
 function headerRow(header: IssueSection | undefined, minutes?: number) {
   // <Header name="Issue 001" /> renders "Issue 001 - 3 min read" top-right.
-  // Opt out with read-time="off".
+  // Opt out of reading time with read-time="off" or the label with name="off".
   const name = header?.attrs.name
+  const withLabel = name !== 'off'
   const withTime =
-    name && minutes && header?.attrs['read-time'] !== 'off'
+    withLabel && name && minutes && header?.attrs['read-time'] !== 'off'
       ? `${name} - ${minutes} min read`
       : name
-  const label = withTime ?? 'Swipe'
+  const label = withLabel ? (withTime ?? 'Swipe') : undefined
   return h(
     Row,
     null,
@@ -165,7 +167,7 @@ function headerRow(header: IssueSection | undefined, minutes?: number) {
     h(
       Column,
       { align: 'right', style: defaultEmailStyles.headerCell, width: '50%' },
-      h(Text, { style: defaultEmailStyles.company }, label),
+      label ? h(Text, { style: defaultEmailStyles.company }, label) : null,
     ),
   )
 }

@@ -1,8 +1,8 @@
 import type { DraftInput } from './types.js'
 
-export function parseWelcomeEmailContent(raw: string): DraftInput {
+export function parseEmailContent(raw: string, sourceName = 'email.md'): DraftInput {
   const match = raw.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/)
-  if (!match) throw new Error('welcome.md must start with frontmatter')
+  if (!match) throw new Error(`${sourceName} must start with frontmatter`)
 
   const frontmatter = Object.fromEntries(
     (match[1] ?? '')
@@ -22,8 +22,8 @@ export function parseWelcomeEmailContent(raw: string): DraftInput {
   )
   const subject = frontmatter.subject
   const preview = frontmatter.preview
-  if (!subject) throw new Error('welcome.md is missing subject')
-  if (!preview) throw new Error('welcome.md is missing preview')
+  if (!subject) throw new Error(`${sourceName} is missing subject`)
+  if (!preview) throw new Error(`${sourceName} is missing preview`)
 
   return {
     subject,
@@ -31,4 +31,8 @@ export function parseWelcomeEmailContent(raw: string): DraftInput {
     template: frontmatter.template ?? 'default',
     bodyMarkdown: (match[2] ?? '').trim(),
   }
+}
+
+export function parseWelcomeEmailContent(raw: string): DraftInput {
+  return parseEmailContent(raw, 'welcome.md')
 }

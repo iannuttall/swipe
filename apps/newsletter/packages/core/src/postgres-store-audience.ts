@@ -1,4 +1,4 @@
-import { and, asc, eq, type SQL, sql } from 'drizzle-orm'
+import { and, asc, eq, inArray, type SQL, sql } from 'drizzle-orm'
 import type { Database } from './db/index.js'
 import { contacts } from './db/schema.js'
 import { mapContact } from './postgres-store-mappers.js'
@@ -169,10 +169,7 @@ function maybeNotIn(column: string, values?: string[]): SQL[] {
 }
 
 function inValues(column: SQL, values: string[]): SQL {
-  return sql`(${sql.join(
-    values.map((value) => sql`${column} = ${value}`),
-    sql` or `,
-  )})`
+  return inArray(column, values)
 }
 
 function all<T>(values: T[] | undefined, build: (value: T) => SQL): SQL[] {

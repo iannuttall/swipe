@@ -2,7 +2,10 @@
 import SiteWordmark from "@/components/content/SiteWordmark.astro";
 
 // `/about` is unpublished for now, so it stays out of the nav.
-const links = [{ href: "/issues", label: "Issues" }];
+const links = [
+  { href: "/issues", label: "Issues" },
+  { href: "/tools", label: "Tools" },
+];
 
 const current = Astro.url.pathname.replace(/\/$/, "");
 ---

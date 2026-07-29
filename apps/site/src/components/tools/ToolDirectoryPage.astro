@@ -1,0 +1,46 @@
+---
+import type { CollectionEntry } from "astro:content";
+import PageHeader from "@/components/content/PageHeader.astro";
+import ToolDirectory from "@/components/tools/ToolDirectory.astro";
+import Layout from "@/layouts/Layout.astro";
+
+interface Props {
+  tools: CollectionEntry<"tools">[];
+  currentPage: number;
+  totalPages: number;
+  canonicalPath: string;
+}
+
+const { tools, currentPage, totalPages, canonicalPath } = Astro.props;
+const description =
+  "Useful AI tools we have checked ourselves, including what they help with and what to watch before you use them.";
+const title =
+  currentPage === 1 ? "Useful AI tools" : `Useful AI tools — Page ${currentPage}`;
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: title,
+  description,
+  url: new URL(canonicalPath, Astro.site).toString(),
+  hasPart: tools.map((tool) => ({
+    "@type": "SoftwareApplication",
+    name: tool.data.name,
+    description: tool.data.description,
+    url: new URL(`/tools/${tool.id}`, Astro.site).toString(),
+  })),
+};
+---
+
+<Layout
+  title={title}
+  description={description}
+  canonicalPath={canonicalPath}
+  structuredData={schema}
+>
+  <PageHeader title="Useful AI tools" description={description} />
+  <ToolDirectory
+    tools={tools}
+    currentPage={currentPage}
+    totalPages={totalPages}
+  />
+</Layout>

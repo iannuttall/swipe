@@ -43,25 +43,27 @@ export function defaultBlocks(
   const units: Array<{ kind: string; node: ReactNode }> = []
   let addedContents = false
   let addedMarkdown = false
-  let activeItemGroup: 'established' | 'new' | undefined
+  let activeItemGroup: 'tool' | 'workflow' | undefined
 
   for (const section of sections) {
     if (section.type === 'item' && !addedContents) {
       units.push({
         kind: 'contents',
-        node: moduleCell(itemContents(items)),
+        node: moduleCell(itemContents(items, issueName)),
       })
       addedContents = true
     }
     if (section.type === 'item') {
       const item = parseIssueItem(section)
       if (!item.sponsor) {
-        const group = item.newRelease ? 'new' : 'established'
+        const group = item.kind
         if (group !== activeItemGroup) {
           units.push({
             kind: 'item-group',
             node: contentCell(
-              sectionHeading(group === 'new' ? 'New and early' : 'Useful tools'),
+              sectionHeading(
+                group === 'workflow' ? 'Skills, loops & workflows' : 'Tools',
+              ),
             ),
           })
           activeItemGroup = group

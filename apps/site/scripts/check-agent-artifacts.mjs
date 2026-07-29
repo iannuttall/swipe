@@ -7,10 +7,12 @@ const dist = resolve(import.meta.dirname, "../dist/client");
 const manifestPath = resolve(dist, "agent-routes.json");
 const headersPath = resolve(dist, "_headers");
 const llmsPath = resolve(dist, "llms.txt");
+const toolSearchPath = resolve(dist, "tools/index.json");
 
 assert.ok(existsSync(manifestPath), "Missing agent-routes.json");
 assert.ok(existsSync(headersPath), "Missing generated _headers");
 assert.ok(existsSync(llmsPath), "Missing llms.txt");
+assert.ok(existsSync(toolSearchPath), "Missing tools/index.json");
 
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
 assert.equal(manifest.version, 1);
@@ -77,6 +79,15 @@ assert.doesNotMatch(
   /Swipe the best AI skills|you're in - check your inbox/iu,
 );
 
+const toolPage = manifest.pages.find(
+  (page) => page.htmlPath === "/tools/here-now",
+);
+assert.ok(toolPage, "Published tool is missing from agent-routes.json");
+assert.match(
+  readFileSync(resolve(dist, toolPage.markdownFile), "utf8"),
+  /Here\.now: Free instant web hosting for AI agents/u,
+);
+
 const headers = readFileSync(headersPath, "utf8");
 assert.match(headers, /^\/index\.md$/mu);
 assert.match(
@@ -93,6 +104,19 @@ assert.match(llms, /https:\/\/swipe\.md\/issues\.md/u);
 
 const sitemap = readFileSync(resolve(dist, "sitemap.xml"), "utf8");
 assert.doesNotMatch(sitemap, /\.md</u);
+assert.match(sitemap, /https:\/\/swipe\.md\/tools\/here-now/u);
+
+const toolSearch = JSON.parse(readFileSync(toolSearchPath, "utf8"));
+assert.ok(Array.isArray(toolSearch), "Tool search index is not an array");
+assert.ok(
+  toolSearch.some(
+    (tool) =>
+      tool.slug === "here-now" &&
+      tool.name === "Here.now" &&
+      tool.icon === "/tools/icons/here-now.png",
+  ),
+  "Here.now is missing from the tool search index",
+);
 
 console.log(`Verified ${manifest.pages.length} agent Markdown routes.`);
 

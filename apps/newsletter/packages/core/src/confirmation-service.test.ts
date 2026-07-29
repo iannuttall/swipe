@@ -68,7 +68,7 @@ describe('subscriber confirmations', () => {
     )
     assert.match(provider.sent[0]?.html ?? '', /background-color:#4548E9/)
     assert.doesNotMatch(provider.sent[0]?.html ?? '', /hr-center-on-white@2x\.png/)
-    assert.equal((provider.sent[0]?.html.match(/Confirm your email/g) ?? []).length, 1)
+    assert.doesNotMatch(provider.sent[0]?.html ?? '', /Confirm your email/)
     assert.doesNotMatch(provider.sent[0]?.html ?? '', /20-22/)
     assert.doesNotMatch(provider.sent[0]?.html ?? '', /{{unsubscribeUrl}}/)
 

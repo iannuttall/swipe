@@ -12,6 +12,7 @@ export interface IssueItem {
   chip: string
   sponsor: boolean
   newRelease: boolean
+  kind: 'tool' | 'workflow'
   sponsorLabel: string
   likeLabel: string
   dislikeLabel: string
@@ -45,6 +46,7 @@ export function parseIssueItem(section: IssueItemSection): IssueItem {
   const url = section.attrs.url?.trim() ?? ''
   const sponsor = isTruthy(section.attrs.sponsor)
   const newRelease = isTruthy(section.attrs.new)
+  const kind = itemKind(section.attrs.kind, id)
   return {
     id,
     title,
@@ -53,6 +55,7 @@ export function parseIssueItem(section: IssueItemSection): IssueItem {
     chip: section.attrs.chip?.trim() || (sponsor ? '✦' : newRelease ? 'β' : '＋'),
     sponsor,
     newRelease,
+    kind,
     sponsorLabel: section.attrs['sponsor-label']?.trim() || '[sponsor]',
     likeLabel:
       section.attrs['like-label']?.trim() ||
@@ -120,6 +123,14 @@ function splitItemBody(body: string, id: string): Record<ItemPart, string> {
 
 function itemPart(name: string): ItemPart {
   return name === 'Like' || name === 'Swipe' ? 'like' : 'dislike'
+}
+
+function itemKind(value: string | undefined, id: string): 'tool' | 'workflow' {
+  const kind = value?.trim().toLowerCase() || 'tool'
+  if (kind !== 'tool' && kind !== 'workflow') {
+    throw new Error(`Item ${id} kind must be tool or workflow`)
+  }
+  return kind
 }
 
 function isTruthy(value?: string): boolean {

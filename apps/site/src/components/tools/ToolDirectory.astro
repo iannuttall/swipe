@@ -1,0 +1,144 @@
+---
+import type { CollectionEntry } from "astro:content";
+import ToolGrid from "@/components/tools/ToolGrid.astro";
+
+interface Props {
+  tools: CollectionEntry<"tools">[];
+  currentPage: number;
+  totalPages: number;
+}
+
+const { tools, currentPage, totalPages } = Astro.props;
+const pageHref = (page: number) => (page === 1 ? "/tools" : `/tools/page/${page}`);
+---
+
+<section
+  class="mt-10"
+  x-data={`toolDirectorySearch(${JSON.stringify({ manifestUrl: "/tools/index.json" })})`}
+>
+  <div class="mb-7 max-w-xl">
+    <label for="tool-search" class="font-heading text-sm font-semibold">
+      Search tools
+    </label>
+    <div class="quiet-field mt-2 flex">
+      <span class="grid w-11 shrink-0 place-items-center font-mono text-muted" aria-hidden="true">
+        /
+      </span>
+      <input
+        id="tool-search"
+        type="search"
+        placeholder="Search by name, job, or category"
+        autocomplete="off"
+        x-model.debounce.150ms="query"
+        class="min-w-0 flex-1 bg-transparent py-3 pr-4 text-base outline-none placeholder:text-muted"
+      />
+    </div>
+  </div>
+
+  <div x-show="query.trim() === ''">
+    {
+      tools.length > 0 ? (
+        <ToolGrid tools={tools} />
+      ) : (
+        <p class="text-muted">No tools have cleared our checks yet.</p>
+      )
+    }
+
+    {
+      totalPages > 1 ? (
+        <nav
+          aria-label="Tool directory pages"
+          class="mt-8 flex items-center justify-between gap-4 font-mono text-sm"
+        >
+          {currentPage > 1 ? (
+            <a
+              href={pageHref(currentPage - 1)}
+              rel="prev"
+              class="text-primary underline decoration-dotted underline-offset-3 hover:decoration-solid"
+            >
+              ← Previous
+            </a>
+          ) : (
+            <span />
+          )}
+          <span class="text-muted">
+            Page {currentPage} of {totalPages}
+          </span>
+          {currentPage < totalPages ? (
+            <a
+              href={pageHref(currentPage + 1)}
+              rel="next"
+              class="text-primary underline decoration-dotted underline-offset-3 hover:decoration-solid"
+            >
+              Next →
+            </a>
+          ) : (
+            <span />
+          )}
+        </nav>
+      ) : null
+    }
+  </div>
+
+  <div x-cloak x-show="query.trim() !== ''">
+    <p x-show="status === 'loading'" class="text-muted">Loading tools…</p>
+    <p x-show="status === 'error'" class="text-muted">
+      Search could not load. The directory pages still work above.
+    </p>
+    <p
+      x-show="status === 'ready' && results.length === 0"
+      class="text-muted"
+      x-text="`No tools found for “${query.trim()}”.`"
+    >
+    </p>
+
+    <ol
+      x-show="status === 'ready' && results.length > 0"
+      class="grid gap-3 sm:grid-cols-2 md:grid-cols-3"
+    >
+      <template x-for="tool in results" x-bind:key="tool.slug">
+        <li>
+          <a
+            x-bind:href="`/tools/${tool.slug}`"
+            class="quiet-card tool-card flex h-full flex-col p-5 no-underline"
+          >
+            <div class="flex items-start justify-between gap-4">
+              <span
+                class="grid size-11 shrink-0 place-items-center overflow-hidden bg-background font-mono text-sm font-semibold text-[#0f1115]"
+                aria-hidden="true"
+              >
+                <template x-if="tool.icon">
+                  <img
+                    x-bind:src="tool.icon"
+                    alt=""
+                    width="48"
+                    height="48"
+                    class="size-full object-contain"
+                  />
+                </template>
+                <span x-show="!tool.icon" x-text="initials(tool.name)"></span>
+              </span>
+              <span
+                class="pt-1 text-right font-mono text-[0.68rem] leading-snug text-muted"
+                x-text="tool.category"
+              >
+              </span>
+            </div>
+            <div class="mt-6">
+              <h2
+                class="tool-card-title font-heading text-lg leading-tight font-semibold tracking-tight text-pretty"
+                x-text="tool.name"
+              >
+              </h2>
+              <p
+                class="tool-card-tagline mt-2 text-sm leading-snug text-muted text-pretty"
+                x-text="tool.tagline"
+              >
+              </p>
+            </div>
+          </a>
+        </li>
+      </template>
+    </ol>
+  </div>
+</section>

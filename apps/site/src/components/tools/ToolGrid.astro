@@ -1,0 +1,20 @@
+---
+import type { CollectionEntry } from "astro:content";
+import ToolCard from "@/components/tools/ToolCard.astro";
+
+interface Props {
+  tools: CollectionEntry<"tools">[];
+}
+
+const { tools } = Astro.props;
+---
+
+<ol class="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+  {
+    tools.map((tool) => (
+      <li>
+        <ToolCard tool={tool} />
+      </li>
+    ))
+  }
+</ol>

@@ -168,7 +168,7 @@ describe('CoreEmailPlatform', () => {
     assert.equal(provider.sent[0]?.to, 'send@example.com')
   })
 
-  it('preserves query params when rewriting tracked links', async () => {
+  it('preserves query params and fragments when rewriting tracked links', async () => {
     const store = new MemoryEmailStore()
     const provider = new TestEmailProvider()
     const platform = new CoreEmailPlatform({
@@ -181,7 +181,7 @@ describe('CoreEmailPlatform', () => {
     const draft = await platform.createDraft({
       subject: 'Query params',
       bodyMarkdown:
-        'Read [this](https://example.com/read?utm_source=local-test&utm_medium=email&utm_campaign=seed-test).',
+        'Read [this](https://example.com/read?utm_source=local-test&utm_medium=email&utm_campaign=seed-test#details).',
     })
     await platform.createBroadcast({ draftId: draft.id, scheduledAt: new Date(0) })
     await platform.sendDue(new Date('2026-06-20T00:00:00.000Z'))
@@ -198,9 +198,10 @@ describe('CoreEmailPlatform', () => {
 
     assert.equal(
       result.url,
-      'https://example.com/read?utm_source=local-test&utm_medium=email&utm_campaign=seed-test',
+      'https://example.com/read?utm_source=local-test&utm_medium=email&utm_campaign=seed-test#details',
     )
     assert.equal(new URL(result.url ?? '').searchParams.get('utm_medium'), 'email')
+    assert.equal(new URL(result.url ?? '').hash, '#details')
   })
 
   it('reschedules failed sends until attempts are exhausted', async () => {

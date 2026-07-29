@@ -34,12 +34,12 @@ const schema = {
     issues.length === 0 ? (
       <p class="mt-12 text-muted">No published issues yet.</p>
     ) : (
-      <ol class="mt-12 border-2 border-border-strong bg-card">
-        {issues.map((issue, index) => (
-          <li class:list={[index > 0 && "border-t-2 border-border-strong"]}>
+      <ol class="mt-12 space-y-3">
+        {issues.map((issue) => (
+          <li>
             <a
               href={`/issues/${issue.id}`}
-              class="issue-row block px-5 py-6 no-underline sm:px-6"
+              class="quiet-card block px-5 py-6 no-underline sm:px-6"
             >
               <time
                 class="font-mono text-xs text-muted"
@@ -48,11 +48,11 @@ const schema = {
                 {formatIssueDate(issue.data.pubDate)}
               </time>
               <p class="mt-2 font-heading text-xl leading-snug font-semibold tracking-tight text-pretty">
-                {issue.data.subject}
+                {issue.data.title ?? issue.data.subject}
               </p>
-              {issue.data.preheader ? (
+              {issue.data.description ?? issue.data.preheader ? (
                 <p class="mt-1.5 text-base leading-normal text-muted text-pretty">
-                  {issue.data.preheader}
+                  {issue.data.description ?? issue.data.preheader}
                 </p>
               ) : null}
             </a>

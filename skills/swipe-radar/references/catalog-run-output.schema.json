@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "title",
+    "message",
+    "nextStep",
+    "reportPath",
+    "created",
+    "updated",
+    "rejected"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["catalog_ready", "no_changes", "blocked"]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "message": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 280
+    },
+    "nextStep": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240
+    },
+    "reportPath": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 8
+    },
+    "updated": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 8
+    },
+    "rejected": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

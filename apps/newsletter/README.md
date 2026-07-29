@@ -282,7 +282,9 @@ The result only matters when the test resembles your real work.
 `id` and `title` are required. Keep the opening description to three or four
 words. `<Like>` and `<Dislike>` are required. Established products use `＋`;
 `new="true"` uses `β`, and `sponsor="true"` uses `✦` plus the paid label. Item
-IDs become stable archive anchors. Finish the issue with `<ReachOut>` and
+IDs become stable archive anchors. The email contents list links to those
+anchors on the canonical `swipe.md` issue page rather than relying on local
+email anchors, which vary by client. Finish the issue with `<ReachOut>` and
 `<Disclosure>` when needed; the direct agent Markdown link is inserted before
 the disclosure.
 

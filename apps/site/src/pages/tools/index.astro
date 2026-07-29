@@ -1,0 +1,21 @@
+---
+export const prerender = true;
+
+import ToolDirectoryPage from "@/components/tools/ToolDirectoryPage.astro";
+import {
+  getVisibleTools,
+  paginateTools,
+  toolPageCount,
+} from "@/lib/tools";
+
+const allTools = await getVisibleTools();
+const totalPages = toolPageCount(allTools.length);
+const tools = paginateTools(allTools, 1);
+---
+
+<ToolDirectoryPage
+  tools={tools}
+  currentPage={1}
+  totalPages={totalPages}
+  canonicalPath="/tools"
+/>

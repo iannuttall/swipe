@@ -198,13 +198,15 @@ signal, not a claim that the product is technically in beta. Set
 `What we like:`, `What we don't like:`, and `[sponsor]`. Use `chip`,
 `like-label`, `dislike-label`, and `sponsor-label` only when an issue needs
 different wording. Contents summaries default to the short description and
-archive anchors are generated from item IDs.
+archive anchors are generated from item IDs. Email contents links use the full
+`https://swipe.md/issues/<slug>#<item-id>` URL because local email anchors are
+not reliable across clients.
 
-Author items in display order. A sponsor goes first, followed by three
-established products and five new or early products. The template inserts
-`Useful tools` and `New and early` headings from the item flags. Sponsor
-responses use `mailto:ian@swipe.md?subject=Sponsor%20Swipe` until the placement
-has enough data to justify a landing page.
+Author items in display order. A sponsor goes first when present. A normal
+issue contains up to four tools and up to four skills, loops, or workflows;
+these are ceilings rather than quotas. Sponsor responses use
+`mailto:ian@swipe.md?subject=Sponsor%20Swipe` until the placement has enough
+data to justify a landing page.
 
 Use `<ReachOut>` for the closing action list and `<Disclosure>` for the final
 editorial note. When a draft has a stable name, the template adds the direct

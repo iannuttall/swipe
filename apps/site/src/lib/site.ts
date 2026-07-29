@@ -1,4 +1,4 @@
-export const siteName = "SWIPE.md";
+export const siteName = "Swipe";
 export const siteUrl = "https://swipe.md";
 export const siteDescription = "The weekly newsletter that helps you learn AI by actually doing cool things with it.";
 export const ogImageServiceUrl = "https://og.ian.is/";

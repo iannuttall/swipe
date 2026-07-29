@@ -5,7 +5,15 @@ import yaml from "js-yaml";
 const appRoot = process.cwd();
 const publicDir = join(appRoot, "public");
 const siteUrl = "https://swipe.md";
-const staticPaths = ["/", "/issues", "/privacy", "/terms", "/cookies"];
+const toolsPerPage = 12;
+const staticPaths = [
+  "/",
+  "/issues",
+  "/tools",
+  "/privacy",
+  "/terms",
+  "/cookies",
+];
 
 async function contentPaths(directory, prefix) {
   const root = join(appRoot, "src/content", directory);
@@ -47,10 +55,20 @@ async function walk(directory) {
   return files;
 }
 
+const issuePaths = await contentPaths("issues", "/issues");
+const toolPaths = await contentPaths("tools", "/tools");
+const pagePaths = await contentPaths("pages", "");
+const toolPagePaths = Array.from(
+  { length: Math.max(0, Math.ceil(toolPaths.length / toolsPerPage) - 1) },
+  (_, index) => `/tools/page/${index + 2}`,
+);
+
 const paths = [
   ...staticPaths,
-  ...(await contentPaths("issues", "/issues")),
-  ...(await contentPaths("pages", "")),
+  ...issuePaths,
+  ...toolPaths,
+  ...toolPagePaths,
+  ...pagePaths,
 ];
 const urls = [...new Set(paths)]
   .sort()

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Swipe Radar"
+  short_description: "Find and test overlooked AI moves"
+  default_prompt: "Use $swipe-radar to research and draft the next Swipe issue."

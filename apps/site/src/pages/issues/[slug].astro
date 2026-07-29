@@ -21,11 +21,12 @@ type Props = { issue: CollectionEntry<"issues"> };
 const { issue } = Astro.props as Props;
 const path = `/issues/${issue.id}`;
 const readingMinutes = issueReadingMinutes(issue.body ?? "");
+const title = issue.data.title ?? issue.data.subject;
 const issueLabel = parseIssueSections(issue.body ?? "").find(
   (section) => section.type === "header",
 )?.attrs.name;
 const description =
-  issue.data.description ?? issue.data.preheader ?? issue.data.subject;
+  issue.data.description ?? issue.data.preheader ?? title;
 const meta = [
   issueLabel,
   formatIssueDate(issue.data.pubDate),
@@ -36,7 +37,7 @@ const meta = [
 const schema = {
   "@context": "https://schema.org",
   "@type": "Article",
-  headline: issue.data.subject,
+  headline: title,
   description,
   datePublished: issue.data.pubDate.toISOString(),
   dateModified: (issue.data.sentAt ?? issue.data.pubDate).toISOString(),
@@ -55,7 +56,7 @@ const issueFontStyle = {
 ---
 
 <Layout
-  title={issue.data.subject}
+  title={title}
   description={description}
   canonicalPath={path}
   ogType="article"
@@ -67,8 +68,8 @@ const issueFontStyle = {
     style={issueFontStyle}
   >
     <PageHeader
-      title={issue.data.subject}
-      description={issue.data.preheader}
+      title={title}
+      description={issue.data.description ?? issue.data.preheader}
       eyebrow={meta}
     />
     {

@@ -137,23 +137,46 @@ html[data-gradient='logo'] {
   display: none !important;
 }
 
-/* Archive row. Hovering inverts the whole row rather than tinting one element,
-   so the palette variables are reassigned and every descendant follows —
-   `text-muted` and friends resolve against the inverted values. */
-.issue-row {
-  transition:
-    background-color 0.15s ease,
-    color 0.15s ease;
+/* Repeated directory and archive items stay quiet so the newsletter signup
+   remains the page's strongest visual surface. */
+.quiet-card {
+  background: color-mix(in oklab, var(--muted) 9%, transparent);
+  transition: background-color 0.15s ease;
 }
 
-.issue-row:hover,
-.issue-row:focus-visible {
-  background-color: var(--card-inv-bg);
-  color: var(--card-inv-fg);
-  --fg: var(--card-inv-fg);
-  --muted: color-mix(in oklch, var(--card-inv-fg) 65%, transparent);
-  --primary: var(--primary-inv);
-  outline: none;
+.quiet-card:hover {
+  background: color-mix(in oklab, var(--muted) 15%, transparent);
+}
+
+.quiet-card:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.quiet-field {
+  background: color-mix(in oklab, var(--muted) 9%, transparent);
+}
+
+.quiet-field:focus-within {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.tool-card-title,
+.tool-card-tagline {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+}
+
+.tool-card-title {
+  min-height: 2.5rem;
+  -webkit-line-clamp: 2;
+}
+
+.tool-card-tagline {
+  min-height: 3.75rem;
+  -webkit-line-clamp: 3;
 }
 
 /* Static dither edge used on inner pages. The tile is solid along its top and
@@ -433,6 +456,7 @@ body {
 }
 
 .content-prose pre {
+  margin: 1.5rem 0;
   overflow-x: auto;
   background: color-mix(in oklab, var(--muted) 12%, transparent);
   padding: 1rem 1.1rem;

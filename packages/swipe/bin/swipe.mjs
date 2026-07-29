@@ -2,9 +2,11 @@
 import { spawnSync } from "node:child_process";
 import {
   existsSync,
+  mkdirSync,
   mkdtempSync,
   readdirSync,
   readFileSync,
+  renameSync,
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
@@ -49,6 +51,12 @@ Issues (apps/site/src/content/issues -> Swipe newsletter):
                                                prod draft + test send to you only
   pnpm swipe issue send [slug] --yes         publish archive page, then broadcast
   (omit the slug to pick from a list)
+
+Radar (agent research helpers):
+  pnpm swipe radar run [weekly|ians-list-launch|catalog-backfill]
+  pnpm swipe radar github [--days 120] [--limit 60] [--json] [--output PATH]
+  pnpm swipe radar hackernews [--days 7] [--limit 100] [--output-dir PATH]
+  pnpm swipe radar catalog [--json] [--stale-days 180] [--as-of YYYY-MM-DD]
 
 Site:
   pnpm swipe site dev
@@ -492,6 +500,9 @@ async function issue(argv) {
         "render",
         "--subject",
         parsed.frontmatter.subject,
+        ...(parsed.frontmatter.preheader
+          ? ["--preview", parsed.frontmatter.preheader]
+          : []),
         "--name",
         slug,
         "--body-file",
@@ -625,6 +636,367 @@ function site(argv) {
   pnpm(aliases[command]);
 }
 
+function radar(argv) {
+  const [command, ...rest] = argv;
+
+  if (!command || command === "help") {
+    console.log(help());
+    return;
+  }
+
+  if (command === "github") {
+    const localCli = resolve(root, "../../cli/gh-research/dist/cli.js");
+    if (existsSync(localCli)) {
+      run("node", [localCli, "skills", ...rest]);
+      return;
+    }
+    run("pnpm", ["dlx", "gh-research", "skills", ...rest]);
+    return;
+  }
+
+  if (command === "hackernews") {
+    const days = getOption(rest, "--days", "7");
+    const limit = getOption(rest, "--limit", "100");
+    if (!/^\d{1,2}$/.test(days) || Number(days) < 1 || Number(days) > 30) {
+      fail("radar hackernews: --days must be between 1 and 30.");
+    }
+    if (!/^\d{1,3}$/.test(limit) || Number(limit) < 1 || Number(limit) > 100) {
+      fail("radar hackernews: --limit must be between 1 and 100.");
+    }
+
+    const localDate = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/London",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+    const outputDir = resolve(
+      root,
+      getOption(rest, "--output-dir", `notes/radar/${localDate}`),
+    );
+    mkdirSync(outputDir, { recursive: true });
+
+    const collect = (stream, sort, extra = []) => {
+      const output = stepCapture("pnpm", [
+        "dlx",
+        "hn-get",
+        "search",
+        "--since",
+        `${days}d`,
+        "--sort",
+        sort,
+        "--type",
+        "story",
+        "--limit",
+        limit,
+        ...extra,
+      ]);
+      const parsed = parseJsonOutput(output, `hn-get ${stream}`);
+      const path = resolve(outputDir, `hackernews-${stream}.json`);
+      writeFileSync(
+        path,
+        `${JSON.stringify(
+          {
+            stream,
+            collectedAt: new Date().toISOString(),
+            windowDays: Number(days),
+            ...parsed,
+          },
+          null,
+          2,
+        )}\n`,
+      );
+      return path;
+    };
+
+    const popularPath = collect("popular", "points");
+    const newPath = collect("new", "date", ["--points", "2"]);
+    console.log(`Popular: ${popularPath}`);
+    console.log(`New: ${newPath}`);
+    return;
+  }
+
+  if (command === "catalog") {
+    const toolsDir = resolve(root, "apps/site/src/content/tools");
+    const staleDaysOption = getOption(rest, "--stale-days");
+    const asOfOption = getOption(rest, "--as-of");
+    if (
+      staleDaysOption !== undefined &&
+      (!/^\d{2,3}$/.test(staleDaysOption) ||
+        Number(staleDaysOption) < 30 ||
+        Number(staleDaysOption) > 365)
+    ) {
+      fail("radar catalog: --stale-days must be between 30 and 365.");
+    }
+    if (
+      asOfOption !== undefined &&
+      !/^\d{4}-\d{2}-\d{2}$/.test(asOfOption)
+    ) {
+      fail("radar catalog: --as-of must be YYYY-MM-DD.");
+    }
+
+    const localDate = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/London",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+    const asOfDate = asOfOption ?? localDate;
+    const asOf = new Date(`${asOfDate}T00:00:00.000Z`);
+    if (
+      Number.isNaN(asOf.valueOf()) ||
+      asOf.toISOString().slice(0, 10) !== asOfDate
+    ) {
+      fail("radar catalog: --as-of is not a real date.");
+    }
+
+    const issueDates = new Map(
+      readdirSync(issuesDir)
+        .filter((file) => file.endsWith(".md"))
+        .map((file) => {
+          const parsed = parseIssueFile(resolve(issuesDir, file));
+          return [
+            file.replace(/\.md$/, ""),
+            parsed.frontmatter.pubDate ?? null,
+          ];
+        }),
+    );
+
+    const tools = readdirSync(toolsDir)
+      .filter((file) => file.endsWith(".md") || file.endsWith(".mdx"))
+      .map((file) => {
+        const path = resolve(toolsDir, file);
+        const source = readFileSync(path, "utf8");
+        const match = source.match(
+          /^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/,
+        );
+        if (!match) fail(`${path} has no frontmatter block.`);
+
+        const frontmatter = {};
+        for (const line of match[1].split(/\r?\n/)) {
+          const kv = line.match(/^([A-Za-z][\w-]*):\s*(.*)$/);
+          if (kv) {
+            frontmatter[kv[1]] = kv[2]
+              .replace(/^["']|["']$/g, "")
+              .trim();
+          }
+        }
+
+        const lastChecked = frontmatter.lastChecked;
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(lastChecked ?? "")) {
+          fail(`${path} needs lastChecked in YYYY-MM-DD form.`);
+        }
+        const checkedAt = new Date(`${lastChecked}T00:00:00.000Z`);
+        const fileReviewDays = Number(frontmatter.reviewEveryDays ?? "180");
+        const reviewEveryDays =
+          staleDaysOption === undefined
+            ? fileReviewDays
+            : Number(staleDaysOption);
+        if (
+          !Number.isInteger(reviewEveryDays) ||
+          reviewEveryDays < 30 ||
+          reviewEveryDays > 365
+        ) {
+          fail(`${path} has an invalid reviewEveryDays value.`);
+        }
+        const nextReviewAt = new Date(
+          checkedAt.valueOf() + reviewEveryDays * 86_400_000,
+        );
+
+        let featuredIssues = [];
+        try {
+          featuredIssues = JSON.parse(frontmatter.featuredIssues ?? "[]");
+        } catch {
+          fail(`${path} needs featuredIssues as an inline JSON-style array.`);
+        }
+        if (!Array.isArray(featuredIssues)) {
+          fail(`${path} has invalid featuredIssues.`);
+        }
+        const datedFeatures = featuredIssues
+          .map((slug) => ({ slug, date: issueDates.get(slug) ?? null }))
+          .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""));
+
+        return {
+          slug: file.replace(/\.mdx?$/, ""),
+          name: frontmatter.name ?? file,
+          status: frontmatter.status ?? "early",
+          lastChecked,
+          reviewEveryDays,
+          nextReviewAt: nextReviewAt.toISOString().slice(0, 10),
+          due: nextReviewAt <= asOf,
+          featuredIssues,
+          lastFeaturedIssue: datedFeatures[0]?.slug ?? null,
+          lastFeaturedAt: datedFeatures[0]?.date ?? null,
+        };
+      })
+      .sort((a, b) => {
+        if (a.due !== b.due) return a.due ? -1 : 1;
+        return a.nextReviewAt.localeCompare(b.nextReviewAt);
+      });
+
+    const report = {
+      asOf: asOf.toISOString().slice(0, 10),
+      staleDaysOverride:
+        staleDaysOption === undefined ? null : Number(staleDaysOption),
+      total: tools.length,
+      due: tools.filter((tool) => tool.due).length,
+      neverFeatured: tools.filter(
+        (tool) => tool.featuredIssues.length === 0,
+      ).length,
+      tools,
+    };
+
+    if (rest.includes("--json")) {
+      console.log(JSON.stringify(report, null, 2));
+      return;
+    }
+
+    console.log(
+      `${report.total} tools · ${report.due} due for review · ${report.neverFeatured} never featured`,
+    );
+    for (const tool of tools) {
+      console.log(
+        `${tool.due ? "DUE " : "     "}${tool.slug} · checked ${tool.lastChecked} · next ${tool.nextReviewAt} · last issue ${tool.lastFeaturedIssue ?? "never"}`,
+      );
+    }
+    return;
+  }
+
+  if (command === "run") {
+    const mode = rest[0] ?? "weekly";
+    if (!["weekly", "ians-list-launch", "launch", "catalog-backfill"].includes(mode)) {
+      fail("radar run mode must be weekly, ians-list-launch, or catalog-backfill.");
+    }
+    const launchMode = mode === "launch" ? "ians-list-launch" : mode;
+    const promptName =
+      launchMode === "ians-list-launch"
+        ? "scheduled-ians-list-launch-prompt.md"
+        : launchMode === "catalog-backfill"
+          ? "scheduled-catalog-backfill-prompt.md"
+          : "scheduled-weekly-prompt.md";
+    const promptPath = resolve(
+      root,
+      "skills/swipe-radar/references",
+      promptName,
+    );
+    const logDir = resolve(root, "notes/radar/logs");
+    mkdirSync(logDir, { recursive: true });
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const eventLog = resolve(logDir, `${timestamp}-${launchMode}.jsonl`);
+    const errorLog = resolve(logDir, `${timestamp}-${launchMode}.stderr.log`);
+    const lastMessage = resolve(
+      logDir,
+      `${timestamp}-${launchMode}.json`,
+    );
+    const outputSchema = resolve(
+      root,
+      "skills/swipe-radar/references",
+      launchMode === "catalog-backfill"
+        ? "catalog-run-output.schema.json"
+        : "run-output.schema.json",
+    );
+    const codex = process.env.CODEX_BIN ?? "codex";
+
+    const result = spawnSync(
+      codex,
+      [
+        "exec",
+        "--ephemeral",
+        "--color",
+        "never",
+        "--json",
+        "--output-schema",
+        outputSchema,
+        "--output-last-message",
+        lastMessage,
+        "--cd",
+        root,
+        "--sandbox",
+        "workspace-write",
+        "--config",
+        'approval_policy="never"',
+        "--config",
+        "sandbox_workspace_write.network_access=true",
+        readFileSync(promptPath, "utf8"),
+      ],
+      {
+        cwd: root,
+        env: process.env,
+        encoding: "utf8",
+        maxBuffer: 50 * 1024 * 1024,
+        stdio: ["ignore", "pipe", "pipe"],
+      },
+    );
+
+    writeFileSync(eventLog, result.stdout ?? "");
+    if (result.stderr) writeFileSync(errorLog, result.stderr);
+    if (result.error) fail(result.error.message);
+    if (result.status !== 0) {
+      if (result.stderr) process.stderr.write(result.stderr);
+      fail(`Swipe Radar failed. Codex events: ${eventLog}`);
+    }
+
+    let summary;
+    try {
+      summary = JSON.parse(readFileSync(lastMessage, "utf8"));
+    } catch {
+      fail(`Swipe Radar returned an invalid summary. See ${lastMessage}`);
+    }
+    if (
+      !summary ||
+      typeof summary.title !== "string" ||
+      typeof summary.message !== "string" ||
+      typeof summary.nextStep !== "string"
+    ) {
+      fail(`Swipe Radar returned an incomplete summary. See ${lastMessage}`);
+    }
+    if (
+      summary.status === "draft_ready" &&
+      (!summary.counts ||
+        summary.counts.tools > 4 ||
+        summary.counts.workflows > 4 ||
+        summary.counts.newTools > summary.counts.tools ||
+        summary.counts.newTools < 3)
+    ) {
+      fail(
+        `Swipe Radar marked a draft ready outside the four tools, four workflows, three new tools contract. See ${lastMessage}`,
+      );
+    }
+
+    console.log(summary.title);
+    console.log(summary.message);
+    if (summary.issuePath) console.log(`Issue: ${summary.issuePath}`);
+    if (summary.reportPath) console.log(`Report: ${summary.reportPath}`);
+    console.log(`Next: ${summary.nextStep}`);
+    reportSchedulerAttention(
+      summary.title,
+      summary.message,
+      summary.nextStep,
+    );
+    return;
+  }
+
+  console.error(`Unknown radar command: ${command}\n`);
+  console.error(help());
+  process.exit(2);
+}
+
+function reportSchedulerAttention(title, message, nextStep) {
+  const path = process.env.SCHEDULER_EVENT_FILE;
+  if (!path) return;
+
+  const temporaryPath = `${path}.${process.pid}.tmp`;
+  writeFileSync(
+    temporaryPath,
+    `${JSON.stringify(
+      { kind: "attention", title, message, nextStep },
+      null,
+      2,
+    )}\n`,
+  );
+  renameSync(temporaryPath, path);
+}
+
 function targetCommand(action, target) {
   const commands = {
     check: {
@@ -669,6 +1041,8 @@ if (!area || area === "help" || area === "--help" || area === "-h") {
   newsletter(rest);
 } else if (area === "issue" || area === "issues") {
   await issue(rest);
+} else if (area === "radar") {
+  radar(rest);
 } else if (area === "site") {
   site(rest);
 } else {

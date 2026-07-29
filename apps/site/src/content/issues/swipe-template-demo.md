@@ -1,6 +1,8 @@
 ---
 subject: "Swipe item template demo"
 preheader: "A focused preview of the new item, contents, and agent Markdown layout."
+title: "Swipe item template demo"
+description: "A focused preview of the item layout used on Swipe issue pages."
 pubDate: 2026-07-28
 draft: true
 ---
@@ -20,99 +22,99 @@ This is only a visual test. Real sponsors still have to meet our selection crite
 </Dislike>
 </Item>
 
-<Item id="seo-skill" title="SEO Skill" url="https://seoskill.dev">
-Local SEO audits.
-
-<Like>
-It gives agents a crawler, Search Console data, analytics, and a clear sequence for finding and fixing site problems. The data stays under your control.
-</Like>
-
-<Dislike>
-The setup is more involved than a hosted audit tool. You need to give the agent access to the right accounts and local environment.
-</Dislike>
-</Item>
-
 <Item id="keep" title="Keep" url="https://keep.md">
-Context for your agents.
+Project memory for agents.
 
 <Like>
-It stores project notes, decisions, and working context in a form an agent can search later. Short, opinionated handoffs make the next session much faster.
+Save the decisions, research, and useful scraps that an agent will need later. The next session can pick up where you stopped instead of asking you to explain the project again.
 </Like>
 
 <Dislike>
-It still depends on keeping the useful context current. A pile of undigested transcripts is still a pile.
+You still have to save the useful parts. A folder full of raw transcripts is just a different kind of mess.
 </Dislike>
 </Item>
 
-<Item id="raycast" title="Raycast" url="https://www.raycast.com">
-Fast desktop command launcher.
+<Item id="here-now" title="Here.now" url="https://here.now/" new="true">
+Free instant web hosting for agents.
 
 <Like>
-It puts common actions, snippets, scripts, and extensions behind one quick command bar.
+Give an agent a report, mockup, or small web page and it gives you a link to share. This beats asking a client to download code just to see a quick demo.
 </Like>
 
 <Dislike>
-The useful setup is personal. It takes time to choose extensions and build the shortcuts that suit your work.
+Free links are public and disappear after 24 hours. They are fine for throwaway demos, but a bad choice for private work.
 </Dislike>
 </Item>
 
-<Item id="kiwa-ui" title="Kiwa UI" url="https://kiwaui.com" new="true">
-Reusable interface components.
+<Item id="flint" title="Flint" url="https://microsoft.github.io/flint-chart/" new="true">
+Turn data into charts.
 
 <Like>
-It gives product work a consistent visual starting point without turning every screen into a one-off design exercise.
+Give Flint a small table and describe the chart you need. You can present the same numbers in a different style without rebuilding the whole chart.
 </Like>
 
 <Dislike>
-It is new, so the component range and documentation are still growing.
+It is still early and can ignore options it does not understand. Check the chart against your source data before sharing it.
 </Dislike>
 </Item>
 
-<Item id="agent-browser" title="Agent Browser" url="https://github.com/vercel-labs/agent-browser" new="true">
-Browser automation for agents.
+<Item id="marka-md" title="marka.md" url="https://github.com/mattenarle10/markamd" new="true">
+Local-first Markdown editor.
 
 <Like>
-It gives agents a fast command-line interface for opening pages, reading state, and taking actions.
+Write your notes in Markdown, pick the ones you need, and copy them into ChatGPT, Claude, or another agent. You choose exactly what the agent sees.
 </Like>
 
 <Dislike>
-It still needs a real browser environment. Authentication and brittle websites remain the painful bits.
+Read everything before copying it. One selected note could contain a password or something private.
 </Dislike>
 </Item>
 
-<Item id="context7" title="Context7" url="https://context7.com" new="true">
-Current docs for agents.
+<Item id="blindspot-pass" title="Find the blind spots" url="https://github.com/Neeeophytee/finding-unknowns-skills/blob/main/skills/blindspot-pass/SKILL.md" kind="workflow">
+Improve the brief before work.
 
 <Like>
-It pulls current library documentation into an agent's context instead of relying on stale training data.
+Ask an agent to find the landmines, hidden context, useful examples, and questions an expert would ask before it starts unfamiliar work. It then rewrites your brief with those findings included.
 </Like>
 
 <Dislike>
-The answer is only as good as the documentation it indexed. Thin upstream docs stay thin.
+It deliberately stops before doing the work. Skip it for small jobs you already understand.
 </Dislike>
 </Item>
 
-<Item id="tambo" title="Tambo" url="https://tambo.co" new="true">
-Generative interface components.
+<Item id="video-preflight" title="Storyboard first" url="https://github.com/dawndrain/movie-gen" kind="workflow">
+Save money on AI video.
 
 <Like>
-It lets React apps choose and render interface components from a conversation instead of returning plain text.
+Ask your agent to make a rough video from still images and draft voices before generating final clips. This catches story, timing, and voice problems while they are still cheap to fix.
 </Like>
 
 <Dislike>
-Generative interfaces add another state layer to test. The product patterns are still settling.
+Costs change quickly, and you will still need retakes. The full workflow also needs several paid accounts.
 </Dislike>
 </Item>
 
-<Item id="stagehand" title="Stagehand" url="https://www.stagehand.dev" new="true">
-Browser automation with code.
+<Item id="customer-language" title="Mine customer words" url="https://github.com/Cesarjoquin/Marketing-Skills/blob/main/skills/customer-research/SKILL.md" kind="workflow">
+Ground AI copy in research.
 
 <Like>
-It mixes normal browser scripts with AI-powered actions, extraction, and observation when selectors are not enough.
+Give an agent interviews, support tickets, survey answers, or reviews before asking for copy. It can pull out real pains, desired outcomes, and the exact phrases people use.
 </Like>
 
 <Dislike>
-You still have to decide when to trust an agent and when to pin the workflow to deterministic code.
+Online reviews overrepresent people with strong opinions. The agent still needs enough real customer material to find a reliable pattern.
+</Dislike>
+</Item>
+
+<Item id="quality-bar" title="Check what the agent built" url="https://x.com/almonk/article/2079461952577802549" kind="workflow">
+Keep the quality bar high.
+
+<Like>
+Before publishing anything an agent made, check that it works reliably, stays quiet, sticks to one job, and gets fixed quickly when it breaks. A human still has to test the details.
+</Like>
+
+<Dislike>
+This is a quality standard rather than a step-by-step test. You still have to decide what good enough means for your product.
 </Dislike>
 </Item>
 

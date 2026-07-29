@@ -1,0 +1,132 @@
+---
+export const prerender = true;
+
+import { render, type CollectionEntry } from "astro:content";
+import Breadcrumbs from "@/components/content/Breadcrumbs.astro";
+import NewsletterSignup from "@/components/content/NewsletterSignup.astro";
+import PageHeader from "@/components/content/PageHeader.astro";
+import Layout from "@/layouts/Layout.astro";
+import { getVisibleIssues } from "@/lib/issues";
+import { formatToolDate, getVisibleTools } from "@/lib/tools";
+
+export async function getStaticPaths() {
+  const tools = await getVisibleTools();
+  return tools.map((tool) => ({
+    params: { slug: tool.id },
+    props: { tool },
+  }));
+}
+
+type Props = { tool: CollectionEntry<"tools"> };
+const { tool } = Astro.props as Props;
+const { Content } = await render(tool);
+const path = `/tools/${tool.id}`;
+const issues = await getVisibleIssues();
+const platforms = tool.data.platforms ?? [];
+const platformLabel = platforms.length > 0 ? platforms.join(", ") : "See product";
+const featuredIssues = (tool.data.featuredIssues ?? [])
+  .map((slug) => issues.find((issue) => issue.id === slug))
+  .filter((issue): issue is CollectionEntry<"issues"> => Boolean(issue));
+const sources = tool.data.sources ?? [];
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: tool.data.name,
+  description: tool.data.description,
+  url: tool.data.url,
+  applicationCategory: tool.data.category,
+  ...(platforms.length > 0 ? { operatingSystem: platformLabel } : {}),
+  ...(tool.data.repository ? { sameAs: tool.data.repository } : {}),
+  mainEntityOfPage: new URL(path, Astro.site).toString(),
+};
+---
+
+<Layout
+  title={tool.data.seoTitle}
+  description={tool.data.description}
+  canonicalPath={path}
+  ogTitle={tool.data.headline}
+  structuredData={schema}
+>
+  <Breadcrumbs
+    items={[
+      { label: "Tools", href: "/tools" },
+      { label: tool.data.name },
+    ]}
+  />
+  <PageHeader
+    title={tool.data.headline}
+    description={tool.data.tagline}
+    eyebrow={`${tool.data.category} · Checked ${formatToolDate(tool.data.lastChecked)}`}
+  />
+
+  <p class="mt-8 text-lg leading-relaxed text-pretty">{tool.data.description}</p>
+
+  <dl class="mt-6 flex flex-wrap gap-x-8 gap-y-3 font-mono text-sm">
+    <div>
+      <dt class="text-muted">Type</dt>
+      <dd class="mt-0.5">{tool.data.kind.replaceAll("-", " ")}</dd>
+    </div>
+    <div>
+      <dt class="text-muted">Works on</dt>
+      <dd class="mt-0.5">{platformLabel}</dd>
+    </div>
+  </dl>
+
+  <p class="mt-6">
+    <a
+      href={tool.data.url}
+      target="_blank"
+      rel="noreferrer"
+      class="inline-flex h-11 items-center bg-button px-5 font-heading text-sm font-semibold text-button-fg no-underline transition-opacity hover:opacity-90"
+    >
+      Open {tool.data.name} ↗︎
+    </a>
+  </p>
+
+  <article class="content-prose mt-12">
+    <Content />
+  </article>
+
+  {
+    featuredIssues.length > 0 ? (
+      <section class="mt-12">
+        <h2 class="font-heading text-2xl font-semibold">Featured in Swipe</h2>
+        <ul class="mt-4 space-y-2">
+          {featuredIssues.map((issue) => (
+            <li>
+              <a
+                class="text-primary underline decoration-dotted underline-offset-3 hover:decoration-solid"
+                href={`/issues/${issue.id}`}
+              >
+                {issue.data.title ?? issue.data.subject}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ) : null
+  }
+
+  <section class="mt-12">
+    <h2 class="font-heading text-2xl font-semibold">Sources</h2>
+    <ul class="mt-4 space-y-2">
+      {sources.map((source) => (
+        <li>
+          <a
+            class="text-primary underline decoration-dotted underline-offset-3 hover:decoration-solid"
+            href={source.url}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {source.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <div class="mt-12">
+    <NewsletterSignup source={`swipe.md${path}`} />
+  </div>
+</Layout>

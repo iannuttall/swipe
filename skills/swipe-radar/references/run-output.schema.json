@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "title",
+    "message",
+    "nextStep",
+    "slug",
+    "issuePath",
+    "reportPath",
+    "counts"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["draft_ready", "no_draft", "blocked"]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "message": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 280
+    },
+    "nextStep": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240
+    },
+    "slug": {
+      "type": ["string", "null"]
+    },
+    "issuePath": {
+      "type": ["string", "null"]
+    },
+    "reportPath": {
+      "type": "string",
+      "minLength": 1
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tools", "newTools", "workflows"],
+      "properties": {
+        "tools": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "newTools": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "workflows": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4
+        }
+      }
+    }
+  }
+}

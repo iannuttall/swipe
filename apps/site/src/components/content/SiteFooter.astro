@@ -1,11 +1,10 @@
 ---
-import DitherEdge from "@/components/DitherEdge.astro";
-
 const year = new Date().getFullYear();
 
 // `/about` and `/advertise` are unpublished for now, so they stay out of here.
 const links = [
   { href: "/issues", label: "Issues" },
+  { href: "/tools", label: "Tools" },
   { href: "/privacy", label: "Privacy" },
   { href: "/terms", label: "Terms" },
   { href: "/cookies", label: "Cookies" },
@@ -29,19 +28,14 @@ const projectThings = [
 ---
 
 <div class="mt-20">
-  {/* The page dissolving into the footer, same treatment as the signup card. */}
-  <div class="text-[color:var(--primary)]">
-    <DitherEdge direction="up" />
-  </div>
-
-  <footer class="bg-primary py-6 text-base text-white selection:bg-white/25 selection:text-white">
+  <footer class="py-8 text-sm text-muted">
     <div
       class="site-column flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6"
     >
       <p>
         &copy; {year} Swipe, an{" "}
         <a
-          class="underline underline-offset-2 hover:decoration-dotted"
+          class="underline decoration-dotted underline-offset-2 hover:text-foreground hover:decoration-solid"
           href="https://ian.is"
           rel="noreferrer"
         >
@@ -52,7 +46,10 @@ const projectThings = [
       <nav aria-label="Footer navigation" class="flex flex-wrap gap-x-5 gap-y-2">
         {
           links.map((link) => (
-            <a class="underline underline-offset-2 hover:decoration-dotted" href={link.href}>
+            <a
+              class="underline decoration-dotted underline-offset-2 hover:text-foreground hover:decoration-solid"
+              href={link.href}
+            >
               {link.label}
             </a>
           ))

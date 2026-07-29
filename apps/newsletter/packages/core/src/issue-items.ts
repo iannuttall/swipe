@@ -10,7 +10,7 @@ import {
 import { type IssueItem, type IssueSection, parseIssueItem } from './issue-parser.js'
 import { mdBlock, mdBlockWithCode, sectionHeading } from './issue-sections.js'
 
-export function itemContents(items: IssueItem[]) {
+export function itemContents(items: IssueItem[], issueName?: string) {
   return h(
     Section,
     null,
@@ -39,11 +39,16 @@ export function itemContents(items: IssueItem[]) {
                 h(
                   Text,
                   { style: styles.contentsLine },
-                  h(
-                    Link,
-                    { href: `#${item.id}`, style: styles.contentsLink },
-                    item.title,
-                  ),
+                  issueName
+                    ? h(
+                        Link,
+                        {
+                          href: issueArchiveAnchor(issueName, item.id),
+                          style: styles.contentsLink,
+                        },
+                        item.title,
+                      )
+                    : item.title,
                   item.summary
                     ? h(
                         'span',
@@ -59,6 +64,10 @@ export function itemContents(items: IssueItem[]) {
       ),
     ),
   )
+}
+
+function issueArchiveAnchor(issueName: string, itemId: string): string {
+  return `https://swipe.md/issues/${encodeURIComponent(issueName)}#${encodeURIComponent(itemId)}`
 }
 
 export function itemSection(section: IssueSection) {

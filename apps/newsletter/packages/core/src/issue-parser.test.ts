@@ -139,7 +139,48 @@ describe('parseIssueSections', () => {
       ].join('\n'),
     )
     assert.ok(section)
-    assert.equal(parseIssueItem(section).chip, 'β')
+    const item = parseIssueItem(section)
+    assert.equal(item.chip, 'β')
+    assert.equal(item.kind, 'tool')
+  })
+
+  it('parses workflow items independently from release status', () => {
+    const [section] = parseIssueSections(
+      [
+        '<Item id="research-loop" title="Research loop" kind="workflow">',
+        'Primary-source research.',
+        '<Like>',
+        'It gives the agent a repeatable sequence.',
+        '</Like>',
+        '<Dislike>',
+        'It still needs editorial judgment.',
+        '</Dislike>',
+        '</Item>',
+      ].join('\n'),
+    )
+    assert.ok(section)
+    const item = parseIssueItem(section)
+    assert.equal(item.kind, 'workflow')
+    assert.equal(item.newRelease, false)
+    assert.equal(item.chip, '＋')
+  })
+
+  it('rejects unknown item kinds', () => {
+    const [section] = parseIssueSections(
+      [
+        '<Item id="bad-kind" title="Bad kind" kind="news">',
+        'Description.',
+        '<Like>',
+        'Action.',
+        '</Like>',
+        '<Dislike>',
+        'Tradeoff.',
+        '</Dislike>',
+        '</Item>',
+      ].join('\n'),
+    )
+    assert.ok(section)
+    assert.throws(() => parseIssueItem(section), /kind must be tool or workflow/)
   })
 
   it('rejects duplicate item anchors', () => {

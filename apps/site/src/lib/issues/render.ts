@@ -124,7 +124,7 @@ export async function renderIssueSections(
   const authoredViews = await Promise.all(sections.map(toView));
   const views: IssueSectionView[] = [];
   let addedContents = false;
-  let activeItemGroup: "established" | "new" | undefined;
+  let activeItemGroup: "tool" | "workflow" | undefined;
 
   for (const view of authoredViews) {
     if (view.type === "item" && view.item) {
@@ -133,12 +133,12 @@ export async function renderIssueSections(
         addedContents = true;
       }
       if (!view.item.sponsor) {
-        const group = view.item.newRelease ? "new" : "established";
+        const group = view.item.kind;
         if (group !== activeItemGroup) {
           views.push(
             syntheticView(
               "item-group",
-              group === "new" ? "New and early" : "Useful tools",
+              group === "workflow" ? "Skills, loops & workflows" : "Tools",
             ),
           );
           activeItemGroup = group;

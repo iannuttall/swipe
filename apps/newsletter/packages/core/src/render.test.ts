@@ -149,6 +149,18 @@ describe('renderDraft', () => {
         '</Dislike>',
         '</Item>',
         '',
+        '<Item id="research-loop" title="Research loop" kind="workflow">',
+        'A reusable research sequence.',
+        '',
+        '<Like>',
+        'It turns discovery into a repeatable process.',
+        '</Like>',
+        '',
+        '<Dislike>',
+        'It still needs editorial judgment.',
+        '</Dislike>',
+        '</Item>',
+        '',
         '<ReachOut>',
         '- Found a useful tool? [Send it over.](mailto:ian@swipe.md)',
         '</ReachOut>',
@@ -160,11 +172,16 @@ describe('renderDraft', () => {
     })
 
     assert.match(rendered.html, /In this issue/)
-    assert.match(rendered.html, /href="#agent-grade"/)
+    assert.match(
+      rendered.html,
+      /href="https:\/\/swipe\.md\/issues\/item-issue#agent-grade"/,
+    )
+    assert.doesNotMatch(rendered.html, /href="#agent-grade"/)
     assert.match(rendered.html, /id="agent-grade"/)
     assert.match(rendered.html, /AgentGrade/)
     assert.match(rendered.html, /β/)
-    assert.match(rendered.html, /New and early/)
+    assert.match(rendered.html, />Tools</)
+    assert.match(rendered.html, /Skills, loops &amp; workflows/)
     assert.match(rendered.html, /What we like:/)
     assert.match(rendered.html, /What we don&#39;t like:/)
     assert.match(rendered.html, /Reach out/)
@@ -176,7 +193,7 @@ describe('renderDraft', () => {
     )
     assert.ok(
       rendered.html.indexOf('hr-center-on-white@2x.png') <
-        rendered.html.indexOf('New and early'),
+        rendered.html.indexOf('>Tools<'),
     )
     assert.match(rendered.text, /AgentGrade/)
     assert.match(rendered.text, /What we like:/)

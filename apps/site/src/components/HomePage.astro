@@ -1,6 +1,10 @@
 ---
 import HomeHero from "@/components/HomeHero.astro";
 import BackgroundCards from "@/components/home/BackgroundCards.astro";
+import { getPublishedIssues } from "@/lib/issues";
+
+const [latestIssue] = await getPublishedIssues();
+const latestIssueUrl = latestIssue ? `/issues/${latestIssue.id}` : undefined;
 ---
 
 <!--
@@ -53,7 +57,7 @@ import BackgroundCards from "@/components/home/BackgroundCards.astro";
   >
   </div>
 
-  <HomeHero />
+  <HomeHero latestIssueUrl={latestIssueUrl} />
   <BackgroundCards />
 </main>
 

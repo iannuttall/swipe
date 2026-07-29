@@ -2,6 +2,13 @@
 import DitherCard from "@/components/DitherCard.astro";
 import NewsletterForm from "@/components/NewsletterForm.astro";
 import SignupPitch from "@/components/SignupPitch.astro";
+import SiteWordmark from "@/components/content/SiteWordmark.astro";
+
+interface Props {
+  latestIssueUrl?: string;
+}
+
+const { latestIssueUrl } = Astro.props;
 ---
 
 <div class="pointer-events-none absolute inset-0 z-20 flex items-center justify-center p-4 sm:p-8">
@@ -10,8 +17,21 @@ import SignupPitch from "@/components/SignupPitch.astro";
     style={{ boxShadow: "0 0 76px 52px var(--bg)" }}
   >
     <DitherCard class="w-full" stripSize={20} seed="home-hero">
+      <SiteWordmark variant="hero" class="mb-6" />
       <SignupPitch as="h1" />
       <NewsletterForm source="home_v2_cta" />
+      {
+        latestIssueUrl ? (
+          <p class="mt-5 font-mono text-sm text-white/65">
+            <a
+              href={latestIssueUrl}
+              class="text-inherit underline decoration-dotted underline-offset-4 transition-colors hover:text-white"
+            >
+              View latest issue
+            </a>
+          </p>
+        ) : null
+      }
     </DitherCard>
   </div>
 </div>

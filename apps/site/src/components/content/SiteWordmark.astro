@@ -1,15 +1,17 @@
 ---
 interface Props {
   class?: string;
+  variant?: "nav" | "hero";
 }
 
-const { class: className } = Astro.props;
+const { class: className, variant = "nav" } = Astro.props;
 ---
 
 <a
   href="/"
   class:list={[
-    "block w-11 no-underline",
+    "block no-underline",
+    variant === "hero" ? "w-14 sm:w-16" : "w-11",
     className,
   ]}
   aria-label="Swipe home"

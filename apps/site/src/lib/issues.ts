@@ -1,5 +1,21 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 
+function newestFirst(
+  issues: CollectionEntry<"issues">[],
+): CollectionEntry<"issues">[] {
+  return issues.sort(
+    (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime(),
+  );
+}
+
+export async function getPublishedIssues(): Promise<
+  CollectionEntry<"issues">[]
+> {
+  const issues = (await getCollection("issues")) as CollectionEntry<"issues">[];
+
+  return newestFirst(issues.filter((issue) => issue.data.draft !== true));
+}
+
 /**
  * Issues for public routes: sent/published only, newest first. Dev builds
  * include drafts so an issue can be previewed at /issues/<slug> before send.
@@ -7,9 +23,9 @@ import { getCollection, type CollectionEntry } from "astro:content";
 export async function getVisibleIssues(): Promise<CollectionEntry<"issues">[]> {
   const issues = (await getCollection("issues")) as CollectionEntry<"issues">[];
 
-  return issues
-    .filter((issue) => import.meta.env.DEV || issue.data.draft !== true)
-    .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+  return newestFirst(
+    issues.filter((issue) => import.meta.env.DEV || issue.data.draft !== true),
+  );
 }
 
 /**

@@ -13,7 +13,9 @@ export function createDbConnection(databaseUrl = loadConfig().databaseUrl) {
   const client = postgres(databaseUrl, { max: 10 })
   return {
     db: drizzle(client, { schema }),
-    close: () => client.end(),
+    // postgres.js can wait forever here after parallel connection failures on
+    // Node 24, which leaves CLI top-level await unsettled and exits with code 13.
+    close: () => client.end({ timeout: 1 }),
   }
 }
 

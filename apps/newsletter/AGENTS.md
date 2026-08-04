@@ -35,8 +35,11 @@ When production data or sending is involved, read
 - Postgres for persistent state.
 - Astro SSR for public human-facing pages.
 - SQL migrations live in `migrations`.
-- Docker image is built with `pnpm --filter @email/cli deploy --legacy --prod`
-  because that is pnpm's deploy compatibility flag.
+- Docker uses pnpm's injected workspace packages and modern `pnpm deploy` so
+  runtime packaging reuses the installed store without another registry pass.
+- `app`, `web`, `ops`, and `worker` share one `APP_IMAGE` and one anchored
+  Compose build definition. VPS inventory builds `app` once; do not add the
+  other services back to `buildServices`.
 - Production deploy is scoped to this app. GitHub Actions builds
   `apps/newsletter/Dockerfile`, syncs root workspace files plus
   `apps/newsletter/**`, runs `apps/newsletter/docker-compose.prod.yml`, migrates
@@ -189,21 +192,27 @@ and `button-url`. The legacy `:::` dialect stays supported for published issues
 but must not be used for new drafts.
 
 New Swipe picks use one first-class `<Item>` block per pick. `id` and `title`
-are required. Use `url` for the destination. The item body starts with a
-three-to-four-word description, then contains one required `<Like>` block and
-one required `<Dislike>` block. Established products use `＋`. Set `new="true"`
-for a newly surfaced product and the marker becomes `β`; this is an editorial
-signal, not a claim that the product is technically in beta. Set
-`sponsor="true"` for a paid placement and the marker becomes `✦`. Defaults are
-`What we like:`, `What we don't like:`, and `[sponsor]`. Use `chip`,
-`like-label`, `dislike-label`, and `sponsor-label` only when an issue needs
-different wording. Contents summaries default to the short description and
-archive anchors are generated from item IDs. Email contents links use the full
+are required. Use `url` for the destination and a four-to-five-word `summary`
+for the contents list. The item body starts with one short sentence explaining
+what it is, followed by a required `<Why>` block and a required `<Try>` block.
+Keep that opening description to 5 to 12 words so it stays on one email line.
+Put the explanation in `<Why>` and `<Try>`. Each block normally takes two or
+three short sentences. The
+contents list uses the same small square bullet for every item. Full item
+details have no leading symbol.
+
+Set `sponsor="true"` for a paid placement. Sponsored items are ads, not
+editorial reviews. They use the same what, `<Why>`, and `<Try>` shape so the
+reader gets a useful example, but the copy is an ad rather than an editorial
+verdict. Do not add legacy `<Like>` or `<Dislike>` blocks to a sponsor. The
+default paid label is `[sponsor]`; use `sponsor-label` only when an issue needs
+different wording. Archive anchors are generated from item IDs. Email contents
+links use the full
 `https://swipe.md/issues/<slug>#<item-id>` URL because local email anchors are
 not reliable across clients.
 
 Author items in display order. A sponsor goes first when present. A normal
-issue contains up to four tools and up to four skills, loops, or workflows;
+issue contains up to five tools and up to five skills, loops, or workflows;
 these are ceilings rather than quotas. Sponsor responses use
 `mailto:ian@swipe.md?subject=Sponsor%20Swipe` until the placement has enough
 data to justify a landing page.
@@ -212,8 +221,8 @@ Use `<ReachOut>` for the closing action list and `<Disclosure>` for the final
 editorial note. When a draft has a stable name, the template adds the direct
 `/issues/<slug>.md` agent link before the disclosure.
 
-Section markers are fixed: sponsors use `✦`, links use `＋`, and classifieds
-use `◆`. Keep them black and close to the heading.
+Legacy section blocks can still define their own markers. First-class item
+details do not use them.
 
 Run `pnpm email:logo` from `apps/newsletter` after changing the logo source.
 It creates the light and dark static PNGs used in the email header and footer.

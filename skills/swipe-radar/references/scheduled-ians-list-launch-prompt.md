@@ -23,7 +23,7 @@ page and relevant documentation for apps. For repositories, inspect the
 README, agent files, user docs, release history, and relevant source before
 writing.
 
-Aim for up to four tools and up to four skills, loops, or workflows. At least
+Aim for up to five tools and up to five skills, loops, or workflows. At least
 three selected tools should be genuinely new, early, or beta. Never add filler
 to reach either limit. Write one `draft: true` canonical Swipe issue and render
 it for review.
@@ -47,6 +47,15 @@ what a reader can actually do with each pick.
 Assume the reader has never used the product and does not know its specialist
 vocabulary. Lead with the useful result. Replace jargon with ordinary words
 unless the exact term is needed, then explain it immediately.
+
+Write every selected item with one plain description sentence of 5 to 12 words
+that stays on one standard email line, two or three short `<Why>` sentences,
+and two or three short `<Try>` sentences that give the reader one specific
+task or mini-workflow. Add a separate four-to-five-word `summary` for the
+contents list. Do not write `<Like>` or
+`<Dislike>` blocks and do not force a negative paragraph into the issue.
+Research limitations privately and use them to reject weak candidates or add a
+necessary safety instruction to the practical example.
 
 Prioritize early or overlooked products and uses that other newsletters have
 not already repeated. Every selected item needs one practical move a reader

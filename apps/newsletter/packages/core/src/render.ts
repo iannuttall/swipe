@@ -124,8 +124,8 @@ export function markdownToText(markdown: string): string {
           item.title,
           item.sponsor ? item.sponsorLabel : '',
           item.description,
-          `${item.likeLabel} ${item.whatWeLike}`,
-          `${item.dislikeLabel} ${item.whatWeDontLike}`,
+          `${item.whyLabel} ${item.why}`,
+          `${item.tryLabel} ${item.try}`,
         ]
           .filter(Boolean)
           .join('\n\n')

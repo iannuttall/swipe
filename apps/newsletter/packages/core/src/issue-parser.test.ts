@@ -96,16 +96,14 @@ describe('parseIssueSections', () => {
   it('parses first-class items and applies stable defaults', () => {
     const sections = parseIssueSections(
       [
-        '<Item id="agent-grade" title="AgentGrade" url="https://www.agentgrade.dev/report" summary="grades an agent setup" sponsor="true">',
-        'A focused description with **useful detail**.',
-        '',
-        '<Like>',
-        'Run the same task against two agent setups and compare the result.',
-        '</Like>',
-        '',
-        '<Dislike>',
-        'Useful when the test task resembles your real work.',
-        '</Dislike>',
+        '<Item id="agent-grade" title="AgentGrade" url="https://www.agentgrade.dev/report" summary="Agent setup grading tool." sponsor="true">',
+        'AgentGrade compares two agent setups against the same real task.',
+        '<Why>',
+        'A change can sound useful while making the result worse. A direct comparison gives the team something concrete to discuss.',
+        '</Why>',
+        '<Try>',
+        'Run one weekly task with both configurations. Compare the finished work and the corrections each one needed.',
+        '</Try>',
         '</Item>',
       ].join('\n'),
     )
@@ -117,24 +115,61 @@ describe('parseIssueSections', () => {
     assert.equal(item.id, 'agent-grade')
     assert.equal(item.chip, '✦')
     assert.equal(item.sponsorLabel, '[sponsor]')
-    assert.equal(item.likeLabel, 'What we like:')
-    assert.equal(item.dislikeLabel, "What we don't like:")
+    assert.equal(item.whyLabel, 'Why:')
+    assert.equal(item.tryLabel, 'Try:')
     assert.equal(item.sponsor, true)
-    assert.match(item.whatWeLike, /same task/)
-    assert.match(item.whatWeDontLike, /real work/)
+    assert.equal(item.summary, 'Agent setup grading tool.')
+    assert.match(item.why, /direct comparison/)
+    assert.match(item.try, /weekly task/)
+  })
+
+  it('rejects editorial review blocks on sponsored items', () => {
+    const [section] = parseIssueSections(
+      [
+        '<Item id="paid-tool" title="Paid Tool" sponsor="true" summary="Useful tool for agents.">',
+        'Sponsor copy.',
+        '<Like>',
+        'A paid opinion.',
+        '</Like>',
+        '<Dislike>',
+        'A paid criticism.',
+        '</Dislike>',
+        '</Item>',
+      ].join('\n'),
+    )
+    assert.ok(section)
+    assert.throws(() => parseIssueItem(section), /must not use Like or Dislike blocks/)
+  })
+
+  it('requires a separate contents summary for sponsored items', () => {
+    const [section] = parseIssueSections(
+      [
+        '<Item id="paid-tool" title="Paid Tool" sponsor="true">',
+        'Sponsor copy belongs in the main slot.',
+        '<Why>',
+        'It helps with a real job. The result should be clear.',
+        '</Why>',
+        '<Try>',
+        'Give the reader a specific task. Explain what should come back.',
+        '</Try>',
+        '</Item>',
+      ].join('\n'),
+    )
+    assert.ok(section)
+    assert.throws(() => parseIssueItem(section), /requires a four-to-five-word summary/)
   })
 
   it('uses beta as the marker for newly surfaced products', () => {
     const [section] = parseIssueSections(
       [
-        '<Item id="new-tool" title="New Tool" new="true">',
-        'Useful new thing.',
-        '<Like>',
-        'Good.',
-        '</Like>',
-        '<Dislike>',
-        'Early.',
-        '</Dislike>',
+        '<Item id="new-tool" title="New Tool" new="true" summary="Useful tool for agents.">',
+        'This tool helps an agent complete a useful task.',
+        '<Why>',
+        'It saves a repeated step. The reader can reuse the result.',
+        '</Why>',
+        '<Try>',
+        'Give it one small task. Check the result before using it.',
+        '</Try>',
         '</Item>',
       ].join('\n'),
     )
@@ -142,6 +177,8 @@ describe('parseIssueSections', () => {
     const item = parseIssueItem(section)
     assert.equal(item.chip, 'β')
     assert.equal(item.kind, 'tool')
+    assert.equal(item.whyLabel, 'Why:')
+    assert.equal(item.tryLabel, 'Try:')
   })
 
   it('parses workflow items independently from release status', () => {

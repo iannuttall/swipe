@@ -26,6 +26,13 @@ x-email-env: &email-env
   AWS_SNS_WEBHOOK_SECRET: ${AWS_SNS_WEBHOOK_SECRET}
   AWS_SNS_ALLOWED_TOPICS: ${AWS_SNS_ALLOWED_TOPICS}
 
+x-app-build: &app-build
+  context: ../..
+  dockerfile: apps/newsletter/Dockerfile
+  args:
+    BASE_URL: ${BASE_URL:-https://newsletter.example.com}
+  target: runner
+
 services:
   postgres:
     image: postgres:17-alpine
@@ -43,12 +50,7 @@ services:
       retries: 10
 
   app:
-    build:
-      context: ../..
-      dockerfile: apps/newsletter/Dockerfile
-      args:
-        BASE_URL: ${BASE_URL:-https://newsletter.example.com}
-      target: runner
+    build: *app-build
     image: ${APP_IMAGE:-swipe:local}
     restart: unless-stopped
     depends_on:
@@ -79,10 +81,7 @@ services:
           - ${APP_NAME:-swipe}
 
   web:
-    build:
-      context: ../..
-      dockerfile: apps/newsletter/Dockerfile
-      target: runner
+    build: *app-build
     image: ${APP_IMAGE:-swipe:local}
     restart: unless-stopped
     depends_on:
@@ -120,10 +119,7 @@ services:
           - ${APP_NAME:-swipe}-web
 
   ops:
-    build:
-      context: ../..
-      dockerfile: apps/newsletter/Dockerfile
-      target: runner
+    build: *app-build
     image: ${APP_IMAGE:-swipe:local}
     profiles: ["ops"]
     depends_on:
@@ -134,10 +130,7 @@ services:
     command: ["node", "dist/index.js", "db", "migrate"]
 
   worker:
-    build:
-      context: ../..
-      dockerfile: apps/newsletter/Dockerfile
-      target: runner
+    build: *app-build
     image: ${APP_IMAGE:-swipe:local}
     profiles: ["sender"]
     depends_on:

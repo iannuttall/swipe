@@ -953,13 +953,13 @@ function radar(argv) {
     if (
       summary.status === "draft_ready" &&
       (!summary.counts ||
-        summary.counts.tools > 4 ||
-        summary.counts.workflows > 4 ||
+        summary.counts.tools > 5 ||
+        summary.counts.workflows > 5 ||
         summary.counts.newTools > summary.counts.tools ||
         summary.counts.newTools < 3)
     ) {
       fail(
-        `Swipe Radar marked a draft ready outside the four tools, four workflows, three new tools contract. See ${lastMessage}`,
+        `Swipe Radar marked a draft ready outside the five tools, five workflows, three new tools contract. See ${lastMessage}`,
       );
     }
 

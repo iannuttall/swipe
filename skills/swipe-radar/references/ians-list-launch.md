@@ -28,7 +28,7 @@ there. The Ian copy is a delivery artifact, not a second editorial source.
 
 The text is portable Markdown, but component blocks are renderer behavior.
 Before the handoff can render faithfully, Ian's newsletter renderer must
-support Swipe's `<Item>`, `<Like>`, and `<Dislike>` blocks. Treat a failed or
+support Swipe's `<Item>`, `<Why>`, and `<Try>` blocks. Treat a failed or
 degraded preview as a launch blocker rather than converting the issue by hand.
 
 ## Confirmation-link contract

@@ -6,9 +6,10 @@ import MarkdownAgentLink from "./MarkdownAgentLink.astro";
 interface Props {
   body: string;
   markdownPath: string;
+  showMarkdownLink?: boolean;
 }
 
-const { body, markdownPath } = Astro.props;
+const { body, markdownPath, showMarkdownLink = true } = Astro.props;
 const sections = await renderIssueSections(body);
 const hasDisclosure = sections.some((section) => section.type === "disclosure");
 const introIndex = sections.findIndex(
@@ -79,8 +80,8 @@ function publicLinkAttrs(url: string | undefined) {
           <ol class="m-0 flex list-none flex-col gap-3 p-0">
             {section.contents.map((item) => (
               <li class="grid grid-cols-[1rem_1fr] gap-1.5">
-                <span class="font-mono text-sm font-semibold text-foreground">
-                  {item.chip}
+                <span class="text-center font-mono text-sm font-semibold text-foreground">
+                  ▪
                 </span>
                 <p class="m-0 text-base leading-6">
                   <a
@@ -99,11 +100,7 @@ function publicLinkAttrs(url: string | undefined) {
             ))}
           </ol>
         ) : section.type === "item" && section.item ? (
-          <div class="grid grid-cols-[1rem_1fr] gap-1.5">
-            <span class="pt-1 font-mono text-sm font-semibold text-foreground">
-              {section.item.chip}
-            </span>
-            <div class="min-w-0">
+          <div class="min-w-0">
               <div class="mb-0.5">
                 <h2 class="m-0 font-heading text-xl leading-7 font-semibold tracking-tight text-foreground">
                   {section.item.url ? (
@@ -122,15 +119,18 @@ function publicLinkAttrs(url: string | undefined) {
                 class="content-prose issue-item-description mb-4"
                 set:html={section.item.descriptionHtml}
               />
-              <div
-                class="content-prose issue-item-action"
-                set:html={section.item.likeHtml}
-              />
-              <div
-                class="content-prose issue-item-action"
-                set:html={section.item.dislikeHtml}
-              />
-            </div>
+              {section.item.whyHtml ? (
+                <div
+                  class="content-prose issue-item-action"
+                  set:html={section.item.whyHtml}
+                />
+              ) : null}
+              {section.item.tryHtml ? (
+                <div
+                  class="content-prose issue-item-action"
+                  set:html={section.item.tryHtml}
+                />
+              ) : null}
           </div>
         ) : section.type === "item-group" ? null : section.type === "links" ? (
           <ul class="m-0 flex list-none flex-col gap-8 p-0">
@@ -231,7 +231,7 @@ function publicLinkAttrs(url: string | undefined) {
       </>
     ))
   }
-  {!hasDisclosure ? <MarkdownAgentLink href={markdownPath} /> : null}
+  {!hasDisclosure && showMarkdownLink ? <MarkdownAgentLink href={markdownPath} /> : null}
 </div>
 
 <style>

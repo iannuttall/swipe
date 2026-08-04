@@ -30,8 +30,8 @@ export function itemContents(items: IssueItem[], issueName?: string) {
               null,
               h(
                 Column,
-                { style: styles.contentsChip, width: 18 },
-                h(Text, { style: styles.chip }, item.chip),
+                { style: styles.contentsBulletCell, width: 18 },
+                h(Text, { style: styles.contentsBullet }, '▪'),
               ),
               h(
                 Column,
@@ -83,22 +83,14 @@ export function itemSection(section: IssueSection) {
       null,
       h(
         Column,
-        { style: styles.markerCell, width: 18 },
-        h(Text, { style: styles.chip }, item.chip),
-      ),
-      h(
-        Column,
-        { style: styles.itemCell },
+        { className: 'issue-cell', style: styles.itemCell },
         h(Text, { style: styles.title }, title),
         mdBlockWithCode(
           `${item.description}${item.sponsor ? ` ${item.sponsorLabel}` : ''}`,
           itemBodyStyles,
         ),
-        mdBlockWithCode(`**${item.likeLabel}** ${item.whatWeLike}`, itemActionStyles),
-        mdBlockWithCode(
-          `**${item.dislikeLabel}** ${item.whatWeDontLike}`,
-          itemLastActionStyles,
-        ),
+        mdBlockWithCode(`**${item.whyLabel}** ${item.why}`, itemActionStyles),
+        mdBlockWithCode(`**${item.tryLabel}** ${item.try}`, itemLastActionStyles),
       ),
     ),
   )

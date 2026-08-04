@@ -1,43 +1,52 @@
 ---
 title: Advertise
 headline: Sponsor Swipe
-description: Sponsor Swipe, a weekly email for people who use AI as part of how they work.
-draft: true
+description: Put your product in front of people using AI to build, market, and ship useful work.
+draft: false
 signup: false
 ---
 
-export const sponsorMockup = `<Sponsor>
-[Acme Crawler](https://example.com) finds the pages your sitemap forgot. It runs locally, reads your Search Console data, and tells you which fixes matter first. Swipe readers get 20% off with the code SWIPE.
-</Sponsor>`
+export const sponsorMockup = `<Item id="seo-skill" title="SEO Skill" url="https://seoskill.dev" sponsor="true" summary="One SEO skill for agents.">
+The only SEO skill your agent needs.
 
-export const classifiedMockup = `<Classifieds button="Book this slot ↗︎" button-url="mailto:sponsor@swipe.md?subject=Classified on Swipe">
-## Acme Crawler
-[Acme Crawler](https://example.com) finds the pages your sitemap forgot.
+<Why>
+Coding agents can change a site quickly, but they do not always know what to inspect or which fixes matter. SEO Skill gives them a repeatable process, so the result is based on real checks instead of generic advice.
+</Why>
 
-## Shipfast Analytics
-[Shipfast Analytics](https://example.com) shows which AI agents visit your site.
-</Classifieds>`
+<Try>
+Install SEO Skill and ask your agent to audit one site you already know well. Compare its findings with the problems you have seen yourself, then let it fix one issue and verify the result.
+</Try>
+</Item>`
 
-Swipe is a short weekly email with practical lessons from using AI every day, plus prompts, tools, and links worth a click. No news, no fluff, under five minutes.
+Launching a new product, shipping a major update, or trying to reach new customers? We can put your work in front of people who actively use AI to build, market, and ship.
 
-The readers are founders, marketers, operators, product people, and developers who use AI as part of how they work. Some are technical, some are not. If your product helps them build, rank, or ship faster, this is a good place to be seen.
+Swipe is a weekly collection of useful AI skills, prompts, tools, and workflows. Our readers include founders, marketers, operators, product people, and developers who are looking for things worth trying.
 
-## What you can book
+## Next available sponsorship
 
-**Main sponsor.** One per issue. Your own section in the body of the email, written in the same plain style as the rest of the issue, with a few sentences about your product and a link.
+The next available slot is **Wednesday 26 August 2026**.
 
-<IssueSections body={sponsorMockup} />
+Sponsorship costs **$250 USD per issue**. There is one main sponsor in each issue.
 
-**Classified.** A one-line listing with a link in the classifieds section at the end of the issue. Cheap, and easy to book for multiple weeks.
+## What your sponsorship includes
 
-<IssueSections body={classifiedMockup} />
+- A listing near the top of the email in the "In this issue" section.
+- Your own section in the main body with a link to your product.
+- A short explanation of what it does, why it is useful, and one practical thing readers can try.
+- A permanent place in the [public issue archive](/issues) after the email is sent.
+- We help shape the copy so it fits Swipe and gives readers something useful.
 
-## Good to know
+This is the format readers will see. Paid placements are clearly marked with `[sponsor]`.
 
-- Only ads that are genuinely relevant to readers are accepted.
-- Sponsor copy stays in the email's plain voice. No all-caps, no hype, and help writing it is included.
-- Every issue is also published on the [public issue archive](/issues), so placements stay live after send day.
+<SponsorEmailPreview body={sponsorMockup} subject="The only SEO skill your agent needs" />
+
+## What we accept
+
+- We only accept ads that are genuinely relevant to readers.
+- Sponsor copy uses the same plain style as the rest of Swipe. No all-caps or breathless claims.
+- A sponsorship is a clearly labelled paid placement. Editorial recommendations remain independent.
+- We will agree the final wording before the issue goes out.
 
 ## Book a slot
 
-Email [sponsor@swipe.md](mailto:sponsor@swipe.md?subject=Sponsoring%20Swipe) with what you're promoting and you'll get a reply with availability and current pricing.
+Email <SponsorEmailLink /> with your product and preferred Wednesday. We will confirm the date and send you a Stripe payment link.

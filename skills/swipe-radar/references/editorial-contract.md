@@ -27,7 +27,7 @@ Every item needs:
    business pattern the reader can adapt.
 4. **A receipt** — a test, result, artifact, example, or credible primary-source
    evidence.
-5. **An honest verdict** — both the useful part and the limitation.
+5. **A useful reason** — a clear explanation of why the move matters.
 6. **One transferable move** — something the reader can apply to their own
    work or business this week.
 7. **A matching source** — the primary source explicitly teaches,
@@ -57,8 +57,8 @@ Reject:
 
 The preferred maximum shape is:
 
-- up to four tools, with at least three genuinely new, early, or beta;
-- up to four reusable skills, loops, or workflows that a reader can perform
+- up to five tools, with at least three genuinely new, early, or beta;
+- up to five reusable skills, loops, or workflows that a reader can perform
   with an AI agent.
 
 These are ceilings, not quotas. “New” is an editorial proxy for early,
@@ -68,11 +68,13 @@ marker is independent from whether an item is a tool or workflow.
 Each final item must answer:
 
 - What is it?
-- When would the reader use it?
+- Why would the reader use it?
 - What can the reader make, save, sell, fix, or avoid?
-- What practical example proves the point?
-- What should the reader watch out for?
-- What is the one move they can use in their own work or business?
+- What exact move can they try in their own work or business?
+
+Radar must still research limitations and failure modes before selecting an
+item. Record them in the private report and reject anything unsafe or
+misleading. Do not force a negative paragraph into every published pick.
 
 Technical test details that only prove Radar did the work belong in the
 private report. Technical details that explain the product or useful move can
@@ -112,7 +114,7 @@ Radar advantage.
 
 The public tool catalogue has a wider threshold than the weekly issue. A tool
 can earn a useful, verified `/tools` page without being one of the week's best
-four picks.
+five picks.
 
 Publish a catalogue page only when Radar can explain a real use, verify the
 central claim, name a limitation, and write distinct copy without padding.

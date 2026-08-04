@@ -28,8 +28,8 @@ export interface IssueLinkItemView extends IssueLinkItem {
 
 export interface IssueItemView extends IssueItem {
   descriptionHtml: string;
-  likeHtml: string;
-  dislikeHtml: string;
+  whyHtml: string;
+  tryHtml: string;
 }
 
 export interface IssueSectionView {
@@ -202,12 +202,8 @@ async function toView(section: IssueSection): Promise<IssueSectionView> {
       descriptionHtml: await markdownToHtml(
         `${item.description}${item.sponsor ? ` ${item.sponsorLabel}` : ""}`,
       ),
-      likeHtml: await markdownToHtml(
-        `**${item.likeLabel}** ${item.whatWeLike}`,
-      ),
-      dislikeHtml: await markdownToHtml(
-        `**${item.dislikeLabel}** ${item.whatWeDontLike}`,
-      ),
+      whyHtml: await markdownToHtml(`**${item.whyLabel}** ${item.why}`),
+      tryHtml: await markdownToHtml(`**${item.tryLabel}** ${item.try}`),
     };
     return view;
   }

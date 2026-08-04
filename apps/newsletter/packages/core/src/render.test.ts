@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
+import { itemStyles } from './issue-item-styles.js'
 import { listEmailTemplates, renderDraft, renderDraftEmail } from './render.js'
 
 describe('renderDraft', () => {
@@ -137,28 +138,38 @@ describe('renderDraft', () => {
       bodyMarkdown: [
         '<Header name="Issue 003" />',
         '',
-        '<Item id="agent-grade" title="AgentGrade" url="https://agentgrade.dev" new="true">',
-        'A focused description.',
-        '',
-        '<Like>',
-        'Compare the same task across two setups.',
-        '</Like>',
-        '',
-        '<Dislike>',
-        'Useful when the task resembles your real work.',
-        '</Dislike>',
+        '<Item id="paid-tool" title="Paid Tool" url="https://example.com" sponsor="true" summary="Useful tool for agents.">',
+        'This sentence explains what the sponsored product does.',
+        '<Why>',
+        'This is the first reason it matters. This is the second reason.',
+        '</Why>',
+        '<Try>',
+        'Give it one real task from your week. Check the result before using it.',
+        '</Try>',
         '</Item>',
         '',
-        '<Item id="research-loop" title="Research loop" kind="workflow">',
-        'A reusable research sequence.',
+        '<Item id="agent-grade" title="AgentGrade" url="https://agentgrade.dev" new="true" summary="Compare two agent setups.">',
+        'AgentGrade compares two agent setups against the same task.',
         '',
-        '<Like>',
-        'It turns discovery into a repeatable process.',
-        '</Like>',
+        '<Why>',
+        'Small configuration changes can alter the finished work. A direct comparison makes the difference visible.',
+        '</Why>',
         '',
-        '<Dislike>',
-        'It still needs editorial judgment.',
-        '</Dislike>',
+        '<Try>',
+        'Choose a task you complete every week. Run it with both setups and compare the corrections.',
+        '</Try>',
+        '</Item>',
+        '',
+        '<Item id="research-loop" title="Research loop" kind="workflow" summary="Repeatable research for agents.">',
+        'This workflow gives an agent a repeatable research sequence.',
+        '',
+        '<Why>',
+        'The same sequence makes separate research runs easier to compare. It also reduces missed source checks.',
+        '</Why>',
+        '',
+        '<Try>',
+        'Run it against one open question. Review the sources before using the answer.',
+        '</Try>',
         '</Item>',
         '',
         '<ReachOut>',
@@ -179,11 +190,14 @@ describe('renderDraft', () => {
     assert.doesNotMatch(rendered.html, /href="#agent-grade"/)
     assert.match(rendered.html, /id="agent-grade"/)
     assert.match(rendered.html, /AgentGrade/)
-    assert.match(rendered.html, /β/)
+    assert.match(rendered.html, /Paid Tool/)
+    assert.match(rendered.html, /Useful tool for agents\. \[sponsor\]/)
+    assert.match(rendered.html, /▪/)
+    assert.doesNotMatch(rendered.html, /β|＋/)
     assert.match(rendered.html, />Tools</)
     assert.match(rendered.html, /Skills, loops &amp; workflows/)
-    assert.match(rendered.html, /What we like:/)
-    assert.match(rendered.html, /What we don&#39;t like:/)
+    assert.match(rendered.html, /Why:/)
+    assert.match(rendered.html, /Try:/)
     assert.match(rendered.html, /Reach out/)
     assert.match(rendered.html, /item-issue\.md/)
     assert.match(rendered.html, /you can paste straight into/)
@@ -196,8 +210,22 @@ describe('renderDraft', () => {
         rendered.html.indexOf('>Tools<'),
     )
     assert.match(rendered.text, /AgentGrade/)
-    assert.match(rendered.text, /What we like:/)
-    assert.doesNotMatch(rendered.text, /<Item|<Like|<Dislike/)
+    const sponsorText = rendered.text.slice(
+      rendered.text.lastIndexOf('Paid Tool'),
+      rendered.text.lastIndexOf('AgentGrade'),
+    )
+    assert.match(sponsorText, /\[sponsor\]/)
+    assert.match(sponsorText, /first reason it matters/)
+    assert.match(sponsorText, /Give it one real task/)
+    assert.doesNotMatch(sponsorText, /What we like:|What we don't like:/)
+    assert.match(rendered.text, /Why:/)
+    assert.match(rendered.text, /Try:/)
+    assert.doesNotMatch(rendered.text, /<Item|<Why|<Try/)
+    assert.equal(itemStyles.contentsLine.fontSize, '18px')
+    assert.equal(itemStyles.contentsLine.lineHeight, '24px')
+    assert.equal(itemStyles.summary.color, '#14171E')
+    assert.equal(itemStyles.summary.fontSize, '14px')
+    assert.equal(itemStyles.summary.lineHeight, '21px')
   })
 
   it('lists available templates', () => {

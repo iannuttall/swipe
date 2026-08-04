@@ -1,0 +1,141 @@
+---
+import IssueSections from "@/components/issues/IssueSections.astro";
+
+interface Props {
+  body: string;
+  subject: string;
+}
+
+const { body, subject }: Props = Astro.props;
+---
+
+<section class="email-preview" aria-label="Example sponsored Swipe email">
+  <header class="inbox-header">
+    <img src="/favicon.png" width="40" height="40" alt="" class="sender-avatar" />
+    <div class="min-w-0">
+      <p class="inbox-subject">{subject}</p>
+      <p class="inbox-sender">Swipe &lt;ian@swipe.md&gt; <span>to you</span></p>
+    </div>
+    <span class="inbox-label">Example</span>
+  </header>
+
+  <div class="email-canvas">
+    <div class="email-brand">
+      <img
+        src="/email/swipe-email-logo-on-white@2x.png"
+        width="150"
+        height="52"
+        alt="Swipe"
+      />
+      <span>{subject}</span>
+    </div>
+
+    <IssueSections body={body} markdownPath="/advertise.md" showMarkdownLink={false} />
+  </div>
+</section>
+
+<style>
+  .email-preview {
+    margin: 2rem 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    background: var(--card);
+    box-shadow: 0 18px 48px color-mix(in oklab, var(--fg) 10%, transparent);
+  }
+
+  .inbox-header {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid var(--border);
+    background: color-mix(in oklab, var(--muted) 7%, var(--card));
+    font-family: var(--font-body);
+  }
+
+  .sender-avatar {
+    border-radius: 0.625rem;
+  }
+
+  .inbox-subject,
+  .inbox-sender {
+    overflow: hidden;
+    margin: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .inbox-subject {
+    color: var(--foreground);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .inbox-sender {
+    margin-top: 0.125rem;
+    color: var(--muted);
+    font-size: 0.75rem;
+    line-height: 1.35;
+  }
+
+  .inbox-sender span {
+    color: var(--foreground-soft);
+  }
+
+  .inbox-label {
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+  }
+
+  .email-canvas {
+    --bg: #ffffff;
+    --fg: #14171e;
+    --background: #ffffff;
+    --background-raised: #ffffff;
+    --foreground: #14171e;
+    --foreground-soft: #6b7280;
+    --muted: #6b7280;
+    --primary: #4548e9;
+    --font-body: "Inter", Helvetica, Arial, sans-serif;
+    --font-heading: "Inter", Helvetica, Arial, sans-serif;
+    color-scheme: light;
+    padding: clamp(1.5rem, 5vw, 3.5rem);
+    background: #ffffff;
+    color: #14171e;
+  }
+
+  .email-brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+    font-family: var(--font-body);
+  }
+
+  .email-brand img {
+    width: 150px;
+    height: auto;
+  }
+
+  .email-brand span {
+    color: #7b7d81;
+    font-size: 0.875rem;
+    text-align: right;
+  }
+
+  @media (max-width: 34rem) {
+    .inbox-label,
+    .email-brand span {
+      display: none;
+    }
+
+    .email-brand {
+      margin-bottom: 2rem;
+    }
+  }
+</style>

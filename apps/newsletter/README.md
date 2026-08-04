@@ -266,22 +266,43 @@ Configure alerts for nearby sensors.
 New issue picks use one first-class item block:
 
 ```md
-<Item id="agent-grade" title="AgentGrade" url="https://agentgrade.dev" new="true">
-Agent setup grading.
+<Item id="agent-grade" title="AgentGrade" url="https://agentgrade.dev" new="true" summary="Compare two agent setups.">
+AgentGrade compares how two agent setups perform against the same real task.
 
-<Like>
-Run the same task against two agent setups and compare the result.
-</Like>
+<Why>
+A change that sounds useful can still make the result worse. Running the same task twice gives you something concrete to compare before changing your normal setup.
+</Why>
 
-<Dislike>
-The result only matters when the test resembles your real work.
-</Dislike>
+<Try>
+Choose one task you complete every week and run it with both configurations. Compare the finished work, time taken, and corrections you had to make.
+</Try>
 </Item>
 ```
 
-`id` and `title` are required. Keep the opening description to three or four
-words. `<Like>` and `<Dislike>` are required. Established products use `＋`;
-`new="true"` uses `β`, and `sponsor="true"` uses `✦` plus the paid label. Item
+`id` and `title` are required. Add a four-to-five-word `summary` for the
+contents list. The opening description explains what the item is in one or two
+short sentences. Every new item requires two or three short `<Why>` sentences
+and two or three short `<Try>` sentences. Every item uses the same square
+bullet in the contents list, while full item details have no leading symbol. A
+paid placement uses the same useful shape:
+
+```md
+<Item id="sponsor-tool" title="Sponsor Tool" url="https://example.com" sponsor="true" summary="Useful tool for agents.">
+The opening sentence explains what the sponsor's product does.
+
+<Why>
+These two short sentences explain the practical result. They are sponsor copy rather than an editorial verdict.
+</Why>
+
+<Try>
+These two short sentences give the reader one specific way to use it. The example should be concrete enough to try at work.
+</Try>
+</Item>
+```
+
+Sponsored items use `[sponsor]`. They require a four-to-five-word `summary`
+for the contents list and remain clearly labelled as ads. Do not add legacy
+`<Like>` or `<Dislike>` blocks to paid placements. Item
 IDs become stable archive anchors. The email contents list links to those
 anchors on the canonical `swipe.md` issue page rather than relying on local
 email anchors, which vary by client. Finish the issue with `<ReachOut>` and
@@ -507,6 +528,12 @@ not start sending mail:
 ```bash
 docker compose -f apps/newsletter/docker-compose.yml --profile sender up --build worker
 ```
+
+Production `app`, `web`, `ops`, and `worker` services share one `APP_IMAGE` and
+one anchored build definition. The VPS deploy builds `app` once and reuses that
+image everywhere. Dependency installation is cached separately from source
+code changes, and modern pnpm workspace deployment packages the runtime from
+the installed store without another registry pass.
 
 Only start the `sender` profile after `doctor`, `ops checklist`, preview-plan,
 SNS/webhook checks, and canary setup are complete.

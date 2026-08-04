@@ -80,9 +80,18 @@ export const itemStyles = {
     fontWeight: 600,
     lineHeight: '24px',
   },
-  contentsChip: {
-    padding: '0 5px 9px 0',
+  contentsBulletCell: {
+    padding: '0 7px 9px 0',
     verticalAlign: 'top',
+  },
+  contentsBullet: {
+    margin: 0,
+    color: barebonesColors.fg,
+    fontFamily: 'Menlo, Consolas, monospace',
+    fontSize: '14px',
+    fontWeight: 600,
+    lineHeight: '24px',
+    textAlign: 'center',
   },
   contentsText: {
     padding: '0 0 9px',
@@ -92,8 +101,8 @@ export const itemStyles = {
     margin: 0,
     color: barebonesColors.fg,
     fontFamily,
-    fontSize: '15px',
-    lineHeight: '21px',
+    fontSize: '18px',
+    lineHeight: '24px',
   },
   contentsLink: {
     color: issueColors.accentInk,
@@ -103,26 +112,19 @@ export const itemStyles = {
     textUnderlineOffset: '3px',
   },
   summary: {
-    color: barebonesColors.fg3,
+    color: barebonesColors.fg,
     fontFamily: 'Menlo, Consolas, monospace',
-    fontSize: '13px',
+    fontSize: '14px',
     fontWeight: 400,
+    lineHeight: '21px',
   },
   markerCell: {
     padding: '1px 5px 0 0',
     verticalAlign: 'top',
   },
   itemCell: {
-    padding: '0 0 25px',
+    padding: '0 20px 25px',
     verticalAlign: 'top',
-  },
-  chip: {
-    margin: 0,
-    color: barebonesColors.fg,
-    fontFamily: 'Menlo, Consolas, monospace',
-    fontSize: '14px',
-    fontWeight: 600,
-    lineHeight: '24px',
   },
   title: {
     margin: '0 0 2px',

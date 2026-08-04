@@ -17,7 +17,7 @@ tests finalists, and writes the issue.
 - Exclude agent orchestrators, multi-agent harnesses, generic coding-agent
   wrappers, context shells, and tools whose product is another way to run
   agents. That category is saturated and is not useful Swipe coverage.
-- Never pad an issue. Fewer strong items beat the preferred 4 + 4 shape.
+- Never pad an issue. Fewer strong items beat the preferred 5 + 5 shape.
 - A scheduled run may create local research files, demos, and a draft issue. It
   must not commit, push, publish, test-send, create a broadcast, or run
   `pnpm swipe issue send`.
@@ -208,8 +208,8 @@ step the reader can reuse.
 
 Aim for:
 
-- up to four tools, with at least three marked with `new="true"`;
-- up to four skills, loops, or workflows marked with `kind="workflow"`.
+- up to five tools, with at least three marked with `new="true"`;
+- up to five skills, loops, or workflows marked with `kind="workflow"`.
 
 These are maximums, not quotas. The new marker describes editorial position,
 not semantic versioning. An early, under-shared tool may be “new” even if its
@@ -270,9 +270,11 @@ Follow `apps/site/src/content/issues/swipe-template-demo.md` for the component
 shape. Each item needs:
 
 - a linked product or project name;
-- a short plain-English description;
-- a concrete `<Like>` centred on what the reader can do;
-- an honest `<Dislike>` that helps the reader decide;
+- a four-to-five-word `summary` for the contents list;
+- one plain-English description sentence of 5 to 12 words, short enough to
+  stay on one standard email line;
+- a two-to-three-sentence `<Why>` explaining the useful result;
+- a two-to-three-sentence `<Try>` with one concrete task or mini-workflow;
 - `new="true"` for early items.
 
 Use the `writing-tips` skill for the issue copy. Use the local trained `blog`
@@ -297,8 +299,8 @@ Assume the reader has never used the product and does not know its specialist
 vocabulary. Replace jargon with ordinary words unless the exact term is needed
 to use the product. Explain it immediately when it has to stay.
 
-Before rendering, audit every factual sentence in each `<Like>` and
-`<Dislike>`. Map it to the exact primary-source section or a real Radar test
+Before rendering, audit every factual sentence in each description, `<Why>`,
+and `<Try>`. Map it to the exact primary-source section or a real Radar test
 receipt in `candidates.md`. Use “we tested”, “we built”, or “we changed” only
 when Radar actually performed that action on the thing described. If the
 receipt is synthetic, keep it private or label it plainly rather than making
@@ -353,7 +355,7 @@ Only when the prompt explicitly requests the launch issue:
    delivery artifact, then prepend the intro and CTA. Do not maintain a second
    independently authored issue.
 6. Preview the copied file with Ian's issue renderer. Swipe's first-class
-   `<Item>`, `<Like>`, and `<Dislike>` blocks must render correctly before the
+   `<Item>`, `<Why>`, and `<Try>` blocks must render correctly before the
    launch can proceed; Ian's current renderer does not yet support them.
 7. Do not create or send a Swipe broadcast.
 8. Do not send Ian's List from this skill. Report whether the Ian composer has

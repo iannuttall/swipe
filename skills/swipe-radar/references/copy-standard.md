@@ -77,12 +77,11 @@ source. Avoid `best`, `ultimate`, and other claims Radar cannot prove.
 
 ## Write for the reader
 
-Every item should let a non-developer answer four questions on the first read:
+Every item should let a non-developer answer three questions on the first read:
 
 1. What is this?
-2. When would I use it?
-3. What could I make, save, sell, fix, or avoid?
-4. What should I watch out for?
+2. Why would I use it?
+3. What exactly could I try with it?
 
 Write to founders, marketers, operators, product people, and curious
 non-developers. Developers can handle plain English too. A developer tool can
@@ -93,26 +92,28 @@ people already know it.
 
 - Tool titles are product names.
 - Workflow titles use two to five words.
-- Descriptions use three to six ordinary words.
-- A description says what the thing is or does. It does not classify the
-  research.
+- Every item has a separate `summary` of four to five ordinary words for the
+  contents list.
+- The opening description is one plain sentence of 5 to 12 words. It must be
+  short enough to stay on one standard email line. Move every explanation into
+  `<Why>` and `<Try>`.
 
 Examples:
 
 - Bad: `Disposable links for artifacts.`
-- Good: `Free instant web hosting for agents.`
+- Good: `Instant web hosting for agents.`
 - Bad: `Local AI context bundles.`
-- Good: `Local-first Markdown editor.`
+- Good: `Local-first Markdown context editor.`
 - Bad: `Storyboard before spending generation credits.`
-- Good: `Storyboard first.`
+- Good: `Storyboard before generating final clips.`
 - Bad: `Unknown-unknown discovery protocol.`
-- Good: `Find the blind spots.`
+- Good: `Find blind spots before work.`
 
-## Lead with the useful move
+## Explain why it matters
 
-`<Like>` should take two to four short sentences. Start with a practical use,
-then give one concrete example. Explain the result in words the reader would
-use when telling a friend.
+`<Why>` should take two or three short sentences. Explain the practical result,
+when it matters, and who it helps. The reader should understand why the link
+earned its place without opening it.
 
 Bad:
 
@@ -135,19 +136,26 @@ Good:
 > See how much your Claude Code sessions cost and which jobs used the most
 > tokens. It is useful when a small experiment quietly turns into a large bill.
 
-## Make the limitation useful
+## Give the reader something to try
 
-`<Dislike>` should take one or two short sentences. Say what could go wrong and
-what the reader should do about it.
+`<Try>` should take two or three short sentences. Give one specific task,
+starting point, or small workflow. Say what to provide, what to ask for, and
+what useful result should come back when those details matter.
 
 Bad:
 
-> Version 0.4.1 accepted a made-up chart property without an error.
+> Try it on your next project.
 
 Good:
 
-> It is still early and can ignore options it does not understand. Check the
-> chart against your source data before sharing it.
+> Paste in one small table from a report and ask for the clearest chart for its
+> main comparison. Request a second version with a different emphasis, then
+> check both against the source data before sharing either one.
+
+Radar still records limitations and failure modes in the private report. Do
+not manufacture a negative sentence for the published item. Put a material
+safety instruction inside `<Try>` when the reader needs it to use the idea
+responsibly.
 
 ## Technical detail has to earn its place
 
@@ -233,12 +241,13 @@ another developer, rewrite it.
 
 The issue is ready when:
 
-- there are no more than four tools and four workflows;
+- there are no more than five tools and five workflows;
 - at least three tools are genuinely early or new;
 - each title and description is easy to scan;
 - no specialist term remains when an ordinary phrase says the same thing;
-- every `<Like>` contains a practical use or example;
-- every `<Dislike>` helps the reader make a decision;
+- every item has a four-to-five-word contents summary;
+- every `<Why>` explains a concrete result or reason to care;
+- every `<Try>` contains one practical task or example;
 - every item contains one practical move the reader can apply;
 - every workflow is something the reader can do with an AI agent;
 - every factual sentence maps to the linked source or a real test receipt;

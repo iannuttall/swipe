@@ -1,121 +1,121 @@
 ---
-subject: "Swipe item template demo"
-preheader: "A focused preview of the new item, contents, and agent Markdown layout."
-title: "Swipe item template demo"
-description: "A focused preview of the item layout used on Swipe issue pages."
+subject: "Give your agents continuity"
+preheader: "Belt, project memory, instant hosting, and practical workflows to swipe."
+title: "Give your agents continuity"
+description: "Tools and workflows that help agents remember more and get useful work done."
 pubDate: 2026-07-28
 draft: true
 ---
-<Header name="Template demo" read-time="off" />
+<Header name="Give your agents continuity" read-time="off" />
 
-This draft is for reviewing the new Swipe issue format. Each pick says what it is, what we like, and what we don't.
+This week: a continuity layer for your agents, project memory that survives the chat, and a few practical workflows worth stealing.
 
-<Item id="sponsor-example" title="A useful sponsor" url="mailto:ian@swipe.md?subject=Sponsor%20Swipe" sponsor="true">
-Useful paid placement.
+<Item id="belt" title="Belt" url="https://inference.sh/belt" sponsor="true" summary="Continuity layer for agents.">
+Give every coding agent the same reusable context.
 
-<Like>
-It leads with the job the product helps with and gives the reader one concrete reason to respond.
-</Like>
+<Why>
+Agents often start each session without the useful context from earlier work. Belt surfaces relevant skills and knowledge as you work, so a good workflow can carry into the next task instead of disappearing with the chat.
+</Why>
 
-<Dislike>
-This is only a visual test. Real sponsors still have to meet our selection criteria.
-</Dislike>
+<Try>
+Install Belt in the coding agent you already use. Add one recurring workflow as a skill, then see whether Belt suggests it when a matching task appears in a later session.
+</Try>
 </Item>
 
-<Item id="keep" title="Keep" url="https://keep.md">
-Project memory for agents.
+<Item id="keep" title="Keep" url="https://keep.md" summary="Project memory for agents.">
+Searchable project memory your agents can use later.
 
-<Like>
-Save the decisions, research, and useful scraps that an agent will need later. The next session can pick up where you stopped instead of asking you to explain the project again.
-</Like>
+<Why>
+The useful parts of a project are usually scattered across tabs, chats, and documents. Giving an agent one searchable memory helps the next session pick up the work without another long explanation.
+</Why>
 
-<Dislike>
-You still have to save the useful parts. A folder full of raw transcripts is just a different kind of mess.
-</Dislike>
+<Try>
+Save your open questions document alongside the best sources you have already found. Ask the agent to retrieve that context and turn the unanswered questions into a research brief.
+</Try>
 </Item>
 
-<Item id="here-now" title="Here.now" url="https://here.now/" new="true">
-Free instant web hosting for agents.
+<Item id="here-now" title="Here.now" url="https://here.now/" new="true" summary="Instant web hosting for agents.">
+Publish an agent's work and get a shareable link.
 
-<Like>
-Give an agent a report, mockup, or small web page and it gives you a link to share. This beats asking a client to download code just to see a quick demo.
-</Like>
+<Why>
+A live link is easier to review than a folder of code or an attachment. It works well for quick demos where the other person only needs to see and click the result.
+</Why>
 
-<Dislike>
-Free links are public and disappear after 24 hours. They are fine for throwaway demos, but a bad choice for private work.
-</Dislike>
+<Try>
+Ask an agent to turn your next written brief into a simple clickable page and publish it with Here.now. Send the resulting link to one colleague for feedback, but keep private material out of the demo.
+</Try>
 </Item>
 
-<Item id="flint" title="Flint" url="https://microsoft.github.io/flint-chart/" new="true">
-Turn data into charts.
+<Item id="flint" title="Flint" url="https://microsoft.github.io/flint-chart/" new="true" summary="Turn data into charts.">
+Turn a small table into a chart through conversation.
 
-<Like>
-Give Flint a small table and describe the chart you need. You can present the same numbers in a different style without rebuilding the whole chart.
-</Like>
+<Why>
+You can explore how the same numbers look in different chart styles without rebuilding everything by hand. That makes it useful when you know the point you want to show but not the best visual form.
+</Why>
 
-<Dislike>
-It is still early and can ignore options it does not understand. Check the chart against your source data before sharing it.
-</Dislike>
+<Try>
+Paste in one small table from a report and ask for the clearest chart for its main comparison. Request a second version with a different emphasis, then check both against the source data before sharing either one.
+</Try>
 </Item>
 
-<Item id="marka-md" title="marka.md" url="https://github.com/mattenarle10/markamd" new="true">
-Local-first Markdown editor.
+<Item id="marka-md" title="marka.md" url="https://github.com/mattenarle10/markamd" new="true" summary="Local-first Markdown context editor.">
+Choose the exact notes and documents your agent receives.
 
-<Like>
-Write your notes in Markdown, pick the ones you need, and copy them into ChatGPT, Claude, or another agent. You choose exactly what the agent sees.
-</Like>
+<Why>
+More context is not always better context. Selecting only the relevant notes keeps the agent focused and makes it easier to see what information shaped its answer.
+</Why>
 
-<Dislike>
-Read everything before copying it. One selected note could contain a password or something private.
-</Dislike>
+<Try>
+Create a small context bundle for one live project using the brief, customer notes, and latest decisions. Read the bundle once for private information, then paste it into a fresh agent session and ask for the next three actions.
+</Try>
 </Item>
 
-<Item id="blindspot-pass" title="Find the blind spots" url="https://github.com/Neeeophytee/finding-unknowns-skills/blob/main/skills/blindspot-pass/SKILL.md" kind="workflow">
-Improve the brief before work.
+<Item id="blindspot-pass" title="Find the blind spots" url="https://github.com/Neeeophytee/finding-unknowns-skills/blob/main/skills/blindspot-pass/SKILL.md" kind="workflow" summary="Improve the brief before work.">
+Find missing context and hidden risks before an agent starts.
 
-<Like>
-Ask an agent to find the landmines, hidden context, useful examples, and questions an expert would ask before it starts unfamiliar work. It then rewrites your brief with those findings included.
-</Like>
+<Why>
+A weak brief makes the agent guess at the most important parts of the job. Finding the gaps first gives both you and the agent a clearer definition of what good work should cover.
+</Why>
 
-<Dislike>
-It deliberately stops before doing the work. Skip it for small jobs you already understand.
-</Dislike>
+<Try>
+Run it against a brief for a project outside your normal expertise. Answer the questions it raises, add the useful findings to the brief, and only then ask another agent to begin the work.
+</Try>
 </Item>
 
-<Item id="video-preflight" title="Storyboard first" url="https://github.com/dawndrain/movie-gen" kind="workflow">
-Save money on AI video.
+<Item id="video-preflight" title="Storyboard first" url="https://github.com/dawndrain/movie-gen" kind="workflow" summary="Save money on AI video.">
+Make a rough AI video before paying for final clips.
 
-<Like>
-Ask your agent to make a rough video from still images and draft voices before generating final clips. This catches story, timing, and voice problems while they are still cheap to fix.
-</Like>
+<Why>
+Story, timing, and voice problems are much cheaper to fix before the final generation pass. A rough cut also gives everyone something concrete to review instead of debating a written script in the abstract.
+</Why>
 
-<Dislike>
-Costs change quickly, and you will still need retakes. The full workflow also needs several paid accounts.
-</Dislike>
+<Try>
+Turn a 30-second script into six still frames and add temporary narration. Watch that rough version once for pacing, rewrite the weak section, and generate final clips only after the sequence works.
+</Try>
 </Item>
 
-<Item id="customer-language" title="Mine customer words" url="https://github.com/Cesarjoquin/Marketing-Skills/blob/main/skills/customer-research/SKILL.md" kind="workflow">
-Ground AI copy in research.
+<Item id="customer-language" title="Mine customer words" url="https://github.com/Cesarjoquin/Marketing-Skills/blob/main/skills/customer-research/SKILL.md" kind="workflow" summary="Ground AI copy in research.">
+Ground AI-written copy in real customer language.
 
-<Like>
-Give an agent interviews, support tickets, survey answers, or reviews before asking for copy. It can pull out real pains, desired outcomes, and the exact phrases people use.
-</Like>
+<Why>
+Customer material shows the agent which pains and desired outcomes appear repeatedly. It also gives the draft real phrases to work from instead of generic marketing language.
+</Why>
 
-<Dislike>
-Online reviews overrepresent people with strong opinions. The agent still needs enough real customer material to find a reliable pattern.
-</Dislike>
+<Try>
+Give the agent ten recent support conversations and ask it to group repeated problems using the customers' own words. Use the strongest group to rewrite one landing-page section, then check every claim against the original conversations.
+</Try>
 </Item>
 
-<Item id="quality-bar" title="Check what the agent built" url="https://x.com/almonk/article/2079461952577802549" kind="workflow">
-Keep the quality bar high.
+<Item id="quality-bar" title="Check what the agent built" url="https://x.com/almonk/article/2079461952577802549" kind="workflow" summary="Check what the agent built.">
+Check agent-made work against a clear quality bar.
 
-<Like>
-Before publishing anything an agent made, check that it works reliably, stays quiet, sticks to one job, and gets fixed quickly when it breaks. A human still has to test the details.
-</Like>
+<Why>
+Agent-made work can look finished while still failing in ordinary use. A human check keeps speed from quietly lowering the standard customers experience.
+</Why>
 
-<Dislike>
-This is a quality standard rather than a step-by-step test. You still have to decide what good enough means for your product.
-</Dislike>
+<Try>
+Before publishing the next thing an agent builds, write down its one job and three common ways it could fail. Test those cases yourself, fix what breaks, and save the checklist for the next version.
+</Try>
 </Item>
 
 <ReachOut>

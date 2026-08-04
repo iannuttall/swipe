@@ -50,17 +50,17 @@
         "tools": {
           "type": "integer",
           "minimum": 0,
-          "maximum": 4
+          "maximum": 5
         },
         "newTools": {
           "type": "integer",
           "minimum": 0,
-          "maximum": 4
+          "maximum": 5
         },
         "workflows": {
           "type": "integer",
           "minimum": 0,
-          "maximum": 4
+          "maximum": 5
         }
       }
     }

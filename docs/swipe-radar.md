@@ -49,7 +49,7 @@ pnpm swipe radar run catalog-backfill
 - keeps the full Codex event stream under `notes/radar/logs/`, which is
   gitignored;
 - validates the final agent response against a small JSON schema;
-- limits the preferred issue shape to four tools and four practical workflows;
+- limits the preferred issue shape to five tools and five practical workflows;
 - collects separate seven-day Hacker News streams for new and popular stories;
 - treats Keep as one source rather than the default feed;
 - maintains verified tool pages under `/tools`, including useful finds that
@@ -69,6 +69,10 @@ pnpm swipe radar run catalog-backfill
   isolated line;
 - replaces specialist product language with ordinary words unless the reader
   needs the exact term;
+- writes each pick as what it is, two or three sentences on why it matters,
+  and two or three sentences giving the reader something specific to try;
+- keeps limitations in the private research unless a safety instruction is
+  needed in the practical example;
 - uses the Swipe writing standard, `writing-tips`, and the local trained `blog`
   profile before declaring copy ready for review;
 - writes a Scheduler attention event containing a short title, message, and

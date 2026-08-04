@@ -1,0 +1,17 @@
+---
+interface Props {
+  subject?: string;
+}
+
+const { subject = "Sponsoring Swipe" }: Props = Astro.props;
+---
+
+<a
+  href="#"
+  aria-label="Email sponsor at Swipe"
+  data-protected-email
+  data-email-recipient="sponsor"
+  data-email-subject={subject}
+  x-data="protectedEmailLinks"
+  x-on:click="openEmail($event)"
+><span aria-hidden="true"><span>sponsor</span><span>&#64;</span><span>swipe.md</span></span></a>

@@ -12,7 +12,7 @@ This week starts with a video editor that lets your agent do the tedious first c
 
 There are also quick ways to draft an email from rough notes, reclaim Mac disk space, test whether a skill helps, and clean up the instructions every session inherits.
 
-<Item id="belt" title="Belt" url="https://inference.sh/belt" sponsor="true" summary="Continuity layer for AI agents.">
+<Item id="belt" title="Belt" url="https://inference.sh/belt?utm_source=swipe-md" sponsor="true" summary="Continuity layer for AI agents.">
 Give every coding agent the same reusable context.
 
 <Why>

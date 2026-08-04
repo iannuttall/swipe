@@ -4,12 +4,13 @@ This run improves the public `/tools` catalogue. It must not create or edit a
 newsletter issue.
 
 Start with the latest gitignored Radar candidate ledger, especially candidates
-rejected from the issue shortlist. Re-evaluate each tool against the wider
-catalogue threshold. An item can be too familiar, too narrow for this week's
-issue, or displaced by a stronger pick and still deserve a useful tool page.
-The normal kill list still applies. Do not publish generic agent runners,
-orchestrators, weak wrappers, unsafe products, articles, or ordinary business
-stories as tools.
+rejected from the issue shortlist. Create a page for every viable app, CLI,
+repository, or agent skill. An item can be familiar, narrow, specialised, or
+displaced by a stronger issue pick and still belongs in the catalogue. Reject
+only when it meets an exclusion test in `tool-catalog.md`; record that evidence.
+Articles, standalone prompts, and ordinary business stories are not catalogue
+artefacts unless Radar has produced and Ian has approved a usable public tool,
+CLI, repository, or skill from them.
 
 Audit the existing `apps/site/src/content/tools/` pages too. Expand any thin
 page that leaves obvious setup, practical-use, price, privacy, platform,
@@ -26,16 +27,17 @@ For every candidate or existing page:
    history, issues, package metadata, and relevant source.
 5. Safely verify the central use. Never run unknown code merely to fill the
    catalogue.
-6. Save the product's own favicon or app icon locally when one exists.
+6. Keep catalogue cards text-only; do not add product icons or generated initials.
 7. Write a complete, direct article that helps a reader decide whether and how
    to use the tool. Do not pad a word count, but do not stop at a short product
    summary.
 
-Inspect all credible candidates, but create or materially rewrite no more than
-eight pages in one run. Fewer is fine. Keep weak candidates and factual
-uncertainties in the private report.
+Inspect every credible candidate. There is no per-run page cap. Finish the
+eligible backlog rather than stopping at an arbitrary count. A concise,
+verified first page is acceptable; prioritise featured, stale, or
+attention-earning pages for deeper enrichment.
 
-Update stable tool files, sources, `lastChecked`, review intervals, icons, and
+Update stable tool files, sources, `lastChecked`, review intervals, and
 issue history without changing established slugs. Preserve unrelated work.
 
 This is an unattended local run. Do not commit, push, publish, deploy, send

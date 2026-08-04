@@ -14,7 +14,7 @@ status: "early"
 firstSeen: 2026-07-29
 lastChecked: 2026-07-29
 reviewEveryDays: 60
-featuredIssues: []
+featuredIssues: ["agent-video-rough-cut"]
 sources:
   - kind: "repository"
     label: "cc-audit source code and README"

@@ -10,27 +10,66 @@ Do not select agent orchestrators, multi-agent harnesses, context shells,
 generic coding-agent wrappers, or other products whose job is merely to run
 agents. Find things people can actually do with AI.
 
+Prefer usable tools, repositories, skills, prompts, and working examples over
+standalone blog posts. Prefer free, open-source, locally runnable, or genuinely
+useful free-tier candidates. A paid product needs unusually strong practical
+value; a saved link alone is not an endorsement.
+
+Run the Keep queues tagged `swipe` and `ianslist` before general Keep searches.
+These tags are Ian's strongest manual shortlist signal. Untagged mobile shares
+and `pluck` saves are ordinary discovery leads and may relate to Ian's own
+projects rather than the newsletter.
+
+If an article contains a reusable method with no good existing artifact,
+follow `skills/swipe-radar/references/article-incubation.md` and build the
+smallest useful local skill, prompt, or CLI. Do not create a remote repository,
+publish a package, push it, or include the unpublished artifact in the public
+issue. Leave it for Ian to review and approve.
+
 Collect the last seven days of Hacker News through both Radar streams before
 topic searches. Inspect a mix from `hackernews-popular.json` and
 `hackernews-new.json`. Keep is one signal, not the main feed.
 
-Read the existing `/tools` catalogue. Update or create pages for every
-verified useful tool that clears the catalogue threshold, even when it does
-not make this week's issue. Use previous issue appearances, meaningful product
-updates, search demand, and reader interest as signals for what to recheck.
+The seven-day feeds are the fresh pass, not the discovery boundary. Also run
+the archive pass from the skill: GitHub skills across 730 days, three to five
+five-year Hacker News problem searches, and three to five whole-library Keep
+searches without `--since`. Deduplicate canonical URLs against previous Radar
+candidate snapshots, the tool catalogue, and past issues before deep research.
+An older item is eligible when Swipe has never inspected it. Vary historical
+queries between runs so the same top results do not become a permanent feed.
+
+Read the existing `/tools` catalogue. Every distinct, usable app, CLI,
+repository, or agent skill that reaches source inspection must end this run as
+a created or updated page, a documented duplicate of an existing canonical
+page, or a rejection tied to an exact catalogue exclusion test. Catalogue
+eligibility does not depend on making this week's issue. Use previous issue
+appearances, meaningful product updates, search demand, and reader interest as
+signals for what to enrich next.
 
 Run `pnpm swipe radar catalog --json` before selecting tools.
 For every new or updated tool page, follow
 `skills/swipe-radar/references/tool-page-writing.md`. Read the live landing
 page and relevant documentation for apps. For repositories, inspect the
 README, agent files, user docs, release history, and relevant source before
-writing. A short landing-page summary does not clear the catalogue threshold.
+writing. Start with a concise verified listing; give featured and
+attention-earning pages the deeper decision article.
 
-Aim for up to five tools and up to five skills, loops, or workflows. At least
-three selected tools should be genuinely new, early, or beta. Never add filler
-to reach either limit. Write one `draft: true` canonical Swipe issue, render it
-for review, and record the evidence, limitations, and rejected finalists in
-the gitignored Radar run directory.
+Find five tools and five skills, loops, or workflows. At least three selected
+tools should be genuinely new, early, or beta. Keep researching when the first
+pass is short and never add filler. If a full source pass cannot support all
+ten items, return `no_draft` and document the missing slots and rejected
+finalists instead of marking a partial issue ready. Otherwise write one
+`draft: true` canonical Swipe issue, render it for review, and record the
+evidence, limitations, and rejected finalists in the gitignored Radar run
+directory.
+
+Maintain `notes/radar/<YYYY-MM-DD>/candidates.md` as you research. Include
+every named candidate that reaches source inspection, not only finalists. For
+each one record its verdict, every exact source URL opened, what each source
+supports, what was tested, the result, limitations, and the specific reason it
+was selected or discarded. Follow
+`skills/swipe-radar/references/candidate-ledger.md`. Do not replace discarded
+names with a vague grouped summary.
 
 Choose one lead item after the issue is settled. Use it to write a recognisable
 `Swipe this:` email subject, a separate web title and description, a
@@ -60,6 +99,12 @@ contents list. Do not write `<Like>` or
 `<Dislike>` blocks and do not force a negative paragraph into the issue.
 Research limitations privately and use them to reject weak candidates or add a
 necessary safety instruction to the practical example.
+
+Read the most recent approved Swipe issues before drafting and use Ian's final
+edits as voice examples. Keep at least one memorable, source-backed specific in
+every `<Why>`. Make every `<Try>` produce a visible output, comparison,
+decision, or reveal. Do not flatten an interesting origin, mechanism, number,
+or test result into a generic product summary.
 
 Prioritize early or overlooked products and uses that other newsletters have
 not already repeated. Every selected item needs one practical move a reader

@@ -17,16 +17,24 @@ tests finalists, and writes the issue.
 - Exclude agent orchestrators, multi-agent harnesses, generic coding-agent
   wrappers, context shells, and tools whose product is another way to run
   agents. That category is saturated and is not useful Swipe coverage.
-- Never pad an issue. Fewer strong items beat the preferred 5 + 5 shape.
+- Never pad an issue. A review-ready weekly issue needs five tools and five
+  workflows, so keep researching when the first pass falls short. If a full
+  source pass cannot support 5 + 5, return `no_draft` and document the gap
+  rather than presenting a partial issue as ready.
 - A scheduled run may create local research files, demos, and a draft issue. It
-  must not commit, push, publish, test-send, create a broadcast, or run
-  `pnpm swipe issue send`.
+  may also incubate a small local skill, prompt, or CLI from a source article
+  when that creates something genuinely reusable. It must not create a remote
+  repository, publish a package, commit, push, publish the issue, test-send,
+  create a broadcast, or run `pnpm swipe issue send`.
 - The launch edition goes to Ian's List only. Do not create a Swipe broadcast;
   Swipe has not been promoted yet.
 - A real Ian's List send remains an explicit human action outside this skill.
 
 Read [references/editorial-contract.md](references/editorial-contract.md)
-before collecting candidates. Read
+and [references/candidate-ledger.md](references/candidate-ledger.md) before
+collecting candidates. Read
+[references/article-incubation.md](references/article-incubation.md) before
+turning an article into a local artifact. Read
 [references/copy-standard.md](references/copy-standard.md) before drafting.
 Read [references/tool-catalog.md](references/tool-catalog.md) before selecting
 tools or changing `/tools`.
@@ -70,6 +78,19 @@ questions. Put uncertainties and decisions in `run.md` for Ian to review.
 Use multiple lenses. A candidate seen in more than one independent source gets
 extra attention, not automatic inclusion.
 
+Run two discovery passes. The fresh pass catches launches and meaningful
+updates. The archive pass searches older Hacker News, GitHub, and Keep history
+for useful things Swipe has never considered. Publication date is not an
+editorial requirement. An older candidate can be new to Swipe and more useful
+than something released yesterday.
+
+Before deep research, compare canonical URLs, repository URLs, and source URLs
+against `radar/candidates/`, `apps/site/src/content/tools/`, and
+`apps/site/src/content/issues/`. Mark each lead `unseen`, `seen and rejected`,
+`catalogued`, or `previously featured`. Skip exact repeats unless a release,
+new use, better source, direct test, or Ian's feedback gives a concrete reason
+to reconsider them.
+
 ### GitHub skills and workflows
 
 Run:
@@ -81,6 +102,24 @@ pnpm swipe radar github \
   --json \
   --output notes/radar/<YYYY-MM-DD>/github.json
 ```
+
+Then run the broader archive pass:
+
+```sh
+pnpm swipe radar github \
+  --days 730 \
+  --limit 100 \
+  --max-stars 10000 \
+  --per-query 50 \
+  --json \
+  --output notes/radar/<YYYY-MM-DD>/github-history.json
+```
+
+The archive result deliberately overlaps the fresh result. Deduplicate it
+against the current run and the historical Swipe records before reading
+repositories. If it yields too few unseen leads, use `gh-research search repos`
+and `gh-research search code` with different problem terms or older date
+slices. Do not keep returning the same top 100 results every week.
 
 The helper searches actual `SKILL.md` files and AI workflow repositories, then
 adds repository freshness and visibility metadata. Read the source and README
@@ -121,6 +160,22 @@ starting queries are `claude code`, `codex`, `agent skill`, `ai workflow`,
 pnpm dlx hn-get search "<query>" --since 14d --sort points --limit 30
 ```
 
+Run three to five archive searches as well. Use problems and outcomes rather
+than this week's product names, search five years, and request enough results
+to get past familiar hits:
+
+```sh
+pnpm dlx hn-get search "<problem or outcome>" \
+  --since 5y \
+  --sort points \
+  --type story \
+  --limit 100
+```
+
+Vary the archive queries between runs and record them in `candidates.md`.
+Search terms such as `agent skill` and `AI workflow` are starting points, not
+a permanent fixed list.
+
 Filter to stories, inspect Show HN, and read first-level comments for
 finalists:
 
@@ -137,8 +192,34 @@ keep list --since 21d --limit 80 --json
 keep content <id>
 ```
 
-Prioritize saves tagged `swipe`, `ianslist`, or `pluck`. Search Keep for the
-candidate's problem and category as well as its name.
+Run the explicit editorial queues before the general recent list:
+
+```sh
+keep list --tag swipe --limit 100 --json
+keep list --tag ianslist --limit 100 --json
+```
+
+Treat `swipe` and `ianslist` as Ian's strongest manual shortlist signals.
+`ianslist` is one lowercase word. A tagged save still needs source inspection,
+a practical use, and a test; the tag is not automatic selection. Treat
+untagged mobile shares and saves tagged `pluck` as ordinary discovery leads.
+They may have been saved for Ian's own product research rather than for the
+newsletter.
+
+For every shortlisted Keep item, read its notes and content with `keep get
+<id> --content --json`. Use the note to understand why Ian saved it. “I am
+building something similar” is product context, not an editorial endorsement.
+
+Search Keep for the candidate's problem and category as well as its name. The
+recent list is only the fresh pass. Run three to five whole-library searches
+without `--since` for the archive pass:
+
+```sh
+keep search "<problem or outcome>" --limit 100 --json
+```
+
+Use semantic and lexical variants, then deduplicate by Item ID and canonical
+URL. A save from two years ago is eligible when Radar has never inspected it.
 
 If the local research CLI is available, inspect the last 14 days of app,
 history, transcript, and finding signals. Use `RESEARCH_CLI` when set;
@@ -182,6 +263,23 @@ supporting section, file, or short excerpt. Reject a source that is merely
 adjacent to the idea. Do not turn one useful sentence from the end of an
 article into its whole lesson.
 
+### Prefer usable artifacts to articles
+
+Prefer tools, repositories, skills, prompts, and working examples that a
+reader can use now. A blog post is normally research material, not the final
+thing featured in Swipe.
+
+When a strong article teaches a practical, repeatable move and no existing
+artifact implements it well, Radar may build a small local skill, prompt, or
+CLI under `radar/incubator/`. Follow `references/article-incubation.md`. The
+artifact must add usable instructions, guardrails, examples, and a real test;
+do not wrap an article summary in a README merely to create a repository.
+
+An incubated artifact cannot enter a public issue until Ian approves its
+public form and it has a stable public URL. Credit and link the original
+article from the artifact and the issue. Publication under a future Swipe
+GitHub account is a separate, explicit action.
+
 ## Select and test
 
 Apply the editorial contract before building demos. For every survivor, answer:
@@ -192,8 +290,10 @@ Apply the editorial contract before building demos. For every survivor, answer:
 4. What happened when we tried it?
 5. What are the limitations or failure modes?
 6. Where does the primary source explicitly support this move?
+7. Can the reader use the useful part now, preferably free or with a meaningful
+   free path?
 
-Reject candidates that cannot answer all six. Deduplicate items that teach the
+Reject candidates that cannot answer all seven. Deduplicate items that teach the
 same move.
 
 Prefer early, overlooked work that other newsletters have not already covered.
@@ -206,14 +306,23 @@ AI agent. A general business lesson, ordinary manual process, or AI-generated
 product story does not qualify unless the source explicitly includes an agent
 step the reader can reuse.
 
-Aim for:
+Prefer candidates that are free, open source, locally runnable, or useful on a
+real free tier. Paid products can still qualify when the free experience is
+substantial or the paid value is unusually strong and clearly disclosed in
+the private review. Reject thin demos, waitlists, and products whose useful
+result is gated behind payment.
 
-- up to five tools, with at least three marked with `new="true"`;
-- up to five skills, loops, or workflows marked with `kind="workflow"`.
+Build a complete issue with:
 
-These are maximums, not quotas. The new marker describes editorial position,
-not semantic versioning. An early, under-shared tool may be “new” even if its
-repository is not technically in beta.
+- five tools, with at least three marked with `new="true"`;
+- five skills, loops, or workflows marked with `kind="workflow"`.
+
+These are editorial targets with the same quality gate as every other item,
+not permission to add filler. Keep searching when short. If the evidence does
+not support all ten items after a full pass, return `no_draft` and explain the
+missing slots and rejected finalists in `run.md`. The new marker describes
+editorial position, not semantic versioning. An early, under-shared tool may
+be “new” even if its repository is not technically in beta.
 
 Test finalists in the smallest safe way that can produce a receipt. Never grant
 unknown code credentials or broad filesystem access. Prefer:
@@ -226,6 +335,11 @@ unknown code credentials or broad filesystem access. Prefer:
 Save demos and evidence under the run directory. Record failures too; a useful
 limitation may be more valuable than a clean demo.
 
+Maintain `notes/radar/<YYYY-MM-DD>/candidates.md` throughout the run using the
+candidate ledger reference. Do not reconstruct it from memory at the end. It
+must include every named candidate that reaches source inspection, including
+candidates rejected before testing.
+
 A local fixture can test a source claim. It cannot create a new source claim.
 Label synthetic fixtures clearly in the private report. Never turn changes
 suggested for an invented sample into a newsletter claim that sounds like we
@@ -233,22 +347,26 @@ improved a real product.
 
 ## Update the tool catalogue
 
-Apply the smaller catalogue threshold in
-[references/tool-catalog.md](references/tool-catalog.md) after testing. Create
-or update a page under `apps/site/src/content/tools/` for every useful,
-verified tool that clears it, including tools that do not make the issue.
-Discard raw and weak candidates in the private report.
+Apply the default-in catalogue rule in
+[references/tool-catalog.md](references/tool-catalog.md) after source
+inspection. Create or update a page under `apps/site/src/content/tools/` for
+every viable app, CLI, repository, or agent skill, including artefacts that do
+not make the issue. Every inspected eligible artefact must end as a created or
+updated page, a documented duplicate of a canonical page, or a rejection tied
+to one exact exclusion test.
 
 Follow
 [references/tool-page-writing.md](references/tool-page-writing.md) for the
-full research and writing pass. For an app, inspect its landing page and the
+verified first-page pass and deeper enrichment pass. For an app, inspect its landing page and the
 documentation supporting the main use and limitation. For a repository, read
 the README, agent files, user docs, release history, and relevant source. A
 shallow temporary clone is allowed for inspection, but never execute unknown
 code during discovery.
 
 Keep tool slugs stable. Update `lastChecked`, typed sources, limitations,
-platforms, review interval, and `featuredIssues` when something changes. Do not
+platforms, review interval, and `featuredIssues` when something changes. Keep
+paid appearances in `sponsoredIssues`; sponsorship alone never counts as an
+editorial feature or proof of quality. Do not
 replace an existing page with generic AI copy or create several pages for the
 same product.
 
@@ -265,6 +383,16 @@ the email subject, web title, description, preheader, and slug around that
 lead using the separate rules in
 [references/copy-standard.md](references/copy-standard.md). Never use an issue
 number, internal research label, or generic roundup phrase as the slug.
+
+Before writing, read the most recent approved, non-draft issues in
+`apps/site/src/content/issues/`. Treat Ian's final edits as voice examples for
+judgment, rhythm, specificity, and what makes a useful example. Do not copy
+their facts, phrases, or item structure mechanically. When a Radar draft and
+Ian's edited version are both available under `radar/drafts/` and the issue
+collection, study what he made more concrete or removed before drafting the
+next issue. Files under `radar/drafts/` are immutable run snapshots. Never edit
+or overwrite them. Read recent notes under `radar/feedback/` as direct
+editorial corrections and apply recurring lessons to the next run.
 
 Follow `apps/site/src/content/issues/swipe-template-demo.md` for the component
 shape. Each item needs:
@@ -298,6 +426,12 @@ no facts and does not override the Swipe copy standard.
 Assume the reader has never used the product and does not know its specialist
 vocabulary. Replace jargon with ordinary words unless the exact term is needed
 to use the product. Explain it immediately when it has to stay.
+
+Do not flatten the source into safe summary copy. Every `<Why>` must preserve
+one candidate-specific fact, origin, mechanism, constraint, or observed result
+that makes the item worth retelling. Every `<Try>` must end in a visible output,
+comparison, decision, or reveal rather than a generic instruction to test the
+thing.
 
 Before rendering, audit every factual sentence in each description, `<Why>`,
 and `<Try>`. Map it to the exact primary-source section or a real Radar test
@@ -338,6 +472,14 @@ report in `notes/radar/<YYYY-MM-DD>/run.md` containing:
 - rejected finalists and why;
 - unresolved editorial or technical questions;
 - exact commands run.
+
+The `swipe radar run` wrapper saves the untouched issue to
+`radar/drafts/<run timestamp>/<slug>.md` after a successful run. The copy in
+the Astro issue collection remains the editable draft. It also archives the
+run report and candidate ledger under `radar/reports/` and
+`radar/candidates/`, then creates an editable note under `radar/feedback/`.
+Do not create, edit, or replace the draft, report, or candidate snapshots
+yourself.
 
 Stop there on scheduled runs.
 

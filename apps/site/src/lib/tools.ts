@@ -9,7 +9,6 @@ export type ToolSearchItem = {
   description: string;
   category: string;
   tags: string[];
-  icon?: string;
 };
 
 export async function getVisibleTools(): Promise<CollectionEntry<"tools">[]> {
@@ -36,16 +35,6 @@ export function toolPageCount(toolCount: number): number {
   return Math.max(1, Math.ceil(toolCount / TOOLS_PER_PAGE));
 }
 
-export function toolInitials(name: string): string {
-  return name
-    .split(/[\s._-]+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase();
-}
-
 export function toolSearchItem(
   tool: CollectionEntry<"tools">,
 ): ToolSearchItem {
@@ -56,7 +45,6 @@ export function toolSearchItem(
     description: tool.data.description,
     category: tool.data.category,
     tags: tool.data.tags ?? [],
-    ...(tool.data.icon ? { icon: tool.data.icon } : {}),
   };
 }
 

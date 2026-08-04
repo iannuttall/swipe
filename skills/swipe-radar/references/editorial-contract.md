@@ -17,6 +17,12 @@ It is not:
 Radar should find useful things early, before every AI newsletter repeats them.
 It covers what people can do with AI, not another shell for running agents.
 
+“Early” describes discovery, not a seven-day publication window. Older tools
+and workflows qualify when Swipe has never considered them and the sources are
+still current. A previously seen candidate needs a meaningful change, a new
+use, better evidence, direct testing, or Ian's explicit feedback before it
+returns to the shortlist.
+
 ## A publishable candidate
 
 Every item needs:
@@ -35,6 +41,12 @@ Every item needs:
 
 The natural reader reaction should be: “we can swipe that.”
 
+Usable artifacts outrank commentary. Prefer a tool, repository, skill, prompt,
+or working example that the reader can try now, especially when it is free,
+open source, locally runnable, or has a meaningful free path. A saved article
+is normally a source for research. If its method deserves a reusable artifact,
+incubate and test that artifact before proposing it for publication.
+
 ## Kill list
 
 Reject:
@@ -46,6 +58,11 @@ Reject:
 - vague productivity advice;
 - consumer novelty with no reusable move;
 - bare links with no explanation;
+- standalone articles when the useful move has not been packaged into
+  something a reader can actually try;
+- thin skills or CLIs created only to make an article look like a product;
+- products whose useful result is hidden behind payment, a waitlist, or a
+  crippled demo;
 - agent orchestrators, multi-agent harnesses, generic coding-agent wrappers,
   context shells, and agent runners, even when technically novel;
 - claims that cannot be checked safely;
@@ -55,15 +72,18 @@ Reject:
 
 ## Issue shape
 
-The preferred maximum shape is:
+The review-ready issue shape is:
 
-- up to five tools, with at least three genuinely new, early, or beta;
-- up to five reusable skills, loops, or workflows that a reader can perform
+- five tools, with at least three genuinely new, early, or beta;
+- five reusable skills, loops, or workflows that a reader can perform
   with an AI agent.
 
-These are ceilings, not quotas. “New” is an editorial proxy for early,
-under-shared, or still-settling work. It does not require a beta label. A new
-marker is independent from whether an item is a tool or workflow.
+Do not lower the quality bar to fill a slot. Keep researching when the first
+pass is short. If a full source pass cannot support 5 + 5, report `no_draft`
+and document the gap instead of marking a partial issue ready. “New” is an
+editorial proxy for early, under-shared, or still-settling work. It does not
+require a beta label. A new marker is independent from whether an item is a
+tool or workflow.
 
 Each final item must answer:
 
@@ -112,12 +132,14 @@ Radar advantage.
 
 ## Catalogue threshold
 
-The public tool catalogue has a wider threshold than the weekly issue. A tool
-can earn a useful, verified `/tools` page without being one of the week's best
-five picks.
+The public tool catalogue is default-in while the weekly issue keeps a high
+editorial threshold. Every distinct, usable app, CLI, repository, or agent
+skill that reaches source inspection gets a verified `/tools` page, even when
+it is narrow or misses the week's five picks.
 
-Publish a catalogue page only when Radar can explain a real use, verify the
-central claim, name a limitation, and write distinct copy without padding.
-Keep all other discoveries in the private run report. Search traffic, Hacker
-News attention, reader submissions, votes, previous coverage, and product
-updates are signals for what to inspect next. They never replace this contract.
+Reject only duplicates, unusable or inaccessible artefacts, unsafe or
+deceptive products, dead releases with no remaining use, serious negative
+evidence, or candidates whose central job cannot be verified. Record which
+test failed. Search traffic, Hacker News attention, reader submissions, votes,
+previous coverage, and product updates decide what to enrich or reconsider;
+they never replace primary-source checks.

@@ -953,8 +953,8 @@ function radar(argv) {
     if (
       summary.status === "draft_ready" &&
       (!summary.counts ||
-        summary.counts.tools > 5 ||
-        summary.counts.workflows > 5 ||
+        summary.counts.tools !== 5 ||
+        summary.counts.workflows !== 5 ||
         summary.counts.newTools > summary.counts.tools ||
         summary.counts.newTools < 3)
     ) {
@@ -963,10 +963,76 @@ function radar(argv) {
       );
     }
 
+    let draftSnapshot;
+    let reportSnapshot;
+    let candidateSnapshot;
+    let feedbackPath;
+    if (summary.status === "draft_ready" && summary.issuePath) {
+      const sourcePath = resolve(root, summary.issuePath);
+      if (
+        !sourcePath.startsWith(`${issuesDir}/`) ||
+        !existsSync(sourcePath)
+      ) {
+        fail(`Swipe Radar returned an invalid issue path: ${summary.issuePath}`);
+      }
+
+      const snapshotDir = resolve(root, "radar/drafts", timestamp);
+      const snapshotPath = resolve(
+        snapshotDir,
+        sourcePath.slice(sourcePath.lastIndexOf("/") + 1),
+      );
+      mkdirSync(snapshotDir, { recursive: true });
+      writeFileSync(snapshotPath, readFileSync(sourcePath), { flag: "wx" });
+      draftSnapshot = snapshotPath.slice(root.length + 1);
+    }
+
+    if (launchMode !== "catalog-backfill") {
+      const reportSource = resolve(root, summary.reportPath);
+      const radarNotesDir = resolve(root, "notes/radar");
+      if (
+        !reportSource.startsWith(`${radarNotesDir}/`) ||
+        !existsSync(reportSource)
+      ) {
+        fail(`Swipe Radar returned an invalid report path: ${summary.reportPath}`);
+      }
+
+      const candidateSource = resolve(dirname(reportSource), "candidates.md");
+      if (!existsSync(candidateSource)) {
+        fail(`Swipe Radar did not write the required candidate ledger: ${candidateSource}`);
+      }
+
+      const reportPath = resolve(root, "radar/reports", `${timestamp}.md`);
+      const candidatesPath = resolve(root, "radar/candidates", `${timestamp}.md`);
+      const reviewPath = resolve(root, "radar/feedback", `${timestamp}.md`);
+      mkdirSync(dirname(reportPath), { recursive: true });
+      mkdirSync(dirname(candidatesPath), { recursive: true });
+      mkdirSync(dirname(reviewPath), { recursive: true });
+      writeFileSync(reportPath, readFileSync(reportSource), { flag: "wx" });
+      writeFileSync(candidatesPath, readFileSync(candidateSource), { flag: "wx" });
+      writeFileSync(
+        reviewPath,
+        `# Radar feedback, ${timestamp}\n\n` +
+          `Original draft: \`${draftSnapshot ?? "No draft produced"}\`\n` +
+          `Candidate ledger: \`${candidatesPath.slice(root.length + 1)}\`\n\n` +
+          `## Picks we should have included\n\n-\n\n` +
+          `## Picks we should have rejected\n\n-\n\n` +
+          `## Source or testing problems\n\n-\n\n` +
+          `## Copy changes to learn from\n\n-\n`,
+        { flag: "wx" },
+      );
+      reportSnapshot = reportPath.slice(root.length + 1);
+      candidateSnapshot = candidatesPath.slice(root.length + 1);
+      feedbackPath = reviewPath.slice(root.length + 1);
+    }
+
     console.log(summary.title);
     console.log(summary.message);
     if (summary.issuePath) console.log(`Issue: ${summary.issuePath}`);
+    if (draftSnapshot) console.log(`Original draft: ${draftSnapshot}`);
     if (summary.reportPath) console.log(`Report: ${summary.reportPath}`);
+    if (reportSnapshot) console.log(`Report snapshot: ${reportSnapshot}`);
+    if (candidateSnapshot) console.log(`Candidates: ${candidateSnapshot}`);
+    if (feedbackPath) console.log(`Feedback: ${feedbackPath}`);
     console.log(`Next: ${summary.nextStep}`);
     reportSchedulerAttention(
       summary.title,

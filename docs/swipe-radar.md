@@ -49,11 +49,34 @@ pnpm swipe radar run catalog-backfill
 - keeps the full Codex event stream under `notes/radar/logs/`, which is
   gitignored;
 - validates the final agent response against a small JSON schema;
-- limits the preferred issue shape to five tools and five practical workflows;
+- saves the untouched draft under `radar/drafts/<run timestamp>/` before Ian
+  edits the copy in the Astro issue collection;
+- archives the full source-and-test report under `radar/reports/` and every
+  considered candidate under `radar/candidates/`;
+- creates an editable `radar/feedback/` note that future runs read before
+  selecting and writing;
+- requires five tools and five practical workflows before marking a draft
+  ready, while returning `no_draft` rather than padding a weak issue;
 - collects separate seven-day Hacker News streams for new and popular stories;
+- treats those seven-day feeds as a fresh pass, then searches five years of
+  Hacker News, two years of GitHub skills, and the full Keep library for useful
+  candidates Swipe has never inspected;
+- deduplicates by canonical source, repository, tool page, and previous issue
+  instead of treating publication date as the novelty test;
 - treats Keep as one source rather than the default feed;
-- maintains verified tool pages under `/tools`, including useful finds that
-  miss the weekly issue;
+- searches the `swipe` and `ianslist` Keep tags first as Ian's explicit
+  editorial shortlist, while treating untagged mobile shares as ordinary
+  leads;
+- prefers free or meaningfully usable tools, repositories, skills, prompts,
+  and working examples over standalone articles;
+- may turn a strong article method into a tested local artifact under
+  `radar/incubator/`, but cannot create or publish a remote repository without
+  explicit approval;
+- creates a verified `/tools` page for every viable app, CLI, repository, and
+  agent skill it source-inspects, including finds that miss the weekly issue;
+- records an exact exclusion reason for duplicates, unsafe, unusable, dead,
+  seriously criticised, or unverifiable artefacts instead of silently dropping
+  them;
 - deeply reads landing pages and documentation for apps, and README, agent
   files, docs, releases, and relevant source for repositories;
 - keeps public tool copy as prerendered Markdown while D1 is reserved for
@@ -81,4 +104,9 @@ pnpm swipe radar run catalog-backfill
 
 The scheduled agent writes its research, demos, receipts, and review report
 under `notes/radar/<YYYY-MM-DD>/`. A successful run stops with a local
-`draft: true` issue. Publishing and sending remain separate human actions.
+`draft: true` issue. The editable issue lives in
+`apps/site/src/content/issues/`; its immutable Radar version lives in the
+tracked `radar/drafts/` archive. The report and candidate snapshots are also
+tracked and immutable. Add corrections to the matching file under
+`radar/feedback/`; do not edit the evidence snapshot. Publishing and sending
+remain separate human actions.

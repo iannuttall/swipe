@@ -115,6 +115,17 @@ Examples:
 when it matters, and who it helps. The reader should understand why the link
 earned its place without opening it.
 
+Keep the detail that makes the candidate memorable. Every `<Why>` needs at
+least one specific that could not be pasted onto a competing product: its
+origin, mechanism, constraint, surprising use, named result, or something
+Radar actually observed. Ask what Ian would repeat to a friend after reading
+the source. If the answer is only a tidier version of the product description,
+the copy is too flat.
+
+Specific does not mean embellished. Names, numbers, histories, and comparisons
+still need an exact primary source or test receipt. Preserve the interesting
+truth instead of replacing it with a safer generic claim.
+
 Bad:
 
 > We published a plain HTML receipt with no account or credentials. It
@@ -141,6 +152,11 @@ Good:
 `<Try>` should take two or three short sentences. Give one specific task,
 starting point, or small workflow. Say what to provide, what to ask for, and
 what useful result should come back when those details matter.
+
+Make the result visible. A strong `<Try>` leaves the reader with something to
+compare, show, decide, send, fix, or reuse. Name a real input and a purposeful
+constraint, then end on the reveal or decision. A dry checklist that only
+proves the tool ran is not enough.
 
 Bad:
 
@@ -239,9 +255,13 @@ reader.
 Read the issue out loud. If it sounds like a developer explaining a test to
 another developer, rewrite it.
 
+Compare it with the most recent approved Swipe issues. Use them as examples of
+Ian's judgment, rhythm, and level of specificity, not as a phrase bank. Never
+copy an old issue's facts or force a new item into an old sentence pattern.
+
 The issue is ready when:
 
-- there are no more than five tools and five workflows;
+- there are five tools and five workflows;
 - at least three tools are genuinely early or new;
 - each title and description is easy to scan;
 - no specialist term remains when an ordinary phrase says the same thing;

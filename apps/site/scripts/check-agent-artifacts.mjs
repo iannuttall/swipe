@@ -113,7 +113,7 @@ assert.ok(
     (tool) =>
       tool.slug === "here-now" &&
       tool.name === "Here.now" &&
-      tool.icon === "/tools/icons/here-now.png",
+      !("icon" in tool),
   ),
   "Here.now is missing from the tool search index",
 );

@@ -130,13 +130,13 @@ function defaultHeader(header: IssueSection | undefined, minutes?: number) {
 }
 
 function headerRow(header: IssueSection | undefined, minutes?: number) {
-  // <Header name="Issue 001" /> renders "Issue 001 - 3 min read" top-right.
-  // Opt out of reading time with read-time="off" or the label with name="off".
+  // A normal <Header> renders "Your 3 min AI swipe file" top-right.
+  // Use read-time="off" to show the supplied name, or name="off" to hide it.
   const name = header?.attrs.name
   const withLabel = name !== 'off'
   const withTime =
     withLabel && name && minutes && header?.attrs['read-time'] !== 'off'
-      ? `${name} - ${minutes} min read`
+      ? `Your ${minutes} min AI swipe file`
       : name
   const label = withLabel ? (withTime ?? 'Swipe') : undefined
   return h(

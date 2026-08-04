@@ -4,7 +4,6 @@ seoTitle: "Flint AI chart generator for editable charts"
 headline: "Flint: Build editable charts for websites, reports, and Excel"
 tagline: "Create one editable chart for websites, reports, dashboards, or Excel."
 description: "Flint turns a compact semantic chart specification into native Vega-Lite, ECharts, Chart.js, Plotly, or editable Excel output for agents and apps."
-icon: "/tools/icons/flint.png"
 url: "https://microsoft.github.io/flint-chart/"
 kind: "repository"
 platforms: ["Web", "Node.js", "Microsoft Excel"]

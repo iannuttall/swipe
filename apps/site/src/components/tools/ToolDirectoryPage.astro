@@ -23,7 +23,12 @@ const schema = {
   description,
   url: new URL(canonicalPath, Astro.site).toString(),
   hasPart: tools.map((tool) => ({
-    "@type": "SoftwareApplication",
+    "@type":
+      tool.data.kind === "skill"
+        ? "CreativeWork"
+        : tool.data.kind === "repository"
+          ? "SoftwareSourceCode"
+          : "SoftwareApplication",
     name: tool.data.name,
     description: tool.data.description,
     url: new URL(`/tools/${tool.id}`, Astro.site).toString(),

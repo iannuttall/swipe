@@ -38,13 +38,11 @@
     },
     "created": {
       "type": "integer",
-      "minimum": 0,
-      "maximum": 8
+      "minimum": 0
     },
     "updated": {
       "type": "integer",
-      "minimum": 0,
-      "maximum": 8
+      "minimum": 0
     },
     "rejected": {
       "type": "integer",

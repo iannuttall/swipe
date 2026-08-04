@@ -240,16 +240,29 @@ Wait until the SES identity shows the MAIL FROM status as `Success`.
 
 ## 7. Add DMARC
 
-Add this DNS record while the new sender is being tested:
+The production domain uses this BIMI-compatible enforcement policy:
 
 | Type | Name | Value |
 | --- | --- | --- |
-| TXT | `_dmarc` | `v=DMARC1; p=none;` |
+| TXT | `_dmarc` | `v=DMARC1; p=quarantine; pct=100; sp=quarantine;` |
 
-Move to a stricter DMARC policy only after normal sends pass and reports show
-that DKIM and SPF align correctly.
+Keep SES DKIM and the custom MAIL FROM domain aligned before adding another
+service that sends as `@swipe.md`.
 
-## 8. Create a dedicated SES API user
+## 8. Add BIMI
+
+The static SVG Tiny PS logo lives at `apps/site/public/bimi.svg`. Deploy the
+site and verify `https://swipe.md/bimi.svg` returns `image/svg+xml` before
+publishing this DNS record:
+
+| Type | Name | Value |
+| --- | --- | --- |
+| TXT | `default._bimi` | `v=BIMI1; l=https://swipe.md/bimi.svg;` |
+
+This self-asserted record can be used by providers that do not require a mark
+certificate. Gmail requires a CMC or VMC for BIMI display.
+
+## 9. Create a dedicated SES API user
 
 Open [AWS IAM users](https://us-east-1.console.aws.amazon.com/iam/home#/users).
 
@@ -303,7 +316,7 @@ vps ssh swipe -- docker compose \
 Send a test before deleting any previous key. Follow
 [the rotation procedure](email-operations.md#rotate-an-ses-access-key).
 
-## 9. Create the SNS feedback topic
+## 10. Create the SNS feedback topic
 
 Open [Amazon SNS topics in `us-east-1`](https://us-east-1.console.aws.amazon.com/sns/v3/home?region=us-east-1#/topics).
 
@@ -329,7 +342,7 @@ Do not use a JSON array.
 
 Restart the API container after changing the allowlist.
 
-## 10. Create the webhook secret
+## 11. Create the webhook secret
 
 Generate a new random value:
 
@@ -362,7 +375,7 @@ https://swipe.md/api/webhooks/<secret>/ses
 The public Worker checks the path secret. The newsletter API then checks the
 topic allowlist and AWS signature.
 
-## 11. Keep the Astro origin setting
+## 12. Keep the Astro origin setting
 
 SNS sends HTTP subscriptions and notifications as:
 
@@ -390,7 +403,7 @@ The repository has only two POST routes:
 
 Do not remove the webhook's own checks when the Astro origin check is disabled.
 
-## 12. Deploy the public webhook
+## 13. Deploy the public webhook
 
 From the repository root:
 
@@ -411,7 +424,7 @@ curl -i -X POST \
 
 Expected status: `404`.
 
-## 13. Create and confirm the SNS subscription
+## 14. Create and confirm the SNS subscription
 
 The public `swipe.md` Worker and newsletter API must both be live before this
 step.
@@ -430,7 +443,7 @@ from `Pending confirmation` to an ARN without a manual browser visit.
 
 Do not paste the URL into logs or screenshots.
 
-## 14. Connect SES bounce and complaint notifications
+## 15. Connect SES bounce and complaint notifications
 
 Open the `swipe.md` SES identity.
 
@@ -444,7 +457,7 @@ Under notifications:
 This installation uses identity-level notifications. It does not require an
 SES configuration set.
 
-## 15. Run the acceptance tests
+## 16. Run the acceptance tests
 
 Complete every check in
 [Email tests and maintenance](email-operations.md#acceptance-tests).

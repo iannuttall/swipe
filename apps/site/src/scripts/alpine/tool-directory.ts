@@ -7,7 +7,6 @@ type ToolSearchItem = {
   description: string;
   category: string;
   tags: string[];
-  icon?: string;
 };
 
 type ToolDirectoryConfig = {
@@ -57,16 +56,6 @@ export function registerToolDirectory(Alpine: AlpineRuntime) {
             .toLocaleLowerCase();
           return words.every((word) => haystack.includes(word));
         });
-      },
-
-      initials(name: string) {
-        return name
-          .split(/[\s._-]+/)
-          .filter(Boolean)
-          .slice(0, 2)
-          .map((part) => part[0])
-          .join("")
-          .toUpperCase();
       },
     }),
   );

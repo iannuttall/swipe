@@ -24,14 +24,15 @@ const tools = defineCollection({
     headline: z.string(),
     tagline: z.string(),
     description: z.string(),
-    icon: z.string().startsWith("/tools/icons/").optional(),
     url: z.url(),
     kind: z.enum([
       "web-app",
       "mobile-app",
       "desktop-app",
       "browser-extension",
+      "cli",
       "repository",
+      "skill",
     ]),
     platforms: z.array(z.string()).min(1),
     repository: z.url().optional(),
@@ -42,6 +43,7 @@ const tools = defineCollection({
     lastChecked: z.coerce.date(),
     reviewEveryDays: z.number().int().min(30).max(365).default(180),
     featuredIssues: z.array(z.string()).default([]),
+    sponsoredIssues: z.array(z.string()).default([]),
     sources: z
       .array(
         z.object({

@@ -5,6 +5,7 @@ import { render, type CollectionEntry } from "astro:content";
 import Breadcrumbs from "@/components/content/Breadcrumbs.astro";
 import NewsletterSignup from "@/components/content/NewsletterSignup.astro";
 import PageHeader from "@/components/content/PageHeader.astro";
+import ToolContentLink from "@/components/tools/ToolContentLink.astro";
 import Layout from "@/layouts/Layout.astro";
 import { getVisibleIssues } from "@/lib/issues";
 import { formatToolDate, getVisibleTools } from "@/lib/tools";
@@ -28,14 +29,24 @@ const featuredIssues = (tool.data.featuredIssues ?? [])
   .map((slug) => issues.find((issue) => issue.id === slug))
   .filter((issue): issue is CollectionEntry<"issues"> => Boolean(issue));
 const sources = tool.data.sources ?? [];
+const schemaType =
+  tool.data.kind === "skill"
+    ? "CreativeWork"
+    : tool.data.kind === "repository"
+      ? "SoftwareSourceCode"
+      : "SoftwareApplication";
 const schema = {
   "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
+  "@type": schemaType,
   name: tool.data.name,
   description: tool.data.description,
   url: tool.data.url,
-  applicationCategory: tool.data.category,
-  ...(platforms.length > 0 ? { operatingSystem: platformLabel } : {}),
+  ...(schemaType === "SoftwareApplication"
+    ? {
+        applicationCategory: tool.data.category,
+        ...(platforms.length > 0 ? { operatingSystem: platformLabel } : {}),
+      }
+    : {}),
   ...(tool.data.repository ? { sameAs: tool.data.repository } : {}),
   mainEntityOfPage: new URL(path, Astro.site).toString(),
 };
@@ -77,7 +88,7 @@ const schema = {
     <a
       href={tool.data.url}
       target="_blank"
-      rel="noreferrer"
+      rel="nofollow noreferrer"
       class="inline-flex h-11 items-center bg-button px-5 font-heading text-sm font-semibold text-button-fg no-underline transition-opacity hover:opacity-90"
     >
       Open {tool.data.name} ↗︎
@@ -85,7 +96,7 @@ const schema = {
   </p>
 
   <article class="content-prose mt-12">
-    <Content />
+    <Content components={{ a: ToolContentLink }} />
   </article>
 
   {
@@ -117,7 +128,7 @@ const schema = {
             class="text-primary underline decoration-dotted underline-offset-3 hover:decoration-solid"
             href={source.url}
             target="_blank"
-            rel="noreferrer"
+            rel="nofollow noreferrer"
           >
             {source.label}
           </a>

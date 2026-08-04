@@ -4,7 +4,6 @@ seoTitle: "Here.now: Free instant web hosting for AI agents"
 headline: "Here.now: Free instant web hosting for AI agents"
 tagline: "Publish an agent-made page to a temporary URL with no setup."
 description: "Here.now publishes a file or static site to a shareable URL for reports and prototypes, with anonymous 24-hour links and account-owned permanent sites."
-icon: "/tools/icons/here-now.png"
 url: "https://here.now/"
 kind: "web-app"
 platforms: ["Web"]

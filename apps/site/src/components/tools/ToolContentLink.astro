@@ -1,0 +1,16 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+type Props = HTMLAttributes<"a"> & { node?: unknown };
+
+const { href, rel, node: _node, ...attrs } = Astro.props;
+const hrefValue = href?.toString();
+const isExternal = hrefValue
+  ? /^https?:\/\//i.test(hrefValue) && new URL(hrefValue).origin !== Astro.site?.origin
+  : false;
+const linkRel = isExternal
+  ? [...new Set([...(rel?.split(/\s+/).filter(Boolean) ?? []), "nofollow", "noreferrer"])].join(" ")
+  : rel;
+---
+
+<a {...attrs} href={href} rel={linkRel}><slot /></a>

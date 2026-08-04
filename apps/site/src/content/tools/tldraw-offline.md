@@ -4,7 +4,6 @@ seoTitle: "tldraw offline: Local AI canvas for coding agents"
 headline: "tldraw offline: A local canvas coding agents can edit"
 tagline: "Sketch a diagram, then let an agent add data and interactions."
 description: "tldraw offline saves whiteboards as local files and lets trusted coding agents add shapes, data, and reusable interactive scripts on macOS, Windows, and Linux."
-icon: "/tools/icons/tldraw-offline.png"
 url: "https://offline.tldraw.com/"
 kind: "desktop-app"
 platforms: ["macOS", "Windows", "Linux"]

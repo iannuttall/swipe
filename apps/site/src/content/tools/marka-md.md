@@ -4,7 +4,6 @@ seoTitle: "marka.md: Local Markdown editor for AI context"
 headline: "marka.md: A local Markdown editor for AI context"
 tagline: "Bundle selected Markdown notes for any AI tool."
 description: "marka.md is a local desktop editor that turns selected Markdown files into one readable context bundle with relative paths before you paste it into an AI tool."
-icon: "/tools/icons/marka-md.png"
 url: "https://markamd.vercel.app/"
 kind: "desktop-app"
 platforms: ["macOS", "Windows", "Linux"]

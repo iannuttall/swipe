@@ -15,8 +15,8 @@ Astro validates the frontmatter and prerenders `/tools` plus every
 article. The Markdown file remains the source of truth for the product name,
 description, article copy, sources, review date, and issue history.
 
-Product favicons and app icons are stored locally under
-`apps/site/public/tools/icons/`; the site never hotlinks them.
+Catalogue cards are text-only. Radar does not download product favicons or
+generate placeholder initials.
 
 The directory shows 12 tools per prerendered page. Every build also regenerates
 `/tools/index.json`, which powers the client-side search without making content
@@ -29,6 +29,13 @@ skills/swipe-radar/references/tool-page-writing.md
 ```
 
 before creating or updating a page.
+
+The catalogue is default-in for usable apps, CLIs, public repositories, and
+agent skills. Missing the newsletter is not a reason to omit a page. Radar
+rejects only duplicates, unusable or unverifiable artefacts, unsafe or
+deceptive products, dead releases with no remaining use, and candidates with
+serious negative evidence. New entries may begin as concise verified listings;
+featured, stale, or attention-earning pages receive deeper research later.
 
 ## D1 stores changing signals
 

@@ -9,7 +9,7 @@ sources beat summaries, live product facts beat old notes, search data informs
 judgment rather than replacing it, and the factual pass is separate from the
 prose lint.
 
-## What counts as a tool
+## What gets a catalogue page
 
 A tool must be something a reader can use:
 
@@ -17,14 +17,16 @@ A tool must be something a reader can use:
 - a mobile app;
 - a desktop app;
 - a browser extension; or
-- a public repository that provides usable software.
+- a CLI;
+- a public repository that provides usable software; or
+- a public agent skill with instructions a reader can install or copy.
 
 An article, prompt, opinion, or general technique is not a tool. It may still
 qualify for the workflow half of a Swipe issue.
 
-Generic agent runners, orchestration frameworks, context shells, and yet
-another coding-agent wrapper remain excluded even when they have a working
-repository.
+Generic agent runners, orchestration frameworks, context shells, and coding
+agent wrappers still need a concrete, distinct job. Do not exclude a viable
+artefact merely because it is narrow or did not make the newsletter.
 
 ## Check the catalogue first
 
@@ -99,7 +101,6 @@ fact sheet needs:
 - privacy, sharing, export, and data-storage details that matter;
 - one honest limitation;
 - recent release or maintenance evidence;
-- the canonical favicon or app icon, when the product provides one;
 - every primary URL used and the date it was checked;
 - a test receipt for every claim beginning with “we tested”, “we made”, “we
   published”, or “we found”.
@@ -111,10 +112,28 @@ When sources conflict, current live documentation wins for product behaviour,
 pricing, and limits. A real safe test can prove what Radar observed, but it
 cannot prove that every reader or platform will behave the same way.
 
-## Check whether the page is worth publishing
+## Publish the verified first page
 
-Apply the catalogue threshold in `tool-catalog.md`. Do not publish a page just
-because a slug might rank.
+Apply the default-in catalogue rule in `tool-catalog.md`. Every viable artefact
+gets a concise first page once Radar has verified its identity, central job,
+access or installation path, one practical example, and one real limitation.
+Do not pad a page while facts are still sparse. Mark uncertainty plainly and
+schedule an earlier review.
+
+The first page must answer:
+
+- what it is and who can use it;
+- how to get it or start it;
+- one concrete job it can perform;
+- one limitation, safety boundary, or reason it may not fit;
+- which primary sources were checked.
+
+That is enough to enter the catalogue. A featured item should normally receive
+the deeper decision article in the same run. A catalogue-only page can be
+enriched later when it earns traffic, reader interest, a meaningful release,
+or an issue slot.
+
+## Enrich pages that earn attention
 
 Use the `seo` skill for the search pass. When search tooling is available:
 
@@ -137,9 +156,8 @@ be manufactured.
 
 ## Cover the decision, not only the description
 
-A thin product summary is not a useful tool page. The public article should
-answer the full set of questions someone needs before trying the product,
-provided the sources support them:
+A deeper article should answer the questions someone needs before trying the
+product, provided the sources support them:
 
 - what the product does and who it is for;
 - a practical example from start to result;
@@ -153,10 +171,10 @@ provided the sources support them:
 - real follow-up questions surfaced by search research.
 
 The outline comes from the product and the search intent. Do not force every
-page into the same headings and do not pad it to a word count. It is finished
-when a reader can make a sensible decision without reopening five tabs. A
-short page that leaves obvious setup, price, privacy, use-case, or limitation
-questions unanswered must be expanded or kept private.
+page into the same headings and do not pad it to a word count. A short verified
+listing may exist while these questions are still being researched; record the
+gap privately and prioritise it for enrichment rather than suppressing the
+page.
 
 ## Write the public Markdown page
 
@@ -180,12 +198,8 @@ Use the collection schema in `apps/site/src/content.config.ts`.
   It should add meaning below the H1 rather than restating it.
 - `description` is one distinct, factual sentence for the page introduction,
   search result, and social card.
-- Save the product's own favicon or app icon under
-  `apps/site/public/tools/icons/<stable-product-slug>.png` and set `icon` to
-  that local path. Do not hotlink it. Prefer a square primary asset, normalise
-  it to a small PNG, and check it in light and dark mode. When a repository has
-  no product icon, omit `icon` so the directory uses its initials; do not pass
-  off a generic GitHub mark or an invented logo as the product's branding.
+- The directory is deliberately text-only. Do not add product icons, favicons,
+  repository marks, or generated initials.
 - `kind`, `platforms`, and `repository` make the product shape explicit.
 - `firstSeen` never changes.
 - `lastChecked` changes only after a real source review.
@@ -222,7 +236,6 @@ check:
 
 - every current feature, price, platform, and limit against a primary source;
 - every external URL still loads;
-- the local icon loads, stays legible, and came from the product itself;
 - every “we” claim has a real receipt;
 - no private research note or synthetic test became a real-world claim;
 - the page adds information beyond the product's own tagline;

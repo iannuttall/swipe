@@ -4,7 +4,6 @@ seoTitle: "Hallmark AI design skill for coding agents"
 headline: "Hallmark: A design skill for coding agents"
 tagline: "Give coding agents clearer rules for building and reviewing interfaces."
 description: "Hallmark is an opinionated design skill for building, auditing, redesigning, and studying interface projects with Claude Code, Cursor, or Codex."
-icon: "/tools/icons/hallmark.png"
 url: "https://www.usehallmark.com/"
 kind: "repository"
 platforms: ["Claude Code", "Cursor", "Codex"]

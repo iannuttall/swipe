@@ -5,6 +5,8 @@ title: "Let an AI agent make your first video cut"
 description: "Edit video, reclaim disk space, test agent skills, audit context, and check claims before publishing."
 pubDate: 2026-08-05
 draft: false
+sentAt: 2026-08-05T11:02:22Z
+broadcastId: "04d392c7-40c6-4685-9f3a-8c8cc1935dfc"
 ---
 <Header name="This week's Swipe" />
 

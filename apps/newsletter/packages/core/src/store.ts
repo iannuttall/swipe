@@ -322,6 +322,11 @@ export interface EmailStore {
   listSuppressions(input?: { limit?: number }): Promise<SuppressionRecord[]>
   createDraft(input: DraftInput): Promise<DraftRecord>
   getDraft(id: string): Promise<DraftRecord | undefined>
+  updateDraft(input: {
+    id: string
+    status?: DraftRecord['status']
+    metadata?: Record<string, unknown>
+  }): Promise<DraftRecord>
   createBroadcast(input: {
     draftId: string
     name: string

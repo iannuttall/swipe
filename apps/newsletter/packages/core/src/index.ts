@@ -9,6 +9,7 @@ export * from './confirmation-types.js'
 export * from './db/index.js'
 export * from './db/migrate.js'
 export * from './delivery-planner.js'
+export * from './draft-qa.js'
 export * from './email-address.js'
 export * from './factory.js'
 export {

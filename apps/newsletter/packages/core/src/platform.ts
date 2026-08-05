@@ -16,6 +16,16 @@ import {
 } from './confirmation-service.js'
 import type { ConfirmationPurpose } from './confirmation-types.js'
 import { unsubscribeContact as unsubscribeContactByOperator } from './contact-consent.js'
+import {
+  assertIssueDraftCanBroadcast,
+  draftFingerprint,
+  type IssueQaReceipt,
+} from './draft-qa.js'
+import {
+  approveIssueDraftQa,
+  getIssueDraftQa,
+  sendTrackedTest,
+} from './issue-qa-service.js'
 import { sendQueuedMessage } from './message-sender.js'
 import type {
   CanaryState,
@@ -233,9 +243,24 @@ export class CoreEmailPlatform implements EmailPlatform {
     })
   }
 
-  async createDraft(input: DraftInput): Promise<{ id: string }> {
+  async createDraft(input: DraftInput): Promise<{ id: string; fingerprint: string }> {
     const draft = await this.deps.store.createDraft(input)
-    return { id: draft.id }
+    return { id: draft.id, fingerprint: draftFingerprint(draft) }
+  }
+
+  async getDraftQa(draftId: string) {
+    return getIssueDraftQa(this.deps, draftId)
+  }
+
+  async approveDraftQa(input: {
+    draftId: string
+    testMessageId: string
+    checkedAt: Date
+    browserCheckedLinks: number
+    archiveHtmlOk: boolean
+    archiveMarkdownOk: boolean
+  }): Promise<IssueQaReceipt> {
+    return approveIssueDraftQa(this.deps, input)
   }
 
   async tagContact(input: {
@@ -415,6 +440,7 @@ export class CoreEmailPlatform implements EmailPlatform {
     scheduledAt?: Date
   }): Promise<{ id: string; totalPlanned: number }> {
     const draft = await this.requireDraft(input.draftId)
+    assertIssueDraftCanBroadcast(draft)
     const broadcast = await this.deps.store.createBroadcast({
       draftId: draft.id,
       name: input.name ?? draft.name ?? draft.subject,
@@ -442,6 +468,7 @@ export class CoreEmailPlatform implements EmailPlatform {
     steps?: Array<number | 'all'>
     scheduledAt?: Date
   }): Promise<CanaryState> {
+    assertIssueDraftCanBroadcast(await this.requireDraft(input.draftId))
     return createCanaryCampaign({
       store: this.deps.store,
       config: this.deps.config,
@@ -594,29 +621,8 @@ export class CoreEmailPlatform implements EmailPlatform {
     return { cancelled: true, skipped }
   }
 
-  async sendTest(input: {
-    draftId: string
-    to: string
-    status?: RecipientStatus
-  }): Promise<{
-    providerMessageId: string
-  }> {
-    const draft = await this.requireDraft(input.draftId)
-    const rendered = await renderDraftEmail(
-      previewConfirmationDraft(draft, this.deps.config),
-      input.status ? { status: input.status } : {},
-    )
-    const fromName = draft.fromName ?? this.deps.config.email.fromName
-    const result = await this.deps.provider.send({
-      to: input.to,
-      fromEmail: this.defaultFromEmail(draft.fromEmail),
-      subject: `[TEST] ${rendered.subject}`,
-      html: rendered.html.replaceAll('{{unsubscribeUrl}}', '#'),
-      text: rendered.text,
-      ...(fromName ? { fromName } : {}),
-      ...(draft.replyTo ? { replyTo: draft.replyTo } : {}),
-    })
-    return { providerMessageId: result.providerMessageId }
+  async sendTest(input: { draftId: string; to: string; status?: RecipientStatus }) {
+    return sendTrackedTest(this.deps, input)
   }
 
   async sendSesSimulator(input: {
@@ -624,8 +630,23 @@ export class CoreEmailPlatform implements EmailPlatform {
     type: SesSimulatorType
   }): Promise<{ providerMessageId: string; to: string }> {
     const to = sesSimulatorAddress(input.type)
-    const result = await this.sendTest({ draftId: input.draftId, to })
-    return { ...result, to }
+    const draft = await this.requireDraft(input.draftId)
+    const rendered = await renderDraftEmail(
+      previewConfirmationDraft(draft, this.deps.config),
+    )
+    const fromEmail = draft.fromEmail ?? this.deps.config.email.fromEmail
+    if (!fromEmail) throw new Error('Missing from email')
+    const fromName = draft.fromName ?? this.deps.config.email.fromName
+    const result = await this.deps.provider.send({
+      to,
+      fromEmail,
+      subject: `[TEST] ${rendered.subject}`,
+      html: rendered.html.replaceAll('{{unsubscribeUrl}}', '#'),
+      text: rendered.text,
+      ...(fromName ? { fromName } : {}),
+      ...(draft.replyTo ? { replyTo: draft.replyTo } : {}),
+    })
+    return { providerMessageId: result.providerMessageId, to }
   }
 
   async retryFailedMessages(
@@ -900,12 +921,6 @@ export class CoreEmailPlatform implements EmailPlatform {
     const draft = await this.deps.store.getDraft(id)
     if (!draft) throw new Error(`Draft not found: ${id}`)
     return draft
-  }
-
-  private defaultFromEmail(fromEmail: string | undefined): string {
-    const configured = fromEmail ?? this.deps.config.email.fromEmail
-    if (!configured) throw new Error('Missing from email')
-    return configured
   }
 
   private hashIp(ip: string): string {

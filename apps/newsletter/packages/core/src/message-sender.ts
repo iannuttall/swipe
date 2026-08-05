@@ -16,7 +16,8 @@ import {
 export async function sendQueuedMessage(
   deps: { store: EmailStore; provider: EmailProvider; config: AppConfig },
   message: MessageRecord,
-): Promise<void> {
+  options: { subjectPrefix?: string } = {},
+): Promise<{ providerMessageId: string; trackingUrls: string[] }> {
   const broadcast = await deps.store.getBroadcast(message.broadcastId)
   if (!broadcast) throw new Error(`Broadcast not found: ${message.broadcastId}`)
   const storedDraft = await deps.store.getDraft(broadcast.draftId)
@@ -67,7 +68,7 @@ export async function sendQueuedMessage(
   const result = await deps.provider.send({
     to: message.toEmail,
     fromEmail,
-    subject: rendered.subject,
+    subject: `${options.subjectPrefix ?? ''}${rendered.subject}`,
     html,
     text: rendered.text,
     ...(fromName ? { fromName } : {}),
@@ -97,5 +98,12 @@ export async function sendQueuedMessage(
     })
   } catch (error) {
     throw new ProviderAcceptedPersistenceError(result, error)
+  }
+  return {
+    providerMessageId: result.providerMessageId,
+    trackingUrls: Array.from(
+      html.matchAll(/href="(https?:\/\/[^"\s]+\/t\/click\/[^"\s]+)"/g),
+      (match) => match[1],
+    ).filter((url): url is string => Boolean(url)),
   }
 }

@@ -448,6 +448,18 @@ export class MemoryEmailStore implements EmailStore {
     return this.drafts.get(id)
   }
 
+  async updateDraft(input: {
+    id: string
+    status?: DraftRecord['status']
+    metadata?: Record<string, unknown>
+  }): Promise<DraftRecord> {
+    const draft = this.drafts.get(input.id)
+    if (!draft) throw new Error(`Draft not found: ${input.id}`)
+    if (input.status) draft.status = input.status
+    if (input.metadata) draft.metadata = input.metadata
+    return draft
+  }
+
   async createBroadcast(input: {
     draftId: string
     name: string

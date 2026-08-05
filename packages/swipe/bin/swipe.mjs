@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import {
   existsSync,
   mkdirSync,
@@ -48,8 +49,9 @@ Newsletter:
 Issues (apps/site/src/content/issues -> Swipe newsletter):
   pnpm swipe issue preview [slug] [--status cold]  render the email HTML locally
   pnpm swipe issue test [slug] [--to email] [--status cold]
-                                               prod draft + test send to you only
-  pnpm swipe issue send [slug] --yes         publish archive page, then broadcast
+                                               publish + tracked test send to you only
+  pnpm swipe issue approve [slug] --yes      browser-QA the exact tracked test
+  pnpm swipe issue send [slug] --yes         broadcast the approved immutable draft
   (omit the slug to pick from a list)
 
 Radar (agent research helpers):
@@ -282,6 +284,7 @@ function newsletter(argv) {
 
 const issuesDir = resolve(root, "apps/site/src/content/issues");
 const deployStatusUrl = "https://swipe.md/.well-known/deploy.json";
+const issueQaDir = resolve(root, ".swipe/issue-qa");
 
 function fail(message) {
   console.error(message);
@@ -379,6 +382,46 @@ function shellQuote(value) {
   return `'${value.replace(/'/g, `'\\''`)}'`;
 }
 
+function issueFingerprint(issue, slug) {
+  return createHash("sha256")
+    .update(JSON.stringify({
+      name: slug,
+      subject: issue.frontmatter.subject,
+      preview: issue.frontmatter.preheader ?? null,
+      bodyMarkdown: issue.body.trim(),
+      template: "default",
+      fromEmail: null,
+      fromName: null,
+      replyTo: null,
+    }))
+    .digest("hex");
+}
+
+function issueQaPath(slug) {
+  return resolve(issueQaDir, `${slug}.json`);
+}
+
+function saveIssueQaState(slug, state) {
+  mkdirSync(issueQaDir, { recursive: true });
+  writeFileSync(issueQaPath(slug), `${JSON.stringify(state, null, 2)}\n`, { mode: 0o600 });
+}
+
+function loadIssueQaState(slug) {
+  const statePath = issueQaPath(slug);
+  if (!existsSync(statePath)) fail(`No tracked test exists for ${slug}. Run pnpm swipe issue test ${slug} first.`);
+  return JSON.parse(readFileSync(statePath, "utf8"));
+}
+
+function assertTrackingRoutingConfigured() {
+  const config = readFileSync(resolve(root, "apps/site/wrangler.jsonc"), "utf8");
+  for (const route of ["/t/click/*", "/t/open/*", "/unsubscribe/*", "/api/*"]) {
+    if (!config.includes(`"${route}"`)) fail(`Cloudflare Worker-first routing is missing ${route}.`);
+  }
+  if (/"run_worker_first"\s*:\s*true/.test(config)) {
+    fail("Cloudflare routing must stay selective; run_worker_first=true is forbidden.");
+  }
+}
+
 function sshEnv() {
   const target = localEnv("SWIPE_NEWSLETTER_SSH");
   const ops = localEnv("SWIPE_NEWSLETTER_OPS");
@@ -426,6 +469,7 @@ function remoteDraftCreate(ssh, issue, slug) {
     "draft create",
     `--subject ${shellQuote(issue.frontmatter.subject)}`,
     `--name ${shellQuote(slug)}`,
+    `--issue-slug ${shellQuote(slug)}`,
     issue.frontmatter.preheader ? `--preview ${shellQuote(issue.frontmatter.preheader)}` : "",
     `--body ${shellQuote(issue.body.trim())}`,
     "--json",
@@ -436,8 +480,10 @@ function remoteDraftCreate(ssh, issue, slug) {
   const parsed = parseJsonOutput(output, "draft create");
   const draftId = parsed.id ?? parsed.draft?.id ?? parsed.data?.id;
   if (!draftId) fail(`draft create returned no id:\n${output}`);
-  console.log(`Created prod draft ${draftId}.`);
-  return draftId;
+  const fingerprint = parsed.fingerprint ?? parsed.draft?.fingerprint ?? parsed.data?.fingerprint;
+  if (!fingerprint) fail(`draft create returned no fingerprint:\n${output}`);
+  console.log(`Created immutable prod draft ${draftId}.`);
+  return { draftId, fingerprint };
 }
 
 async function waitForDeploy(sha, timeoutMs = 10 * 60 * 1000) {
@@ -460,6 +506,109 @@ async function waitForDeploy(sha, timeoutMs = 10 * 60 * 1000) {
     await new Promise((resolveSleep) => setTimeout(resolveSleep, 15000));
   }
   fail(`\nTimed out waiting for ${sha} to go live. Check the Cloudflare build, then re-run; the broadcast has NOT been created.`);
+}
+
+function assertMainBranch() {
+  const branch = stepCapture("git", ["rev-parse", "--abbrev-ref", "HEAD"]).trim();
+  if (branch !== "main") fail(`Issue publishing runs from main; you are on ${branch}.`);
+}
+
+async function publishIssueArchive(path, parsed, slug) {
+  assertMainBranch();
+  if (parsed.frontmatter.draft === "true") {
+    writeIssueFrontmatter(path, parsed, { draft: "false" });
+  }
+  const published = parseIssueFile(path);
+  const dirty = stepCapture("git", ["status", "--porcelain", "--", path]).trim();
+  if (dirty) {
+    stepRun("git", ["add", path]);
+    stepRun("git", ["commit", "-m", `content(issues): publish ${slug}`]);
+  }
+  stepRun("git", ["push", "origin", "main"]);
+  const sha = stepCapture("git", ["rev-parse", "HEAD"]).trim();
+  await waitForDeploy(sha);
+  return published;
+}
+
+const browserNavigationHeaders = {
+  Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+  "Sec-Fetch-Dest": "document",
+  "Sec-Fetch-Mode": "navigate",
+  "Sec-Fetch-Site": "none",
+  "Upgrade-Insecure-Requests": "1",
+  "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/150 Safari/537.36",
+};
+
+async function requireOk(url, label) {
+  const response = await fetch(url, {
+    cache: "no-store",
+    redirect: "follow",
+    headers: browserNavigationHeaders,
+  });
+  if (!response.ok) fail(`${label} failed with HTTP ${response.status}: ${url}`);
+}
+
+async function checkTrackingRedirect(link) {
+  const response = await fetch(link.trackingUrl, {
+    cache: "no-store",
+    redirect: "manual",
+    headers: browserNavigationHeaders,
+  });
+  if (![301, 302, 303, 307, 308].includes(response.status)) {
+    fail(`Tracked browser request returned HTTP ${response.status}, not a redirect: ${link.trackingUrl}`);
+  }
+  const location = response.headers.get("location");
+  if (!location || new URL(location, link.trackingUrl).href !== new URL(link.originalUrl).href) {
+    fail(`Tracked link expected ${link.originalUrl}, got ${location ?? "no Location header"}.`);
+  }
+}
+
+function agentBrowserJson(args, label) {
+  const output = stepCapture("agent-browser", ["--json", ...args]);
+  let parsed;
+  try {
+    parsed = JSON.parse(output);
+  } catch {
+    fail(`${label} returned invalid JSON:\n${output}`);
+  }
+  if (!parsed.success || parsed.error) fail(`${label} failed: ${parsed.error ?? output}`);
+  return parsed.data;
+}
+
+async function runIssueBrowserQa(slug, state) {
+  if (!Array.isArray(state.trackingLinks) || state.trackingLinks.length === 0) {
+    fail("Tracked test returned no click-tracking links; QA cannot pass.");
+  }
+  const canonicalUrl = `https://swipe.md/issues/${encodeURIComponent(slug)}`;
+  await requireOk(canonicalUrl, "Issue archive");
+  await requireOk(`${canonicalUrl}.md`, "Issue Markdown");
+  for (const link of state.trackingLinks) await checkTrackingRedirect(link);
+
+  const session = `swipe-issue-qa-${slug.replace(/[^a-z0-9-]/gi, "-")}-${process.pid}`;
+  try {
+    for (const [index, link] of state.trackingLinks.entries()) {
+      const data = agentBrowserJson(
+        ["--session", session, "open", link.trackingUrl],
+        `Browser link ${index + 1}`,
+      );
+      const finalUrl = data.url;
+      if (!finalUrl || finalUrl.includes("/t/click/") || finalUrl.startsWith("chrome-error://")) {
+        fail(`Browser did not reach a real destination for tracked link ${index + 1}: ${finalUrl ?? "no URL"}`);
+      }
+      const network = agentBrowserJson(
+        ["--session", session, "network", "requests"],
+        `Browser network check ${index + 1}`,
+      );
+      const documents = (network.requests ?? []).filter((request) => request.resourceType === "Document");
+      const failedDocument = documents.find((request) => request.status >= 400);
+      if (failedDocument) fail(`Browser received HTTP ${failedDocument.status} for ${failedDocument.url}`);
+      process.stdout.write(`  browser ${index + 1}/${state.trackingLinks.length}\r`);
+    }
+  } finally {
+    spawnSync("agent-browser", ["--session", session, "close"], { cwd: root, stdio: "ignore" });
+  }
+  console.log(`  browser ${state.trackingLinks.length}/${state.trackingLinks.length} passed`);
+  return { checkedAt: new Date().toISOString(), checkedLinks: state.trackingLinks.length };
 }
 
 async function issue(argv) {
@@ -523,27 +672,91 @@ async function issue(argv) {
   }
 
   if (command === "test") {
+    assertTrackingRoutingConfigured();
+    if (parsed.frontmatter.broadcastId) {
+      fail(`${slug} already has broadcastId ${parsed.frontmatter.broadcastId}; refusing to create a new issue test.`);
+    }
     const ssh = sshEnv();
     const to = getOption(rest, "--to") ?? localEnv("SWIPE_TEST_EMAIL");
     if (!to) fail("issue test needs --to or SWIPE_TEST_EMAIL in root .env.local.");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) fail("issue test needs a valid email address.");
     const status = getOption(rest, "--status", "cold");
-    const draftId = remoteDraftCreate(ssh, parsed, slug);
+    const published = await publishIssueArchive(path, parsed, slug);
+    const localFingerprint = issueFingerprint(published, slug);
+    const { draftId, fingerprint } = remoteDraftCreate(ssh, published, slug);
+    if (fingerprint !== localFingerprint) fail("Local issue and production draft fingerprints differ; test blocked.");
     const output = sshCapture(
       ssh.target,
       `${ssh.ops} broadcast test --yes --draft-id ${shellQuote(draftId)} --to ${shellQuote(to)} --status ${shellQuote(status)} --json`,
     );
-    console.log(output.trim());
-    console.log(`Test sent to ${to}.`);
+    const test = parseJsonOutput(output, "broadcast test");
+    if (test.draftFingerprint !== fingerprint) fail("Tracked test used a different draft fingerprint.");
+    if (!test.messageId || !Array.isArray(test.trackingLinks) || test.trackingLinks.length === 0) {
+      fail(`Tracked test returned incomplete QA evidence:\n${output}`);
+    }
+    const canonicalUrl = `https://swipe.md/issues/${encodeURIComponent(slug)}`;
+    await requireOk(canonicalUrl, "Issue archive");
+    await requireOk(`${canonicalUrl}.md`, "Issue Markdown");
+    for (const link of test.trackingLinks) await checkTrackingRedirect(link);
+    saveIssueQaState(slug, {
+      slug,
+      draftId,
+      fingerprint,
+      messageId: test.messageId,
+      broadcastId: test.broadcastId,
+      providerMessageId: test.providerMessageId,
+      testedTo: to,
+      testedAt: new Date().toISOString(),
+      trackingLinks: test.trackingLinks,
+    });
+    console.log(`Tracked test sent to ${to}; ${test.trackingLinks.length} browser-shaped redirects passed.`);
+    console.log(`Inspect the email, then approve it with: pnpm swipe issue approve ${slug} --yes`);
+    return;
+  }
+
+  if (command === "approve") {
+    assertTrackingRoutingConfigured();
+    if (!rest.includes("--yes")) fail("Inspect the received test, then re-run issue approve with --yes.");
+    if (parsed.frontmatter.broadcastId) fail(`${slug} has already been sent.`);
+    const state = loadIssueQaState(slug);
+    const localFingerprint = issueFingerprint(parsed, slug);
+    if (state.fingerprint !== localFingerprint) {
+      fail(`${slug} changed after the tracked test. Run pnpm swipe issue test ${slug} again.`);
+    }
+    console.log(`Running real-browser QA for ${state.trackingLinks.length} tracked links...`);
+    const browserQa = await runIssueBrowserQa(slug, state);
+    const ssh = sshEnv();
+    const output = sshCapture(
+      ssh.target,
+      `${ssh.ops} draft qa-approve --yes --draft-id ${shellQuote(state.draftId)} --test-message-id ${shellQuote(state.messageId)} --checked-at ${shellQuote(browserQa.checkedAt)} --browser-checked-links ${browserQa.checkedLinks} --archive-html-ok --archive-markdown-ok --json`,
+    );
+    const receipt = parseJsonOutput(output, "draft qa-approve");
+    if (receipt.fingerprint !== localFingerprint) fail("Production QA receipt fingerprint mismatch.");
+    writeIssueFrontmatter(path, parsed, {
+      qaDraftId: `"${state.draftId}"`,
+      qaFingerprint: `"${receipt.fingerprint}"`,
+      qaApprovedAt: receipt.checkedAt,
+    });
+    stepRun("git", ["add", path]);
+    stepRun("git", ["commit", "-m", `content(issues): approve ${slug} for send`]);
+    stepRun("git", ["push", "origin", "main"]);
+    console.log(`${slug} is approved. The send command is now unlocked for this exact draft.`);
     return;
   }
 
   if (command === "send") {
+    assertTrackingRoutingConfigured();
     if (!rest.includes("--yes")) {
       fail("issue send creates a real broadcast to the list. Re-run with --yes.");
     }
     if (parsed.frontmatter.broadcastId) {
       fail(`${slug} already has broadcastId ${parsed.frontmatter.broadcastId}; refusing to double-send.`);
+    }
+    if (!parsed.frontmatter.qaDraftId || !parsed.frontmatter.qaFingerprint || !parsed.frontmatter.qaApprovedAt) {
+      fail(`${slug} has no approved tracked-test receipt. Run issue test, inspect it, then issue approve.`);
+    }
+    if (issueFingerprint(parsed, slug) !== parsed.frontmatter.qaFingerprint) {
+      fail(`${slug} changed after approval. Run a new tracked test and browser QA.`);
     }
     const ssh = sshEnv();
     const composeSuffix = " run --rm -T ops node dist/index.js";
@@ -556,8 +769,7 @@ async function issue(argv) {
       fail("Cannot derive the compose command for the sender worker; set SWIPE_NEWSLETTER_COMPOSE.");
     }
 
-    const branch = stepCapture("git", ["rev-parse", "--abbrev-ref", "HEAD"]).trim();
-    if (branch !== "main") fail(`issue send publishes from main; you are on ${branch}.`);
+    assertMainBranch();
 
     const otherChanges = stepCapture("git", ["status", "--porcelain"])
       .split("\n")
@@ -567,21 +779,18 @@ async function issue(argv) {
       for (const line of otherChanges) console.log(`  ${line}`);
     }
 
-    // Publish the archive page first so the email can never link to a 404.
-    if (parsed.frontmatter.draft === "true") {
-      writeIssueFrontmatter(path, parsed, { draft: "false" });
+    const published = await publishIssueArchive(path, parsed, slug);
+    const qaOutput = sshCapture(
+      ssh.target,
+      `${ssh.ops} draft qa-status --draft-id ${shellQuote(published.frontmatter.qaDraftId)} --json`,
+    );
+    const qa = parseJsonOutput(qaOutput, "draft qa-status");
+    if (qa.status !== "ready" || qa.fingerprint !== published.frontmatter.qaFingerprint || !qa.receipt) {
+      fail("Production draft QA receipt is missing, stale, or does not match this issue.");
     }
-    const dirty = stepCapture("git", ["status", "--porcelain", "--", path]).trim();
-    if (dirty) {
-      stepRun("git", ["add", path]);
-      stepRun("git", ["commit", "-m", `content(issues): publish ${slug}`]);
-    }
-    stepRun("git", ["push", "origin", "main"]);
-    const sha = stepCapture("git", ["rev-parse", "HEAD"]).trim();
-    await waitForDeploy(sha);
-
-    const published = parseIssueFile(path);
-    const draftId = remoteDraftCreate(ssh, published, slug);
+    await requireOk(qa.receipt.canonicalUrl, "Issue archive");
+    await requireOk(`${qa.receipt.canonicalUrl}.md`, "Issue Markdown");
+    const draftId = published.frontmatter.qaDraftId;
     const output = sshCapture(
       ssh.target,
       `${ssh.ops} broadcast create --draft-id ${shellQuote(draftId)} --name ${shellQuote(slug)} --json`,

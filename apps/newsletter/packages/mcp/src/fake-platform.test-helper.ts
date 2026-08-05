@@ -70,8 +70,20 @@ export class FakePlatform implements EmailPlatform {
     return queueSummary()
   }
 
-  async createDraft(): Promise<{ id: string }> {
-    return { id: 'draft_1' }
+  async createDraft(): Promise<{ id: string; fingerprint: string }> {
+    return { id: 'draft_1', fingerprint: 'fingerprint_1' }
+  }
+
+  async approveDraftQa() {
+    return qaReceipt()
+  }
+
+  async getDraftQa() {
+    return {
+      fingerprint: 'fingerprint_1',
+      status: 'ready' as const,
+      receipt: qaReceipt(),
+    }
   }
 
   async createBroadcast(): Promise<{ id: string; totalPlanned: number }> {
@@ -225,8 +237,14 @@ export class FakePlatform implements EmailPlatform {
     return { cancelled: true, skipped: 1 }
   }
 
-  async sendTest(): Promise<{ providerMessageId: string }> {
-    return { providerMessageId: 'test_1' }
+  async sendTest() {
+    return {
+      providerMessageId: 'test_1',
+      broadcastId: 'broadcast_test_1',
+      messageId: 'message_test_1',
+      draftFingerprint: 'fingerprint_1',
+      trackingLinks: [],
+    }
   }
 
   async sendSesSimulator(): Promise<{ providerMessageId: string; to: string }> {
@@ -259,6 +277,20 @@ export class FakePlatform implements EmailPlatform {
 
   async handleProviderEvents(): Promise<{ processed: number }> {
     return { processed: 1 }
+  }
+}
+
+function qaReceipt() {
+  return {
+    fingerprint: 'fingerprint_1',
+    testBroadcastId: 'broadcast_test_1',
+    testMessageId: 'message_test_1',
+    testedTo: 'test@example.com',
+    testedAt: new Date(0).toISOString(),
+    checkedAt: new Date(0).toISOString(),
+    canonicalUrl: 'https://swipe.md/issues/test',
+    checkedLinks: 1,
+    browserCheckedLinks: 1,
   }
 }
 

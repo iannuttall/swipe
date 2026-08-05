@@ -42,7 +42,9 @@ Commands:
   email template render --subject SUBJECT (--body TEXT | --body-file PATH) [--template default] [--preview TEXT] [--status new|warm|cold] [--out-dir PATH] [--json]
 
   Drafts and broadcasts:
-  email draft create --subject SUBJECT (--body TEXT | --body-file PATH) [--template NAME] [--preview TEXT] [--metadata-file PATH] [--json]
+  email draft create --subject SUBJECT (--body TEXT | --body-file PATH) [--template NAME] [--preview TEXT] [--issue-slug SLUG] [--metadata-file PATH] [--json]
+  email draft qa-status --draft-id ID [--json]
+  email draft qa-approve --yes --draft-id ID --test-message-id ID --checked-at ISO --browser-checked-links N --archive-html-ok --archive-markdown-ok [--json]
   email broadcast preview-plan [--audience-file PATH] [--delivery-file PATH] [--sample-limit N] [--json]
   email broadcast create --draft-id ID [--scheduled-at ISO] [--audience-file PATH] [--delivery-file PATH] [--json]
   email canary create --draft-id ID [--steps 50,500,2000,all] [--scheduled-at ISO] [--audience-file PATH] [--delivery-file PATH] [--json]

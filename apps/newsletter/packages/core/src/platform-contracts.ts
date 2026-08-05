@@ -1,5 +1,6 @@
 import type { SendPlanPreview } from './broadcast-planning.js'
 import type { ConfirmationPurpose, ConfirmationReport } from './confirmation-types.js'
+import type { IssueQaReceipt } from './draft-qa.js'
 import type { ProductionOpsChecklist } from './production-ops.js'
 import type { DoctorReport } from './readiness.js'
 import type { NormalizedProviderEvent } from './ses-webhooks.js'
@@ -76,7 +77,21 @@ export interface EmailPlatform {
   doctor(): Promise<DoctorReport>
   getProductionOpsChecklist(): Promise<ProductionOpsChecklist>
   getQueueSummary(input?: QueueSummaryRequest): Promise<QueueSummary>
-  createDraft(input: DraftInput): Promise<{ id: string }>
+  createDraft(input: DraftInput): Promise<{ id: string; fingerprint: string }>
+  approveDraftQa(input: {
+    draftId: string
+    testMessageId: string
+    checkedAt: Date
+    browserCheckedLinks: number
+    archiveHtmlOk: boolean
+    archiveMarkdownOk: boolean
+  }): Promise<IssueQaReceipt>
+  getDraftQa(draftId: string): Promise<{
+    fingerprint: string
+    status: 'draft' | 'ready' | 'archived'
+    issueSlug?: string
+    receipt?: IssueQaReceipt
+  }>
   createBroadcast(input: {
     draftId: string
     name?: string
@@ -180,11 +195,13 @@ export interface EmailPlatform {
   pauseBroadcast(id: string): Promise<{ paused: boolean }>
   resumeBroadcast(id: string): Promise<{ resumed: boolean }>
   cancelBroadcast(id: string): Promise<{ cancelled: boolean; skipped: number }>
-  sendTest(input: {
-    draftId: string
-    to: string
-    status?: RecipientStatus
-  }): Promise<{ providerMessageId: string }>
+  sendTest(input: { draftId: string; to: string; status?: RecipientStatus }): Promise<{
+    providerMessageId: string
+    broadcastId: string
+    messageId: string
+    draftFingerprint: string
+    trackingLinks: Array<{ trackingUrl: string; originalUrl: string }>
+  }>
   sendSesSimulator(input: {
     draftId: string
     type: SesSimulatorType

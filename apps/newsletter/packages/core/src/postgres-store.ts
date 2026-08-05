@@ -6,7 +6,6 @@ import {
   contacts,
   contactTags,
   contactValueRollups,
-  drafts,
   links,
   messages,
   purchases,
@@ -35,6 +34,11 @@ import {
   updatePostgresCanaryCampaignStatus,
 } from './postgres-store-canaries.js'
 import { recordPostgresClickRollup } from './postgres-store-click-rollups.js'
+import {
+  createPostgresDraft,
+  getPostgresDraft,
+  updatePostgresDraft,
+} from './postgres-store-drafts.js'
 import { listPostgresEvents, recordPostgresEvent } from './postgres-store-events.js'
 import {
   assertMoney,
@@ -43,7 +47,6 @@ import {
   mapContact,
   mapContactExternalId,
   mapContactValue,
-  mapDraft,
   mapLink,
   mapMessage,
   mapPurchase,
@@ -529,27 +532,19 @@ export class PostgresEmailStore implements EmailStore {
   }
 
   async createDraft(input: DraftInput): Promise<DraftRecord> {
-    const [row] = await this.db
-      .insert(drafts)
-      .values({
-        subject: input.subject,
-        bodyMarkdown: input.bodyMarkdown,
-        template: input.template ?? 'default',
-        metadata: input.metadata ?? {},
-        ...(input.name ? { name: input.name } : {}),
-        ...(input.preview ? { preview: input.preview } : {}),
-        ...(input.fromEmail ? { fromEmail: input.fromEmail } : {}),
-        ...(input.fromName ? { fromName: input.fromName } : {}),
-        ...(input.replyTo ? { replyTo: input.replyTo } : {}),
-      })
-      .returning()
-    if (!row) throw new Error('Failed to create draft')
-    return mapDraft(row)
+    return createPostgresDraft(this.db, input)
   }
 
   async getDraft(id: string): Promise<DraftRecord | undefined> {
-    const [row] = await this.db.select().from(drafts).where(eq(drafts.id, id)).limit(1)
-    return row ? mapDraft(row) : undefined
+    return getPostgresDraft(this.db, id)
+  }
+
+  async updateDraft(input: {
+    id: string
+    status?: DraftRecord['status']
+    metadata?: Record<string, unknown>
+  }): Promise<DraftRecord> {
+    return updatePostgresDraft(this.db, input)
   }
 
   async createBroadcast(input: {

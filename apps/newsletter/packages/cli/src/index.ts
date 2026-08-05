@@ -22,7 +22,9 @@ import {
   parseArgs,
 } from './args.js'
 import { parseCanarySteps } from './canary-steps.js'
+import { CliError } from './cli-error.js'
 import { runConfirmationCommand } from './confirmation-commands.js'
+import { runDraftQaCommand } from './draft-qa-commands.js'
 import { gmailAliases } from './gmail-aliases.js'
 import { usage } from './help.js'
 import { seedGmailSubscriberIntelligence } from './seed-intelligence.js'
@@ -38,15 +40,6 @@ interface CliIo {
 export interface CliRunInput extends CliIo {
   env?: NodeJS.ProcessEnv
   platform?: EmailPlatform
-}
-
-class CliError extends Error {
-  constructor(
-    message: string,
-    readonly exitCode = 2,
-  ) {
-    super(message)
-  }
 }
 
 export async function runCli(
@@ -170,6 +163,10 @@ async function dispatch(parsed: ParsedArgs, input: CliRunInput): Promise<unknown
 
     if (area === 'draft' && action === 'create') {
       return await platform.createDraft(await draftInput(parsed))
+    }
+
+    if (area === 'draft' && (action === 'qa-status' || action === 'qa-approve')) {
+      return await runDraftQaCommand(action, parsed, platform)
     }
 
     if (area === 'broadcast' && action === 'preview-plan') {
@@ -642,7 +639,9 @@ async function draftInput(parsed: ParsedArgs): Promise<DraftInput> {
             await readFile(mustString(parsed, 'metadata-file'), 'utf8'),
           ),
         }
-      : {}),
+      : getStringFlag(parsed, 'issue-slug')
+        ? { metadata: { issueSlug: mustString(parsed, 'issue-slug') } }
+        : {}),
     ...(getStringFlag(parsed, 'name') ? { name: mustString(parsed, 'name') } : {}),
     ...(getStringFlag(parsed, 'preview')
       ? { preview: mustString(parsed, 'preview') }

@@ -25,6 +25,7 @@
     "newsletter:lint:fix": "pnpm --filter email lint:fix",
     "newsletter:test": "pnpm --filter email test",
     "newsletter:typecheck": "pnpm --filter email typecheck",
+    "test:issue-qa": "node --test packages/swipe/test/issue-qa-routing.test.mjs",
     "newsletter:web:dev": "pnpm --filter @email/web dev"
   },
   "devDependencies": {

@@ -138,8 +138,15 @@ Issue commands use Markdown files under `apps/site/src/content/issues`.
 ```sh
 pnpm swipe issue preview <slug>
 pnpm swipe issue test <slug>
+pnpm swipe issue approve <slug> --yes
 pnpm swipe issue send <slug> --yes
 ```
+
+`issue test` publishes the archive first and sends an exact, tracked production-path
+test. After inspecting the received email, `issue approve` verifies every emitted
+tracking URL with browser navigation headers and real Chromium, then stores a QA
+receipt against the immutable production draft. `issue send` is blocked unless that
+exact receipt is present, current, and still matches the issue content.
 
 Check or build one app area:
 

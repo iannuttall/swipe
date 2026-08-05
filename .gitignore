@@ -26,6 +26,7 @@ wrangler.deploy.jsonc.tmp
 coverage/
 apps/newsletter/rendered/
 apps/newsletter/rendered-email/
+.swipe/
 .tmp/
 tmp/
 

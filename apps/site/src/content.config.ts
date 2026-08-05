@@ -13,6 +13,9 @@ const issues = defineCollection({
     draft: z.boolean().default(false),
     sentAt: z.coerce.date().optional(),
     broadcastId: z.string().optional(),
+    qaDraftId: z.string().optional(),
+    qaFingerprint: z.string().optional(),
+    qaApprovedAt: z.coerce.date().optional(),
   }),
 });
 

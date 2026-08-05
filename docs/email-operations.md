@@ -86,6 +86,34 @@ Expected:
 - the reply target is `ian@swipe.md`;
 - authentication results show DKIM and SPF alignment.
 
+The test recipient must already exist as a contact. Test sends now use the same
+tracked rendering and persistence path as broadcasts; the JSON result includes the
+test message, broadcast, draft fingerprint, and emitted tracking links.
+
+### Approve an issue for broadcast
+
+Use the issue wrapper for real issues:
+
+```sh
+pnpm swipe issue test <slug> --to <operator-address>
+# Inspect the delivered message in the inbox.
+pnpm swipe issue approve <slug> --yes
+pnpm swipe issue send <slug> --yes
+```
+
+This sequence is fail-closed:
+
+- the archive HTML and `.md` route are published and live before the test;
+- the test uses click tracking and the normal message sender;
+- browser-shaped HTTP requests must redirect to the stored destination;
+- real Chromium must navigate every emitted tracking URL without a 4xx response;
+- generated contents anchors and the `.md` link must use the canonical issue slug;
+- approval is tied to a SHA-256 fingerprint of the immutable production draft;
+- broadcast and canary creation reject issue drafts without a fresh matching receipt.
+
+Changing the subject, preheader, body, slug, template, sender, or reply target after
+approval invalidates the receipt and requires another test.
+
 ### Check the SNS subscription
 
 Run in AWS CloudShell:

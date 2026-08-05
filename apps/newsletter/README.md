@@ -207,6 +207,7 @@ email confirmation report --purpose swipe_invite --batch-key KEY --json
 email template list --json
 email template render --subject "Hello" --body-file draft.md --out-dir rendered --json
 email draft create --subject "Hello" --body-file draft.md --json
+email draft qa-status --draft-id <draft_id> --json
 email broadcast preview-plan --sample-limit 25 --json
 email broadcast create --draft-id <draft_id> --scheduled-at 2026-06-20T12:00:00.000Z --json
 email canary create --draft-id <draft_id> --steps 50,500,2000,all --json
@@ -222,6 +223,11 @@ email mcp serve
 
 Commands that send mail or mutate queues require explicit confirmation flags.
 Use `--json` for scripts and agents.
+
+Issue drafts carry `issueSlug` metadata. They cannot create a broadcast or canary
+until an exact tracked test has a current browser-QA receipt. Use the root
+`pnpm swipe issue test`, `issue approve`, and `issue send` flow instead of approving
+issue drafts by hand.
 
 ## Templates
 

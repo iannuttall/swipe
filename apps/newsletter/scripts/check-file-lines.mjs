@@ -9,6 +9,7 @@ const ALLOWLIST = new Map([
   ['packages/api/src/index.ts', 676],
   ['packages/cli/src/index.test.ts', 500],
   ['packages/cli/src/index.ts', 787],
+  ['packages/cli/src/fake-platform.test-helper.ts', 400],
   ['packages/core/src/db/schema.ts', 650],
   ['packages/core/src/memory-store.ts', 1000],
   ['packages/core/src/platform.test.ts', 520],
@@ -17,6 +18,7 @@ const ALLOWLIST = new Map([
   ['packages/core/src/postgres-store.ts', 1000],
   ['packages/core/src/store.ts', 450],
   ['packages/mcp/src/index.ts', 750],
+  ['packages/mcp/src/fake-platform.test-helper.ts', 400],
 ])
 
 const ignoredDirs = new Set([

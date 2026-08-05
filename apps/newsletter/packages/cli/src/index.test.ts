@@ -144,7 +144,7 @@ describe('cli', () => {
     assert.equal(platform.draftTemplate, undefined)
     assert.deepEqual(JSON.parse(output.join('')), {
       ok: true,
-      data: { id: 'draft_1' },
+      data: { id: 'draft_1', fingerprint: 'fingerprint_1' },
     })
   })
 

@@ -4,7 +4,7 @@ preheader: "Find wasted tokens, compare local models, and catch what your agent 
 title: "Let an AI agent make your first video cut"
 description: "Edit video, reclaim disk space, test agent skills, audit context, and check claims before publishing."
 pubDate: 2026-08-05
-draft: true
+draft: false
 ---
 <Header name="This week's Swipe" />
 

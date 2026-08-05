@@ -188,6 +188,11 @@ describe('renderDraft', () => {
       rendered.html,
       /href="https:\/\/swipe\.md\/issues\/item-issue#agent-grade"/,
     )
+    assert.match(rendered.html, /href="https:\/\/example\.com"[^>]*>Paid Tool<\/a>/)
+    assert.doesNotMatch(
+      rendered.html,
+      /href="https:\/\/swipe\.md\/issues\/item-issue#paid-tool"/,
+    )
     assert.doesNotMatch(rendered.html, /href="#agent-grade"/)
     assert.match(rendered.html, /id="agent-grade"/)
     assert.match(rendered.html, /AgentGrade/)

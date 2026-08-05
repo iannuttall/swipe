@@ -21,8 +21,14 @@ export function itemContents(items: IssueItem[], issueName?: string) {
         Column,
         { className: 'issue-cell', style: styles.cell },
         h(Text, { style: styles.contentsHeading }, 'In this issue'),
-        ...items.map((item) =>
-          h(
+        ...items.map((item) => {
+          const href =
+            item.sponsor && item.url
+              ? item.url
+              : issueName
+                ? issueArchiveAnchor(issueName, item.id)
+                : undefined
+          return h(
             Fragment,
             { key: item.id },
             h(
@@ -39,11 +45,11 @@ export function itemContents(items: IssueItem[], issueName?: string) {
                 h(
                   Text,
                   { style: styles.contentsLine },
-                  issueName
+                  href
                     ? h(
                         Link,
                         {
-                          href: issueArchiveAnchor(issueName, item.id),
+                          href,
                           style: styles.contentsLink,
                         },
                         item.title,
@@ -59,8 +65,8 @@ export function itemContents(items: IssueItem[], issueName?: string) {
                 ),
               ),
             ),
-          ),
-        ),
+          )
+        }),
       ),
     ),
   )

@@ -85,7 +85,7 @@ function publicLinkAttrs(url: string | undefined) {
                 </span>
                 <p class="m-0 text-base leading-6">
                   <a
-                    href={`#${item.id}`}
+                    {...publicLinkAttrs(item.sponsor && item.url ? item.url : `#${item.id}`)}
                     class="font-semibold text-primary underline decoration-dotted underline-offset-4 hover:decoration-solid"
                   >
                     {item.title}

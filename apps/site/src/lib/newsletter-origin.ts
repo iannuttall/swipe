@@ -24,11 +24,31 @@ export async function fetchNewsletterOrigin(
   if (clientIp) headers.set("x-forwarded-for", clientIp);
   headers.set("x-forwarded-proto", "https");
 
-  return fetch(url, {
-    method,
-    headers,
-    redirect: "manual",
-  });
+  const attempts = method === "GET" ? 2 : 1;
+
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      const response = await fetch(url, {
+        method,
+        headers,
+        redirect: "manual",
+      });
+
+      if (
+        attempt + 1 < attempts &&
+        [502, 503, 504].includes(response.status)
+      ) {
+        await response.body?.cancel();
+        continue;
+      }
+
+      return response;
+    } catch (error) {
+      if (attempt + 1 === attempts) throw error;
+    }
+  }
+
+  throw new Error("Newsletter origin unavailable");
 }
 
 export function originResponse(upstream: Response): Response {

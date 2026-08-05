@@ -8,11 +8,17 @@ const manifestPath = resolve(dist, "agent-routes.json");
 const headersPath = resolve(dist, "_headers");
 const llmsPath = resolve(dist, "llms.txt");
 const toolSearchPath = resolve(dist, "tools/index.json");
+const deployMarkerPath = resolve(dist, ".well-known/deploy.json");
 
 assert.ok(existsSync(manifestPath), "Missing agent-routes.json");
 assert.ok(existsSync(headersPath), "Missing generated _headers");
 assert.ok(existsSync(llmsPath), "Missing llms.txt");
 assert.ok(existsSync(toolSearchPath), "Missing tools/index.json");
+assert.ok(existsSync(deployMarkerPath), "Missing deploy marker");
+
+const deployMarker = JSON.parse(readFileSync(deployMarkerPath, "utf8"));
+assert.match(deployMarker.gitSha, /^[0-9a-f]{40}$/iu);
+assert.equal(deployMarker.deployId, deployMarker.gitSha);
 
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
 assert.equal(manifest.version, 1);

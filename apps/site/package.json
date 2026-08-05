@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "astro dev",
     "dev:cf": "wrangler dev",
-    "build": "pnpm build:sitemap && node scripts/check-issue-parity.mjs && astro build && node scripts/check-agent-artifacts.mjs",
+    "build": "node scripts/write-deploy-marker.mjs && pnpm build:sitemap && node scripts/check-issue-parity.mjs && astro build && node scripts/check-agent-artifacts.mjs",
     "build:sitemap": "node scripts/build-sitemap.mjs",
     "check": "astro check && node ../../packages/swipe/test/issue-qa-routing.test.mjs",
     "deploy": "pnpm build && wrangler deploy",

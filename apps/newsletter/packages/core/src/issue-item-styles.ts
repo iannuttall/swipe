@@ -23,6 +23,11 @@ export const itemBodyStyles = {
     fontSize: '14px',
     lineHeight: '21px',
   },
+  codeInline: {
+    ...defaultEmailMarkdownStyles.codeInline,
+    fontSize: '15px',
+    lineHeight: '21px',
+  },
 } satisfies Record<string, CSSProperties>
 
 export const itemActionStyles = {
@@ -38,6 +43,10 @@ export const itemActionStyles = {
     ...itemBodyStyles.li,
     fontFamily,
     fontSize: '16px',
+    lineHeight: '24px',
+  },
+  codeInline: {
+    ...itemBodyStyles.codeInline,
     lineHeight: '24px',
   },
   bold: {

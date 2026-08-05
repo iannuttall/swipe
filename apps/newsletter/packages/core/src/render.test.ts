@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { itemStyles } from './issue-item-styles.js'
+import { itemActionStyles, itemBodyStyles, itemStyles } from './issue-item-styles.js'
 import { listEmailTemplates, renderDraft, renderDraftEmail } from './render.js'
 
 describe('renderDraft', () => {
@@ -232,6 +232,8 @@ describe('renderDraft', () => {
     assert.equal(itemStyles.summary.color, '#14171E')
     assert.equal(itemStyles.summary.fontSize, '14px')
     assert.equal(itemStyles.summary.lineHeight, '21px')
+    assert.equal(itemBodyStyles.codeInline.fontSize, '15px')
+    assert.equal(itemActionStyles.codeInline.fontSize, '15px')
   })
 
   it('lists available templates', () => {

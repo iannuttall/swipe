@@ -95,14 +95,20 @@ test message, broadcast, draft fingerprint, and emitted tracking links.
 Use the issue wrapper for real issues:
 
 ```sh
+pnpm swipe issue check <slug>
 pnpm swipe issue test <slug> --to <operator-address>
 # Inspect the delivered message in the inbox.
 pnpm swipe issue approve <slug> --yes
+pnpm swipe issue send <slug>
+# If the final checks pass, explicitly confirm the broadcast:
 pnpm swipe issue send <slug> --yes
 ```
 
 This sequence is fail-closed:
 
+- `issue check` renders the real template and runs SpamAssassin in a local Docker container;
+- the checker blocks clipped HTML, missing unsubscribe support, unresolved values,
+  unsafe markup, insecure links, and a failing SpamAssassin score;
 - the archive HTML and `.md` route are published and live before the test;
 - the test uses click tracking and the normal message sender;
 - browser-shaped HTTP requests must redirect to the stored destination;
@@ -113,6 +119,14 @@ This sequence is fail-closed:
 
 Changing the subject, preheader, body, slug, template, sender, or reply target after
 approval invalidates the receipt and requires another test.
+
+The first SpamAssassin run builds a small local image. It does not send email.
+`issue send` reruns the same gate and, without `--yes`, stops after showing the
+result. To include an existing Mail-Tester JSON result in the gate, use:
+
+```sh
+pnpm swipe issue check <slug> --mail-tester-report <report.json>
+```
 
 ### Check the SNS subscription
 

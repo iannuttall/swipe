@@ -1,16 +1,27 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
-import { type DraftInput, listEmailTemplates, renderDraftEmail } from '@email/core'
+import {
+  type DraftInput,
+  listEmailTemplates,
+  preparePreflightEmail,
+  renderDraftEmail,
+  runPreSendChecks,
+  summarizeMailTesterReport,
+} from '@email/core'
 import { getStringFlag, type ParsedArgs } from './args.js'
+import { runSpamAssassin } from './spamassassin.js'
 
 export async function runTemplateCommand(
   parsed: ParsedArgs,
+  env: NodeJS.ProcessEnv = process.env,
 ): Promise<object | undefined> {
   const [area, action] = parsed.positionals
   if (area === 'template' && action === 'list') {
     return { templates: listEmailTemplates() }
   }
 
-  if (area !== 'template' || action !== 'render') return undefined
+  if (area !== 'template' || (action !== 'render' && action !== 'preflight')) {
+    return undefined
+  }
 
   const draft = await draftInput(parsed)
   const status = getStringFlag(parsed, 'status')
@@ -18,6 +29,35 @@ export async function runTemplateCommand(
     throw new Error('Invalid --status; expected new, warm, or cold')
   }
   const rendered = await renderDraftEmail(draft, status ? { status } : {})
+  if (action === 'preflight') {
+    const fromEmail = getStringFlag(parsed, 'from-email') ?? env.EMAIL_FROM_EMAIL
+    if (!fromEmail) throw new Error('Missing --from-email or EMAIL_FROM_EMAIL')
+    const baseUrl = getStringFlag(parsed, 'base-url') ?? env.BASE_URL
+    if (!baseUrl) throw new Error('Missing --base-url or BASE_URL')
+    const fromName = getStringFlag(parsed, 'from-name') ?? env.EMAIL_FROM_NAME
+    const prepared = preparePreflightEmail({
+      rendered,
+      fromEmail,
+      ...(fromName ? { fromName } : {}),
+      baseUrl,
+    })
+    const spamAssassin = runSpamAssassin({
+      mime: prepared.mime,
+      command:
+        getStringFlag(parsed, 'spamassassin-command') ??
+        env.EMAIL_SPAMASSASSIN_COMMAND ??
+        'spamassassin',
+    })
+    const mailTesterPath = getStringFlag(parsed, 'mail-tester-report')
+    const mailTester = mailTesterPath
+      ? summarizeMailTesterReport(JSON.parse(await readFile(mailTesterPath, 'utf8')))
+      : undefined
+    return runPreSendChecks({
+      prepared,
+      spamAssassin,
+      ...(mailTester ? { mailTester } : {}),
+    })
+  }
   const outDir = getStringFlag(parsed, 'out-dir')
   if (outDir) {
     await writeRenderedEmail(outDir, rendered)

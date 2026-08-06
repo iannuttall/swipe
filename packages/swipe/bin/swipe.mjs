@@ -48,6 +48,8 @@ Newsletter:
 
 Issues (apps/site/src/content/issues -> Swipe newsletter):
   pnpm swipe issue preview [slug] [--status cold]  render the email HTML locally
+  pnpm swipe issue check [slug] [--mail-tester-report PATH]
+                                               run the local deliverability gate
   pnpm swipe issue test [slug] [--to email] [--status cold]
                                                publish + tracked test send to you only
   pnpm swipe issue approve [slug] --yes      browser-QA the exact tracked test
@@ -611,6 +613,95 @@ async function runIssueBrowserQa(slug, state) {
   return { checkedAt: new Date().toISOString(), checkedLinks: state.trackingLinks.length };
 }
 
+function runIssuePreflight(issue, slug, argv) {
+  const status = getOption(argv, "--status", "cold");
+  if (!["new", "warm", "cold"].includes(status)) {
+    fail("issue check --status must be new, warm, or cold.");
+  }
+  const dir = mkdtempSync(join(tmpdir(), "swipe-preflight-"));
+  const bodyFile = join(dir, `${slug}.md`);
+  writeFileSync(bodyFile, issue.body);
+  buildNewsletterCliIfMissing();
+  const mailTesterReport = getOption(argv, "--mail-tester-report");
+  const spamAssassinCommand =
+    getOption(argv, "--spamassassin-command") ??
+    resolve(newsletterDir, "scripts/run-spamassassin.sh");
+  const localFromEmail = localEnv("EMAIL_FROM_EMAIL");
+  const localFromName = localEnv("EMAIL_FROM_NAME");
+  const senderArgs = localFromEmail
+    ? [
+        "--from-email",
+        localFromEmail,
+        ...(localFromName ? ["--from-name", localFromName] : []),
+      ]
+    : existsSync(newsletterEnv)
+      ? []
+      : ["--from-email", "ian@swipe.md", "--from-name", "Ian at Swipe"];
+  const commandArgs = [
+    ...newsletterNodeArgs(),
+    newsletterCli,
+    "template",
+    "preflight",
+    "--subject",
+    issue.frontmatter.subject,
+    ...(issue.frontmatter.preheader
+      ? ["--preview", issue.frontmatter.preheader]
+      : []),
+    "--name",
+    slug,
+    "--body-file",
+    bodyFile,
+    "--status",
+    status,
+    "--base-url",
+    "https://swipe.md",
+    ...senderArgs,
+    "--spamassassin-command",
+    spamAssassinCommand,
+    ...(mailTesterReport
+      ? ["--mail-tester-report", resolve(root, mailTesterReport)]
+      : []),
+    "--json",
+  ];
+  const result = spawnSync("node", commandArgs, {
+    cwd: root,
+    env: {
+      ...process.env,
+      SWIPE_EMAIL_ASSET_BASE_URL: "https://swipe.md",
+    },
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  if (result.error) fail(`Pre-send checker could not start: ${result.error.message}`);
+  const output = result.stdout ?? "";
+  if (result.status !== 0) {
+    let error;
+    try {
+      error = JSON.parse(output).error;
+    } catch {
+      error = undefined;
+    }
+    fail(`Pre-send checker could not run: ${error ?? result.stderr?.trim() ?? "unknown error"}`);
+  }
+  const parsed = parseJsonOutput(output, "issue pre-send check");
+  const report = parsed.data ?? parsed;
+  if (!report.counts || !Array.isArray(report.checks)) {
+    fail(`Pre-send checker returned an invalid report:\n${output}`);
+  }
+
+  const spam = report.spamAssassin
+    ? ` · SpamAssassin ${report.spamAssassin.score.toFixed(1)}/${report.spamAssassin.requiredScore.toFixed(1)}`
+    : "";
+  console.log(
+    `Pre-send: ${report.ready ? "PASS" : "FAIL"} · ${report.counts.pass} passed · ${report.counts.warn} warnings · ${report.counts.fail} failed${spam}`,
+  );
+  for (const check of report.checks.filter((item) => item.status !== "pass")) {
+    console.log(`  ${check.status.toUpperCase()}: ${check.title} — ${check.detail}`);
+  }
+  if (!report.ready) fail("Pre-send checks failed. Nothing was sent.");
+  return report;
+}
+
 async function issue(argv) {
   const [command, ...restArgs] = argv;
 
@@ -668,6 +759,12 @@ async function issue(argv) {
         },
       },
     );
+    return;
+  }
+
+  if (command === "check") {
+    runIssuePreflight(parsed, slug, rest);
+    console.log("Nothing was sent.");
     return;
   }
 
@@ -746,9 +843,6 @@ async function issue(argv) {
 
   if (command === "send") {
     assertTrackingRoutingConfigured();
-    if (!rest.includes("--yes")) {
-      fail("issue send creates a real broadcast to the list. Re-run with --yes.");
-    }
     if (parsed.frontmatter.broadcastId) {
       fail(`${slug} already has broadcastId ${parsed.frontmatter.broadcastId}; refusing to double-send.`);
     }
@@ -757,6 +851,11 @@ async function issue(argv) {
     }
     if (issueFingerprint(parsed, slug) !== parsed.frontmatter.qaFingerprint) {
       fail(`${slug} changed after approval. Run a new tracked test and browser QA.`);
+    }
+    runIssuePreflight(parsed, slug, rest);
+    if (!rest.includes("--yes")) {
+      console.log(`Nothing was sent. Re-run pnpm swipe issue send ${slug} --yes to broadcast.`);
+      return;
     }
     const ssh = sshEnv();
     const composeSuffix = " run --rm -T ops node dist/index.js";

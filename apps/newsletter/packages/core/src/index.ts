@@ -20,9 +20,11 @@ export {
   parseLinkItem,
 } from './issue-parser.js'
 export * from './link-metadata.js'
+export * from './mail-tester-report.js'
 export * from './platform.js'
 export * from './platform-contracts.js'
 export * from './postgres-store.js'
+export * from './pre-send-checks.js'
 export * from './production-ops.js'
 export * from './providers.js'
 export { DefaultEmail } from './react-email-templates.js'

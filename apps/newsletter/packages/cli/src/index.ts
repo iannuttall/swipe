@@ -107,7 +107,7 @@ async function dispatch(parsed: ParsedArgs, input: CliRunInput): Promise<unknown
     })
   }
 
-  const templateResult = await runTemplateCommand(parsed)
+  const templateResult = await runTemplateCommand(parsed, input.env ?? process.env)
   if (templateResult) return templateResult
 
   const runtime = input.platform

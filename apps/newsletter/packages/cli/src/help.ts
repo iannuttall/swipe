@@ -40,6 +40,7 @@ Commands:
   Templates:
   email template list [--json]
   email template render --subject SUBJECT (--body TEXT | --body-file PATH) [--template default] [--preview TEXT] [--status new|warm|cold] [--out-dir PATH] [--json]
+  email template preflight --subject SUBJECT (--body TEXT | --body-file PATH) --from-email EMAIL --base-url URL [--from-name NAME] [--status new|warm|cold] [--spamassassin-command PATH] [--mail-tester-report PATH] [--json]
 
   Drafts and broadcasts:
   email draft create --subject SUBJECT (--body TEXT | --body-file PATH) [--template NAME] [--preview TEXT] [--issue-slug SLUG] [--metadata-file PATH] [--json]

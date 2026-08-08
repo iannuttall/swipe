@@ -13,6 +13,7 @@ import { runSpamAssassin } from './spamassassin.js'
 export async function runTemplateCommand(
   parsed: ParsedArgs,
   env: NodeJS.ProcessEnv = process.env,
+  fetchUrl?: typeof fetch,
 ): Promise<object | undefined> {
   const [area, action] = parsed.positionals
   if (area === 'template' && action === 'list') {
@@ -52,10 +53,11 @@ export async function runTemplateCommand(
     const mailTester = mailTesterPath
       ? summarizeMailTesterReport(JSON.parse(await readFile(mailTesterPath, 'utf8')))
       : undefined
-    return runPreSendChecks({
+    return await runPreSendChecks({
       prepared,
       spamAssassin,
       ...(mailTester ? { mailTester } : {}),
+      ...(fetchUrl ? { fetchUrl } : {}),
     })
   }
   const outDir = getStringFlag(parsed, 'out-dir')

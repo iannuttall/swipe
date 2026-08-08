@@ -20,7 +20,7 @@ Content analysis details:   (1.4 points, 5.0 required)
 `
 
 describe('pre-send checks', () => {
-  it('materializes unsubscribe links and accepts a healthy message', () => {
+  it('materializes unsubscribe links and accepts a healthy message', async () => {
     const prepared = preparePreflightEmail({
       rendered: {
         subject: 'Useful tools',
@@ -33,7 +33,11 @@ describe('pre-send checks', () => {
     })
     const spamAssassin = parseSpamAssassinOutput(spamAssassinOutput)
     assert.ok(spamAssassin)
-    const report = runPreSendChecks({ prepared, spamAssassin })
+    const report = await runPreSendChecks({
+      prepared,
+      spamAssassin,
+      fetchUrl: healthyFetch,
+    })
     assert.equal(report.ready, true)
     assert.equal(
       report.checks.find((check) => check.id === 'spamassassin')?.status,
@@ -42,7 +46,7 @@ describe('pre-send checks', () => {
     assert.doesNotMatch(prepared.mime, /{{unsubscribeUrl}}/)
   })
 
-  it('blocks clipped HTML, unsafe content, HTTP links, and spam', () => {
+  it('blocks clipped HTML, unsafe content, HTTP links, and spam', async () => {
     const prepared = preparePreflightEmail({
       rendered: {
         subject: 'Bad message',
@@ -52,9 +56,10 @@ describe('pre-send checks', () => {
       fromEmail: 'ian@swipe.md',
       baseUrl: 'https://swipe.md',
     })
-    const report = runPreSendChecks({
+    const report = await runPreSendChecks({
       prepared,
       spamAssassin: { score: 6.2, requiredScore: 5, isSpam: true, rules: [] },
+      fetchUrl: healthyFetch,
     })
     assert.equal(report.ready, false)
     assert.deepEqual(
@@ -63,6 +68,42 @@ describe('pre-send checks', () => {
         .map((check) => check.id)
         .sort(),
       ['html_size', 'secure_links', 'spamassassin', 'unsafe_html', 'unsubscribe_body'],
+    )
+  })
+
+  it('blocks broken links and non-image image sources', async () => {
+    const prepared = preparePreflightEmail({
+      rendered: {
+        subject: 'Broken URLs',
+        html: '<a href="https://example.com/missing">Missing</a><img src="https://example.com/image" alt="Example"><a href="{{unsubscribeUrl}}">Unsubscribe</a>',
+        text: 'Unsubscribe: {{unsubscribeUrl}}',
+      },
+      fromEmail: 'ian@swipe.md',
+      baseUrl: 'https://swipe.md',
+    })
+    const report = await runPreSendChecks({
+      prepared,
+      spamAssassin: { score: 0, requiredScore: 5, isSpam: false, rules: [] },
+      fetchUrl: async (url) => {
+        const value = url.toString()
+        if (value.includes('/missing')) return new Response('', { status: 404 })
+        if (value.includes('/image')) {
+          return new Response('not an image', {
+            status: 200,
+            headers: { 'content-type': 'text/html' },
+          })
+        }
+        return healthyFetch(url)
+      },
+    })
+    assert.equal(report.ready, false)
+    assert.equal(
+      report.checks.find((check) => check.id === 'link_destinations')?.status,
+      'fail',
+    )
+    assert.equal(
+      report.checks.find((check) => check.id === 'image_sources')?.status,
+      'fail',
     )
   })
 
@@ -87,3 +128,6 @@ describe('pre-send checks', () => {
     )
   })
 })
+
+const healthyFetch: typeof fetch = async () =>
+  new Response('', { status: 200, headers: { 'content-type': 'image/png' } })

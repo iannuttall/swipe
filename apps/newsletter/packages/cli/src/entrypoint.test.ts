@@ -24,6 +24,15 @@ it('runs a complete local template preflight without creating platform state', a
     ],
     {
       env: { ...process.env, NODE_ENV: 'test' },
+      fetchUrl: async (url) =>
+        new Response('', {
+          status: 200,
+          headers: {
+            'content-type': url.toString().includes('/email/')
+              ? 'image/png'
+              : 'text/html',
+          },
+        }),
       stdout: (text) => {
         output += text
       },

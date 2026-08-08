@@ -1,4 +1,5 @@
 import crypto from 'node:crypto'
+import { runRemoteUrlChecks } from './remote-url-checks.js'
 import type { RenderedEmail } from './types.js'
 
 export type PreSendCheckStatus = 'pass' | 'warn' | 'fail'
@@ -75,11 +76,12 @@ export function preparePreflightEmail(input: {
   }
 }
 
-export function runPreSendChecks(input: {
+export async function runPreSendChecks(input: {
   prepared: PreparedPreflightEmail
   spamAssassin?: SpamAssassinResult
   mailTester?: MailTesterSummary
-}): PreSendReport {
+  fetchUrl?: typeof fetch
+}): Promise<PreSendReport> {
   const { rendered, mime, unsubscribeUrl } = input.prepared
   const htmlBytes = Buffer.byteLength(rendered.html)
   const textBytes = Buffer.byteLength(rendered.text)
@@ -161,6 +163,7 @@ export function runPreSendChecks(input: {
           : `${images.length} images have alt attributes.`,
     },
     spamAssassinCheck(input.spamAssassin),
+    ...(await runRemoteUrlChecks(rendered.html, input.fetchUrl)),
   ]
   if (input.mailTester) checks.push(...input.mailTester.checks)
 

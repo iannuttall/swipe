@@ -108,7 +108,8 @@ This sequence is fail-closed:
 
 - `issue check` renders the real template and runs SpamAssassin in a local Docker container;
 - the checker blocks clipped HTML, missing unsubscribe support, unresolved values,
-  unsafe markup, insecure links, and a failing SpamAssassin score;
+  unsafe markup, insecure or broken links, failed image sources, and a failing
+  SpamAssassin score;
 - the archive HTML and `.md` route are published and live before the test;
 - the test uses click tracking and the normal message sender;
 - browser-shaped HTTP requests must redirect to the stored destination;

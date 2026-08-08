@@ -40,6 +40,7 @@ interface CliIo {
 export interface CliRunInput extends CliIo {
   env?: NodeJS.ProcessEnv
   platform?: EmailPlatform
+  fetchUrl?: typeof fetch
 }
 
 export async function runCli(
@@ -107,7 +108,11 @@ async function dispatch(parsed: ParsedArgs, input: CliRunInput): Promise<unknown
     })
   }
 
-  const templateResult = await runTemplateCommand(parsed, input.env ?? process.env)
+  const templateResult = await runTemplateCommand(
+    parsed,
+    input.env ?? process.env,
+    input.fetchUrl,
+  )
   if (templateResult) return templateResult
 
   const runtime = input.platform
